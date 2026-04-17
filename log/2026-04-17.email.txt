@@ -1,47 +1,47 @@
-Agent Pattern Scan — 2026-04-17 — 5 patterns | Voice-booking port from trades to dental/vet/medical
+Agent Pattern Scan — 2026-04-17 — 5 patterns | Voice booking copied from trades into dental and vet clinics
 
 Ryan, Henry —
 
-Daily agent pattern scan for 2026-04-17. Repo copy: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-bfUgi/log/2026-04-17.md
+Full writeup: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-bfUgi/log/2026-04-17.md
 
-TL;DR: Highest-leverage port today is Avoca's inbound-voice-booking pattern (proven in HVAC/plumbing at 400+ bookings a week) copied into independent dental, veterinary, and small medical practices. Near-identical operational surface — phone-heavy, calendar-constrained, expensive front desk — with near-zero agent penetration and roughly 200k practices in the US. Same mechanism, different PMS.
+The pattern worth acting on this week is the one Avoca has been quietly running for HVAC shops. Their voice agent is booking 400 calls a week at one operator — answering inbound and after-hours calls, asking qualifying questions, checking the tech calendar, honoring service-area and pricing rules, booking the slot, and confirming by SMS. The mechanism is already proven and the operationally identical sectors next door have almost none of it. A dental, vet, or small medical practice is the same shape of business: phone-heavy, calendar-constrained, expensive front desk. Roughly 200,000 practices in the US. That's the highest-leverage copy available in agent-land right now.
 
-1. Reaction-as-trigger task handoff (source: software | ports: healthcare, professional-services)
-Source: How I AI with Steve Kaliski, 2026-03-25. https://www.lennysnewsletter.com/p/how-stripe-built-minionsai-coding
-Mechanism: a Slack emoji reaction on a message is the trigger. Agent spins up a dev env, reads the thread for context, opens a PR. No form, no ticket, no branch-cutting. Stripe ships ~1,300 PRs/week this way.
-Why not a dashboard: the trigger is an ambient human signal inside the tool you're already using.
-Port to healthcare: a Gmail or portal label ("draft-reply," "refill-review") on a patient thread. Agent reads the thread, the chart note in Dentrix/Jane/Kareo, and the last message sent. Drafts a reply in the provider's voice. Replaces 90 min/day of front-desk triage. $200–400/mo. Pitch: label the message, get a chart-aware draft.
-Port to professional-services: a label on a client email at a small CPA firm. Agent reads the thread and pulls prior-year return from Karbon or Canopy. Drafts a reply citing the specific notice or line item. $150/mo at a two-partner firm. Pitch: every client email becomes a labeled work order, grounded in their file.
+Below, in rough order of how excited I am about each one.
 
-2. KPI narrative agent — anti-dashboard Monday report (source: software | ports: hospitality, fitness)
-Source: LogRocket and Cotera. https://blog.logrocket.com/product-management/ai-powered-slack-workflows-for-product-managers and https://cotera.co/articles/slack-workflow-builder-advanced-guide
-Mechanism: scheduled trigger reads a KPI sheet and the prior week's post, computes deltas, writes a summary with causal framing, posts to Slack.
-Why not a dashboard: it names the driver and compares against its own prior post. Synthesis, not a chart.
-Port to hospitality: Monday 7 AM cron reads Toast or Square POS plus 7shifts labor. Owner gets one text per location — "labor 34% vs 28% target, bar overstaffed Fri/Sat; Tuesday covers down four weeks running." $40–60/mo. Replaces the Monday recap nobody reads.
-Port to fitness: Monday 6 AM cron reads Mindbody or Mariana Tek. Owner gets one text — "class fill flat at 62%, noon classes dropped fifth week, Jenna's 7 AM up 80." $30/mo. Replaces an hour of logging into Mindbody.
+1. The Slack reaction is the work order (dental and vet clinics, small medical practices, accountants)
 
-3. Standup collector with follow-up enforcement (source: software | ports: trades, healthcare)
-Source: Cotera. https://cotera.co/articles/slack-workflow-builder-advanced-guide
-Mechanism: agent prompts each person on a schedule, tracks replies, DMs non-responders at +45 min, counts skips across the week, escalates to the manager on the third skip with the specific pattern. Stateful.
-Why not a dashboard: it remembers and takes different actions based on the count.
-Port to trades: Friday 4 PM, agent SMSes each tech with his week's completed jobs pre-filled from ServiceTitan or Housecall Pro. Reply captures notes per job. Auto-files into the job record so photos and notes are one tap from the invoice. Nudges Saturday morning, pings ops manager Sunday night on the laggards. $80/mo. Replaces ops-manager nagging on a Sunday.
-Port to in-home healthcare: end-of-shift SMS to each visiting nurse with her day's visits pre-filled. Reply captures visit notes per patient, files into WellSky or MatrixCare. Compliance up, retention up because charting finishes before she gets to the car. $100/mo.
+At Stripe, an engineer reacts to a Slack message with a specific emoji and an agent picks it up — reads the thread, spins up a dev environment, makes the code change, opens a PR that links back. One click, in the tool they already use. Stripe ships around 1,300 PRs a week this way. Steve Kaliski walked through it on How I AI on March 25. https://www.lennysnewsletter.com/p/how-stripe-built-minionsai-coding
 
-4. Inbound voice booking (source: trades | ports: healthcare, hospitality)
-Source: Owned and Operated #173 (Avoca). https://www.ownedandoperated.com/post/owned-and-operated-173-we-booked-400-calls-a-week-how-avoca-ai-is-shaping-home-services
-Mechanism: SIP forward on ring-no-answer and after-hours to a voice agent. Agent reads caller history, provider calendar, and guardrails. Qualifies, books, confirms by SMS, writes the job to the CRM, declines when rules require.
-Why not a dashboard: multi-turn live conversation that queries systems and decides.
-Port to healthcare: SIP forward at a dental, vet, or small medical practice. Agent reads patient history in Dentrix, Eaglesoft, ezyVet, or Kareo, provider calendar, and insurance rules. Books cleanings and re-exams, routes emergencies to on-call, files refill requests as tasks. Writes back to the PMS. $300–700/mo. Replaces the front-desk person covering evenings. Pitch: you already pay for new-patient acquisition; stop losing the 38% who call after 5.
-Port to hospitality: SIP forward at an independent restaurant. Agent reads Resy or OpenTable availability and house rules, books the table, offers alternates when full. $200–500/mo. Replaces 15 reservations a week lost to an unanswered landline.
+The interesting part is not the code. It's the trigger. Every knowledge-work SMB has the same shape of problem — email comes in, sits for two days, the person who owned it has to reconstruct context before they can act. Drop this into a dental or vet office and the trigger is a Gmail label on a patient thread. The agent reads the thread, pulls the chart note from Dentrix or ezyVet, drafts a reply in the provider's voice as a Gmail draft, and pings the medical assistant. Stack is Gmail plus an Apps Script label watcher plus Claude plus a shim over the practice management software. Around $200–400 a month. Replaces about 90 minutes a day of front-desk triage. The pitch: label the message, get back a chart-aware draft; the provider signs or edits. Same shape works at a two-partner CPA firm — label a client email, get a draft grounded in the prior-year return from Karbon or Canopy.
 
-5. Supply-chain ping agent (source: cpg-enterprise | ports: hospitality, construction)
-Source: Crisp. https://www.businesswire.com/news/home/20260211212237/en/Crisp-Launches-AI-Agents-to-Drive-Shareholder-Value-for-CPG-Brands-and-Retailers
-Mechanism: agent watches distributor/retailer feeds, detects low inventory or velocity spikes, drafts a replenishment rec, contacts the buyer directly. The outreach is the work.
-Port to hospitality — flip the direction since an independent restaurant has no distributor telemetry: daily cron plus Gmail or SMS watcher on Sysco, US Foods, and specialty-supplier threads. Reads Toast velocity on spoilables and the on-hand sheet. If forecast exceeds on-hand or a supplier email says "pushed" or "OOS," drafts a text to the owner with the SKU, the gap, and the move — call supplier B, sub this cut, 86 the special. $40/mo. Replaces the Sunday inventory spiral and the Wednesday 86-list scramble.
-Port to construction: Gmail watcher on lumber yard and supply-house threads. Reads Buildertrend or Procore project schedules and PO statuses. When a delivery slides past the scheduled install, drafts a message to the PM with project, affected trade, and crew to reschedule. $80/mo. Replaces the PM finding out the framing package is three days late when the framers show up.
+2. A Monday-morning text that does the work of a Monday-morning report (restaurants, gyms)
 
-Notes on source mix: X/Twitter wasn't searchable this run. Signal came from two podcasts and two practitioner blogs. If the next two runs lean the same, the source list needs changing.
+The pattern comes from product teams tired of dashboards. An agent runs on a schedule, reads a KPI sheet plus its own previous post, and publishes a short summary to Slack with causal framing: not "support volume up 23 percent" but "support volume up 23 percent, highest week-over-week since January, concentrated in Salesforce connector issues." LogRocket has the writeup and Cotera has the exact workflow.
 
-Framing note: today's patterns are carried over from the pre-rewrite scan and reframed against the new cross-sector thesis. Tomorrow's run searches sector-agnostic from the start.
+At an independent restaurant, a Monday 7 AM cron pulls Toast or Square POS plus 7shifts labor data. The owner gets one text per location: "labor ran 34 percent versus 28 percent target, driven by Friday and Saturday bar overstaffing, Tuesday covers down 18 percent for the fourth week in a row." Stack is the POS API or a CSV drop plus Claude plus Make or n8n plus Twilio, about $40–60 a month. Replaces the Monday-morning recap the GM writes that nobody reads. Pitch: you already own the POS; the conclusions show up on your phone before you unlock the door. For a pilates or yoga studio, swap in Mindbody and Mariana Tek — the owner gets a Monday 6 AM text about class fill, signups, and which instructor's classes are growing. Around $30 a month.
+
+3. The standup that chases itself (trades, home health)
+
+A Slack agent that does what a Google Form can't: prompts each person on a schedule, tracks who replied, DMs non-responders after 45 minutes, counts skips across the week, and on the third skip pings the manager with the specific pattern. It remembers. Cotera has the full writeup. https://cotera.co/articles/slack-workflow-builder-advanced-guide
+
+At a 10-tech HVAC shop, it's a Friday 4 PM SMS. Each tech gets their week's completed jobs pre-filled from ServiceTitan or Housecall Pro. They reply with notes per job, the agent auto-files into the job record, invoices go out with real notes. Around $80 a month. Replaces the owner texting techs on Sunday night. At a home-health agency, it's an end-of-shift SMS to each visiting nurse with her visit list pre-filled. The agent files notes into WellSky or MatrixCare before she gets to her car. Around $100 a month. Compliance goes up. Retention goes up, because the nurse isn't doing an hour of charting at her kitchen table.
+
+4. A voice agent that answers the phone and books the job (dental and vet clinics, small medical practices, independent restaurants)
+
+Covered in the TL;DR. Source is Owned and Operated #173 with Avoca. https://www.ownedandoperated.com/post/owned-and-operated-173-we-booked-400-calls-a-week-how-avoca-ai-is-shaping-home-services
+
+Healthcare version: SIP forward on ring-no-answer and after-hours at a dental, vet, or small medical practice. Agent reads patient history in Dentrix, Eaglesoft, ezyVet, or Kareo, provider calendar, and rules about insurance and emergencies. Books cleanings and re-exams, routes emergencies to on-call, files refill requests as tasks for the MA. Writes back to the PMS. Vapi or Retell for voice plus Claude plus the PMS API. Around $300–700 a month. Replaces the front-desk person covering evenings plus the afternoon lull you can't staff. Pitch: you already pay for new-patient acquisition; you're losing the 38 percent who call after five.
+
+Restaurant version: the same agent reads Resy or OpenTable availability, books the table, offers alternates when full. $200–500 a month. Replaces the fifteen reservations a week that walk because the host is on the floor.
+
+5. A pager that notices supply problems before you do (restaurants, small construction)
+
+Crisp announced a CPG supply agent in February that watches distributor feeds, detects low-inventory or velocity spikes, drafts a replenishment recommendation, and emails the retail buyer directly. The interesting part is that it reaches out — enterprise tooling surfaces the same alerts and waits for someone to act.
+
+SMB restaurants have no distributor telemetry, so the direction flips. A daily cron plus a Gmail or SMS watcher on Sysco, US Foods, and specialty supplier threads. Reads Toast velocity on spoilables and the on-hand sheet. When forecast exceeds on-hand for short-shelf-life items, or when a supplier email contains "pushed" or "out of stock," the agent texts the owner or chef with the SKU, the gap, and the actual move: call supplier B, sub this cut, 86 the special tonight. Around $40 a month. Replaces the Sunday inventory spiral and the Wednesday 86-list scramble. At a small general contractor, the same agent watches lumber yard threads and cross-references the project schedule in Buildertrend or Procore. When a delivery slides past the install date, the PM gets a message with the project, the trade, and the crew to reschedule. Around $80 a month.
+
+Sources note: X/Twitter wasn't searchable this run. Signal came from two podcasts and two practitioner blogs. If the next few runs lean the same, we fix the source list.
+
+Framing note: today's patterns are the same five from the earlier pass, rewritten against the new cross-sector thesis and the newsletter voice. Tomorrow's run starts fresh.
 
 — Claude
