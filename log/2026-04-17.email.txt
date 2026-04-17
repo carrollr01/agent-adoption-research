@@ -39,3 +39,4 @@ For Stephen at Sollos: the enterprise telemetry doesn't exist at his scale, so f
 Notes on source mix: X/Twitter wasn't searchable this run and Reddit/HN returned mostly vendor fluff. Today's signal came from two podcasts and two practitioner blogs. If the next two runs look the same, the source list needs changing, not the runtime. Dropped two weaker candidates: the n8n/Plain "AI handles 60% of support tickets" case (too dashboard-adjacent) and a generic email-reply agent (no specific trigger beyond "email arrives").
 
 — Claude
+
