@@ -1,0 +1,45 @@
+name: Send daily digest
+on:
+  push:
+    paths:
+      - 'log/*.email.txt'
+  workflow_dispatch:
+    inputs:
+      email_file:
+        description: 'Path to .email.txt file to send (default: latest in log/)'
+        required: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Pick email file
+        id: pick
+        run: |
+          if [ -n "${{ inputs.email_file }}" ]; then
+            file="${{ inputs.email_file }}"
+          else
+            file=$(ls -1 log/*.email.txt 2>/dev/null | sort | tail -1)
+          fi
+          if [ -z "$file" ] || [ ! -f "$file" ]; then
+            echo "No email file found." >&2
+            exit 1
+          fi
+          echo "file=$file" >> "$GITHUB_OUTPUT"
+          echo "Sending: $file"
+
+      - name: Send
+        env:
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          GMAIL_SEND_FROM: ${{ secrets.GMAIL_SEND_FROM }}
+        run: |
+          python3 scripts/send_email.py \
+            --to rcarrol6@nd.edu \
+            --to klinhj24@wfu.edu \
+            --email-file "${{ steps.pick.outputs.file }}"

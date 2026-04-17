@@ -1,0 +1,41 @@
+Agent Pattern Scan — 2026-04-17 — 5 patterns | Emoji-triggered parent-update agent for Jenn
+
+Ryan, Henry —
+
+Daily agent pattern scan for 2026-04-17. Five patterns today. Repo copy: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-bfUgi/log/2026-04-17.md
+
+TL;DR: Stripe's "minions" ship 1,300 PRs/week triggered by a Slack emoji reaction. The trigger, not the agent, is the interesting part. A Gmail label as a one-click work order is the shortest path to Jenn's parent-update problem without building her a portal.
+
+1. Reaction-as-trigger task handoff (tag: jenn)
+Source: How I AI with Steve Kaliski, 2026-03-25. https://www.lennysnewsletter.com/p/how-stripe-built-minionsai-coding
+Mechanism: Slack emoji reaction on a message is the trigger. Agent spins up a dev env, reads thread context, opens a PR. No form, no ticket.
+Why not a dashboard: the trigger is an ambient human signal inside the tool they're already using.
+For Jenn: Gmail label "needs-update" on a student thread. Agent reads the thread, her CPP/CounselMore record, and the last parent update sent. Drafts the next update in her voice as a Gmail draft and pings her "draft ready for Emma Chen." Stack: Gmail API, Claude API, Apps Script label watcher, thin MCP over her CRM export. Replaces ~15 hrs/mo of her Sunday writing at 20 clients. Pitch: "Label the email. Get back a draft. No portal."
+
+2. KPI narrative agent (tag: caped)
+Source: LogRocket/Cotera. https://blog.logrocket.com/product-management/ai-powered-slack-workflows-for-product-managers and https://cotera.co/articles/slack-workflow-builder-advanced-guide
+Mechanism: Friday 4 PM cron reads a KPI sheet and the prior week's post, computes WoW deltas, writes a summary with causal framing ("volume up 23%, concentrated in Salesforce connector issues"), posts to Slack.
+Why not a dashboard: it names the driver and compares against its own prior post. Synthesis, not a chart.
+For Caped: Monday 7 AM cron. Reads Blueprint/TestInnovators scores, attendance, tutor notes. Posts one message per cohort to Debbie's Slack or WhatsApp. Stack: Sheets, Claude API, Make.com, about $30/mo. Replaces the director pulling numbers for a Monday email. Pitch: "Skip the dashboard nobody opens. Get the conclusion as a Slack message."
+
+3. Standup collector with follow-up enforcement (tag: music-space)
+Source: Cotera. https://cotera.co/articles/slack-workflow-builder-advanced-guide
+Mechanism: Scheduled prompt. Tracks who replied. DMs non-responders at +45 min. Counts skips across the week. DMs the manager on the third skip with the specific pattern.
+Why not a dashboard: stateful. It remembers, escalates, and takes different actions based on the count.
+For Justin at The Music Space: Sunday 6 PM, agent SMSes each teacher a pre-filled list of their 6 students and asks for notes. Nudges Monday 9 AM. Pings Justin on the laggards Wednesday. Teacher notes auto-file into Opus1 for parents. Stack: Opus1 CSV via Make, Twilio, Claude API. Replaces Justin's weekly nagging. Pitch: "Teachers get one SMS. Parents get notes. You stop being the nag."
+
+4. Inbound voice booking for trades (tags: hvac, landscaping, pest-control)
+Source: Owned and Operated #173 (Avoca). https://www.ownedandoperated.com/post/owned-and-operated-173-we-booked-400-calls-a-week-how-avoca-ai-is-shaping-home-services
+Mechanism: SIP forward on ring-no-answer/after-hours to a voice agent. Agent reads call history, tech calendar, service-area and pricing guardrails. Qualifies, books, confirms via SMS, writes the job to the CRM.
+Why not a dashboard: multi-turn conversation that consults live systems and can decline.
+For cold outreach: Vapi or Retell plus Claude plus ServiceTitan/Housecall Pro/Jobber. $200-600/mo at SMB volume. Replaces the missed-call voicemail that kills 40% of leads. Pitch: "You already pay for the leads. Stop losing the ones that call after 5 PM." This is the opener for an HVAC or landscaping cold call — ROI math is on the monthly phone bill.
+
+5. Supply-chain ping agent (tag: sollos)
+Source: Crisp, Feb 2026. https://www.businesswire.com/news/home/20260211212237/en/Crisp-Launches-AI-Agents-to-Drive-Shareholder-Value-for-CPG-Brands-and-Retailers
+Mechanism: Agent monitors distributor/retailer feeds, detects low inventory or a velocity spike, drafts a concrete replenishment rec, contacts the retail buyer directly.
+Why not a dashboard: it reaches out. The outreach is the work.
+For Stephen at Sollos: the enterprise telemetry doesn't exist at his scale, so flip the direction. Daily cron plus a Gmail watcher on his co-packer and yerba supplier threads. Reads Shopify/QuickBooks volume and the co-packer schedule sheet. If forecast exceeds on-hand or a supplier email contains "pushed/backordered/ETA," drafts an SMS to Stephen with the SKU, the gap, and what to do next. Stack: Gmail, Sheets, Claude, Twilio. About $40/mo. Replaces the 2 AM "do we have enough tea for Whole Foods" spiral. Not an ERP. A pager that wakes up before you do, and only for things that actually matter.
+
+Notes on source mix: X/Twitter wasn't searchable this run and Reddit/HN returned mostly vendor fluff. Today's signal came from two podcasts and two practitioner blogs. If the next two runs look the same, the source list needs changing, not the runtime. Dropped two weaker candidates: the n8n/Plain "AI handles 60% of support tickets" case (too dashboard-adjacent) and a generic email-reply agent (no specific trigger beyond "email arrives").
+
+— Claude
