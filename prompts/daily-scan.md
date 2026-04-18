@@ -31,20 +31,22 @@ Prioritize patterns that are proven in a mature sector and have an obvious copy 
 ## Research process
 
 ### Step 1 — dedup check
-Read the last 14 daily files in `/log/`. Note the patterns already captured. If a candidate overlaps, either skip it or flag it as a variation of a prior entry and only include if the new angle is materially different.
+Read the last 7 daily files in `/log/`. Note the patterns already captured. Reject a candidate only if its mechanism is a near-exact duplicate of a prior entry — same trigger, same data read, same action, same replaced task, same sector. If the candidate differs in sector, trigger, stack, scale, or replaced role, include it and briefly call out the new angle in the write-up. Adjacent variants are welcome; the goal is breadth of deployable patterns, not a museum of unique mechanisms.
 
 ### Step 2 — scan sources
-Operators over vendors. Rough priority:
+Every source below must be checked every run. The list is the scan, not a menu. Do not stop early because earlier sources produced candidates. Priority order below determines sequence, not cutoff — if a source is inaccessible or returns nothing, note it and move on.
+
+At the end of the write-up, include a `## Sources checked` section listing each source on its own line with a one-phrase note on what was found or why it was empty (e.g., "r/HVAC — nothing mechanism-level, mostly tool recommendations"). This is the accountability check that keeps the scan honest.
 
 - **X/Twitter** — highest signal if accessible. Search: "we built an agent that," "shipped an agent," "replaced our X with," "running an agent that," and sector-specific variants ("HVAC agent," "dental practice AI," "trucking dispatch AI," "clinic intake agent"). If X is inaccessible, note it.
-- **Reddit** — r/AI_Agents, r/automation, r/n8n, r/smallbusiness, r/Entrepreneur, r/ChatGPTCoding, r/LocalLLaMA. Sector-specific: r/HVAC, r/landscaping, r/Construction, r/restaurantowners, r/dentistry, r/medicine, r/Accounting, r/Trucking, r/farming, r/realtors, r/insurance, r/Fitness, r/auto_repair, r/nonprofit, r/propertymanagement, r/musicschool, r/ApplyingToCollege, r/ChatGPTPro.
+- **Reddit** — r/AI_Agents, r/automation, r/n8n, r/smallbusiness, r/Entrepreneur, r/ChatGPTCoding, r/LocalLLaMA. Sector-specific: r/HVAC, r/landscaping, r/Construction, r/restaurantowners, r/dentistry, r/medicine, r/Accounting, r/Trucking, r/farming, r/realtors, r/insurance, r/Fitness, r/auto_repair, r/nonprofit, r/propertymanagement, r/musicschool, r/ApplyingToCollege, r/ChatGPTPro. Hit at least one generic sub and at least three sector-specific subs per run; rotate which sector subs you prioritize so all get covered across the week.
 - **Hacker News** — Show HN + front-page posts from the last 48 hours.
-- **Podcasts** — How I AI, Owned and Operated, Service Business Mastery, Small Business Big AI, Lenny's Podcast, The Modern CPA, Acquired, sector-specific shows when relevant. Episode notes and transcripts are usually enough.
-- **Newsletters** — Ben's Bites (concrete deployments only).
+- **Podcasts** — How I AI, Owned and Operated, Service Business Mastery, Small Business Big AI, Lenny's Podcast, The Modern CPA, Acquired, sector-specific shows when relevant. Episode notes and transcripts are usually enough. Podcasts don't post daily — look at the last 7 days.
+- **Newsletters** — Ben's Bites (concrete deployments only). Last 7 days.
 - **Product Hunt** — AI-tagged launches from the last 48 hours. Mechanism, not hype.
-- **Platform case studies** — Zapier, n8n, Make, Lindy, Relevance AI, Gumloop, Vapi, Retell. Filter hard for SMB-relevant mechanisms in sectors outside software.
-- **Anthropic and OpenAI customer stories** — filter out enterprise-only.
-- **YC** — recent batch launches and demo day posts mentioning agent workflows, especially in non-software verticals.
+- **Platform case studies** — Zapier, n8n, Make, Lindy, Relevance AI, Gumloop, Vapi, Retell. Filter hard for SMB-relevant mechanisms in sectors outside software. Last 7 days.
+- **Anthropic and OpenAI customer stories** — filter out enterprise-only. Last 7 days.
+- **YC** — recent batch launches and demo day posts mentioning agent workflows, especially in non-software verticals. Last 7 days.
 
 ### Step 3 — filter hard
 Most "AI use case" content is fluff. Discard anything where you cannot identify a specific trigger, a specific action, and a specific replaced task. Better to return 2 strong patterns than 6 weak ones.
@@ -72,6 +74,17 @@ Three lines max. The single most interesting pattern today and the sector that m
 [2–4 short paragraphs in newsletter prose. First paragraph: source link + what it is + how it works. Next paragraph(s): where else it could work, written as continuous sentences with realistic triggers, stacks, replaced roles, and one-liner pitches.]
 
 ### 2. ...
+
+## Sources checked
+- X/Twitter — [what was found, or "inaccessible" / "nothing mechanism-level"]
+- Reddit (r/X, r/Y, r/Z) — [notes per sub or aggregate]
+- Hacker News — [notes]
+- Podcasts — [shows checked and notes]
+- Newsletters — [notes]
+- Product Hunt — [notes]
+- Platform case studies — [notes]
+- Anthropic and OpenAI customer stories — [notes]
+- YC — [notes]
 ```
 
 ### Email companion — `/log/YYYY-MM-DD.email.txt`
