@@ -1,0 +1,71 @@
+name: Daily agent pattern scan
+on:
+  schedule:
+    # 11:00 UTC = 7am ET (EDT) / 6am ET (EST). Runs every day.
+    - cron: '0 11 * * *'
+  workflow_dispatch:
+    inputs:
+      date:
+        description: 'Override date (YYYY-MM-DD). Defaults to today.'
+        required: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve date
+        id: date
+        run: |
+          if [ -n "${{ inputs.date }}" ]; then
+            d="${{ inputs.date }}"
+          else
+            d=$(date -u +%Y-%m-%d)
+          fi
+          echo "date=$d" >> "$GITHUB_OUTPUT"
+
+      - name: Skip if already run
+        id: check
+        run: |
+          if [ -f "log/${{ steps.date.outputs.date }}.md" ]; then
+            echo "already_run=true" >> "$GITHUB_OUTPUT"
+            echo "log/${{ steps.date.outputs.date }}.md already exists; skipping."
+          else
+            echo "already_run=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Run daily scan via Claude
+        if: steps.check.outputs.already_run == 'false'
+        uses: anthropics/claude-code-base-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt_file: prompts/daily-scan.md
+          allowed_tools: "Bash,Read,Write,Edit,Glob,Grep,WebFetch,WebSearch"
+          timeout_minutes: "30"
+
+      - name: Commit and push results
+        if: steps.check.outputs.already_run == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add log/
+          if git diff --staged --quiet; then
+            echo "No new log files produced."
+            exit 0
+          fi
+          git commit -m "daily scan ${{ steps.date.outputs.date }}"
+          # Retry push up to 4 times with exponential backoff.
+          n=0
+          until git push origin HEAD:${GITHUB_REF_NAME}; do
+            n=$((n+1))
+            if [ $n -ge 4 ]; then
+              echo "Push failed after 4 attempts."
+              exit 1
+            fi
+            sleep $((2**n))
+          done
