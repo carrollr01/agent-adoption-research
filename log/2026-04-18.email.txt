@@ -1,9 +1,0 @@
-Agent Pattern Scan — 2026-04-18 — No qualifying patterns
-
-https://github.com/carrollr01/agent-adoption-research
-
-No qualifying patterns today. Today's research surfaced platform comparisons, sector trend analysis, and general AI tool catalogs rather than concrete mechanisms with specific triggers and replaced tasks. 
-
-The scan covered extensive ground — veterinary AI scribes, HVAC automation metrics, dental practice workflows, and restaurant optimization tools — but found implementations of existing patterns rather than novel mechanisms. HVAC contractors reporting 4-second vs 4-hour lead response times suggests strong opportunity for voice booking agents in after-hours scenarios, but this is a direct copy of yesterday's Avoca pattern.
-
-Empty days are data. Source mix may need adjustment if this pattern continues.
