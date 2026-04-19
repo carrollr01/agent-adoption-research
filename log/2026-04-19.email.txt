@@ -1,0 +1,9 @@
+Agent Pattern Scan — 2026-04-19 — No qualifying patterns
+
+https://github.com/carrollr01/agent-adoption-research
+
+No qualifying patterns today. The scan found extensive AI agent discussion across all sources — Reddit communities documenting autonomous agents that scan for product opportunities, YC Demo Day featuring 60% AI companies, Anthropic hitting $30B ARR with agent workflows — but nothing met the filter for concrete mechanisms with specific triggers, actions, and replaced tasks at SMB scale.
+
+Most content was either too high-level (enterprise deployment trends), too theoretical (agent architecture discussions), or focused on developer tools rather than operational workflows. The signals suggest the market is transitioning from experimental to production, but the concrete patterns that SMBs can copy haven't surfaced in today's scan.
+
+This is the kind of day the methodology accounts for. Empty days are data.
