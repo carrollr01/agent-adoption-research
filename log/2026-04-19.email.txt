@@ -1,0 +1,43 @@
+Agent Pattern Scan — 2026-04-19 — 5 patterns | Agents that file the paperwork (Faraday → small insurance, medical billing)
+
+Ryan, Henry —
+
+Full writeup: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-pcAFH/log/2026-04-19.md
+
+The one worth acting on this week is Faraday. They're a YC company running an agent that does what every home-services back office hates — permits, manufacturer warranty registrations, utility rebate submissions. The novel part isn't the filing. It's that the agent drives the actual city portal, the manufacturer site, and the rebate form. Everything we've logged so far has the agent working inside systems the SMB owns (Gmail, Slack, ServiceTitan). This one goes the other way. It fills someone else's forms. That's a different primitive, and the copies are everywhere people drown in portal paperwork: small insurance brokers filing state surplus-lines stampings, two-person medical billing shops submitting CMS-1500s across a dozen payer portals, immigration paralegals filing I-129s, franchise compliance teams filing local licenses. Pitch to any of them: your CSR is a highly paid form-filler; she should be calling renewals.
+
+Below, in rough order of how excited I am.
+
+1. The agent that files the paperwork nobody wants to file (trades, small insurance brokers, medical billing, franchise ops)
+
+Faraday's Feb 2026 hiring posts describe production deployments at home-services shops — trigger is a completed job in ServiceTitan or Housecall Pro, agent drives the city permit portal, the OEM warranty site, and the utility rebate form, writes confirmations back into the FSM record so invoices stop sitting in AR waiting on rebate codes. https://hnhiring.com/february-2026
+
+At a 4–6 producer independent insurance agency, the trigger is a new bound policy in Applied Epic or EZLynx. The agent reads the carrier's filing requirements, logs into the state surplus-lines portal, files the stamping, pays the fee, writes the receipt back. Stack is Applied Epic or EZLynx plus a headless browser plus Claude plus a state-by-state rules file. Around $400–800 a month. Replaces the CSR whose job is compliance filing. At a two-person medical billing office, the trigger is a CMS-1500 arriving from a client practice — agent submits, watches for denial, either re-submits or flags the specific CARC/RARC code. Around $300–600 a month. Same shape works for immigration paralegals, franchise compliance, state registrations.
+
+2. The accounts-receivable chaser that lives inside the ledger (accountants, small professional services, agencies)
+
+Xero announced a multi-year deal with Anthropic in March to build JAX inside their accounting platform. Trigger is an invoice crossing an aging threshold. The agent reads the ledger — invoices, payments, bank feed, the customer's whole prior communication history on that account — and drafts a chase grounded in what was actually said last time, not boilerplate. Owner approves in one click. https://www.xero.com/us/media-releases/xero-and-anthropic-collaborate/
+
+At a 3-partner CPA firm, trigger is an aging invoice in QuickBooks or Xero. The agent reads the engagement letter, prior scope, and the partner's last three emails with that client, drafts a chase in the partner's voice referencing the specific March close or 1099 run. Around $150–300 a month. Replaces the partner's Friday 5 PM sweep. At a small creative agency, it reads the project Slack channel and the SOW so the chase references the actual deliverable. Around $100 a month. Replaces the account manager's least-favorite Monday. Pitch: the worst part of running a small firm is asking a client you like to pay you; this does the ask in your voice and you hit approve.
+
+3. The outbound caller that hits a lead inside two minutes (real estate investors, insurance agencies, solar and roofing, home services)
+
+This is the counterpart to last week's Avoca. Avoca answers when you call the shop. ISpeedToLead runs a Retell agent going the other direction — the moment a lead lands, the agent calls outbound within seconds, qualifies against the buyer's rules, books a callback or live-transfers to the human. Dispositions written back to the CRM. https://www.retellai.com/case-study/ispeedtolead-retell-ai-lead-response-case-study
+
+At an independent agency buying Medicare Advantage leads at $40–80 each, trigger is a new lead in EZLynx or AgencyBloc. Agent calls immediately, confirms ZIP and current plan, books a 15-minute slot on the licensed agent's calendar. Around $500–900 a month at 200–400 leads a week. Replaces the junior assistant who's supposed to dial but is on another call. At a roofing contractor buying from Angi, Thumbtack, or Google LSAs, same trigger. Agent confirms property type, rough roof age, insurance-claim status, books the estimator. Around $400–700 a month. Pitch: the $60 lead you bought yesterday is already cold; you're not paying Humana more than your competitors, you're just slower on the phone.
+
+4. The SMS leasing agent that books tours from the first text (property management, small landlords)
+
+ShowDigs runs an SMS agent for property managers. Trigger is a prospect texting on a Zillow or Apartments.com listing. Agent reads the listing record in AppFolio, Buildium, or Rent Manager — price, availability, income and pet rules — plus the leasing agent's calendar and route for the day, texts back, qualifies, proposes slots that fit the route, books. The interesting part is route-awareness: the agent doesn't just book, it books geographically. https://www.showdigs.com/property-managers/ai-leasing-agent-from-first-text-to-scheduled-tour-automatically
+
+Already deployed at hundred-unit PMs. Scales down to a 20-unit independent landlord with a Twilio number and a Google Sheet of vacancies, tours on the owner's Google Calendar, around $80–150 a month. Replaces the owner's evening phone tag. Adjacent sector: self-storage. Trigger is a web inquiry on a SiteLink or storEDGE page. Agent texts, quotes price, handles the reservation and move-in appointment. Around $100 a month per facility. Replaces the front-desk person covering evenings and Sundays.
+
+5. The morning agent that reads four apps and drafts the replies (solo and two-person firms, professional services, agencies)
+
+JJ Englert at Tenex walked through this on How I AI. Setup is Claude Cowork on a schedule plus a maintained brain.md file in a project folder — who the clients are, who the team is, the voice the owner writes in, standing priorities for the quarter. At 7 AM the agent runs, reads Gmail, Calendar, Slack, and Notion through Claude's connectors, filters through brain.md, drafts Gmail replies in the owner's voice, posts a one-screen agenda with the day's top three. https://www.lennysnewsletter.com/p/claude-cowork-101-how-to-automate
+
+The reason this doesn't collapse into "ChatGPT read my email" is brain.md. That's the thing that makes the agent sound like the owner and prioritize the way the owner would, and it's the thing an SMB can actually maintain — a markdown file, not a CRM schema. At a 3-person law firm the connectors are Gmail, Calendar, Slack, and Clio. brain.md carries the partners' voices, matter-by-matter rules about draft-versus-hold, and client sensitivities. Around $100–200 a month plus seat cost. Replaces the legal assistant's first two hours of the day. At a 2-person bookkeeping firm, swap Clio for QuickBooks Online; brain.md carries the client list and the partner's standard answers to common questions.
+
+Sources note: best material this run came from platform case studies (Retell, ShowDigs, Xero) and one How I AI episode. X was accessible but produced almost no operator posts. Reddit and HN's 7-day indexes were thin. If the next two runs lean the same way, we prune the source list toward platforms and podcasts.
+
+— Claude
