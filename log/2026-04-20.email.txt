@@ -1,7 +1,33 @@
-Agent Pattern Scan — 2026-04-20 — No qualifying patterns
+Agent Pattern Scan — 2026-04-20 — 3 patterns | Managerbot-shape agents for every vertical SaaS Block won't serve
 
-https://github.com/carrollr01/agent-adoption-research
+Ryan, Henry —
 
-No qualifying patterns today. The scan found plenty of AI agent discussion but nothing that met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale.
+Full writeup: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-4DMOw/log/2026-04-20.md
 
-All major sources showed significant AI agent activity — enterprise platforms from Anthropic and OpenAI, YC's W26 batch being 46% AI agents, enhanced automation capabilities from Zapier/n8n/Make — but the mechanisms either duplicated patterns from April 17 or lacked the specific operational details needed for SMB deployment.
+The most interesting thing this week is that Block decided the unit of delivery for SMB AI is a proactive agent inside the POS the operator already uses, not a chatbot, not a dashboard, not a separate tool. Managerbot watches Square's inventory, scheduling, and marketing data, pulls external signals like weather and local events, and hands the seller specific actions to approve. That's the shape to copy. For every vertical where the SaaS is not Square — dental with Dentrix, vet with ezyVet, music studios with Opus1, solo accountants with Karbon, small insurance agencies with AMS360 — the pattern says the same thing. The data is already there. The piece you're missing is the agent that reads it every morning and hands you the send.
+
+Below, the three patterns.
+
+1. A proactive co-pilot baked into the operational SaaS (retail, dental and vet clinics, music studios, accountants, insurance agencies)
+
+Block launched Managerbot last week — an agent embedded in Square that monitors stock, sales velocity, the staff schedule, and external signals like weather and events, then proposes actions with a one-tap approval. Inventory reorders, shift trims, marketing campaigns. Every write is gated. Block is positioning it as a virtual COO for the 4 million SMBs on Square. https://venturebeat.com/data/block-introduces-managerbot-a-proactive-square-ai-agent-and-the-clearest — https://squareup.com/help/us/en/article/8617-use-managerbot-to-manage-business-tasks-and-insights
+
+The copy into any vertical is the same. For a dental practice, the agent watches Dentrix recall lists, the provider calendar, and no-show history, then drafts three things in the MA's queue every morning: recall texts with suggested slots for patients aged past six months, insurance-renewal pings before coverage flips at quarter-end, and unbilled-procedure nudges approaching the timely-filing cliff. Dentrix API plus Claude plus Twilio plus one approval screen. $300–500 a month. Replaces the front-desk afternoon where recall happens if there's time. Pitch: the PMS already has the list; what it doesn't have is the thing that reads it every morning and hands you the send. Same shape for vet clinics with ezyVet vaccination reminders and boosters-overdue lists, music studios with Opus1 enrollment versus teacher availability, solo accountants with Karbon's missing-docs list thirty days before deadline.
+
+2. The voice-commanded outreach agent (trades, landscaping, real estate, music studios)
+
+Flow AI moved its real estate outreach onto n8n and built something worth stealing. An agent says into their phone "I'm hosting an open house Saturday, invite everyone in my contacts." ElevenLabs converts speech to structured input, hits an n8n webhook, workflows query the Postgres contact database, verify opt-in and 10DLC/CAN-SPAM compliance, generate personalized content with Claude, send through SMS or Mailgun. End to end in under 60 seconds. Replaces the assistant who used to build these campaigns. https://n8n.io/case-studies/flow-ai/
+
+The trigger is the voice. That matters more than the stack. SMB owners are driving, on a ladder, behind a chair — their phone is the input device and their thumbs are busy. At a landscaping company the owner says "text everyone on this week's spring cleanup that rain pushed us to Thursday" and the agent pulls scheduled jobs from Jobber, filters affected customers, and sends personalized SMS with the new slot. $60–100 a month. Replaces 30 minutes of Sunday-night texting from bed. At a music studio the director says "invite all my high school seniors to a June recital" and the agent queries Opus1 or a Google Sheets roster, drafts parent-addressed emails with an RSVP form, posts RSVPs back to a shared sheet. $50 a month. Same mechanism for an HVAC seasonal tune-up push, a pest control quarterly renewal blast, a real estate open-house invite.
+
+3. Categorize once with an LLM, route deterministically after (accountants, insurance agencies, law firms, property management)
+
+On How I AI this month, JJ Englert walked through his Slack digest. The design choice is the point. The agent doesn't classify every message with an LLM. It categorizes the buckets once — DMs, mentions, threads — then sub-routes into action/read/FYI using deterministic rules generated from the LLM's pattern. Claude only runs on the ambiguous tail. Cheap, fast, predictable. https://www.lennysnewsletter.com/p/this-week-on-how-i-ai-claude-cowork
+
+Most SMB inbox-triage pitches fail because they route every email through an LLM. That's expensive and weird when the model has a bad day. Englert's shape is better: have the model design the taxonomy once, let deterministic rules handle 80 percent for fractions of a cent, call the model only on the last 20 percent.
+
+At a solo accountant, 80 percent of client email is predictable by sender, subject, and attachment type — W-2 uploads, quarterly estimate questions, K-1s, payroll escalations. Each routes to a Gmail label with an owner and a pre-drafted reply stub. The LLM only reads the ambiguous messages, maybe 15 a day at a 200-client book. Gmail Apps Script plus Claude for the initial rule build plus the Claude API for the tail. $40–80 a month. Replaces the partner's evening triage and the Saturday catch-up session. Pitch: you don't need an AI looking at every email; you need one built once, then a router that costs pennies to run. At a small insurance agency, certificate requests auto-issue from a template with a signed attachment, and only claims or non-standard endorsements hit the LLM. At a two-partner law firm, intake and scheduling route deterministically and only substantive client emails get agent drafts.
+
+Source note: X/Twitter still inaccessible on search. The signal this run came from n8n's case studies, How I AI, and the Block launch coverage. One enterprise adjacent find — Anthropic's Duvo customer story with Rohlik Group, procurement agents spanning ERPs, supplier portals, spreadsheets, email, and phone calls to book €2.8M in annualized savings in three months — is worth revisiting when we have an SMB data point to hang the downscaled version on.
+
+— Claude
