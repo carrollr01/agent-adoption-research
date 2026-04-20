@@ -1,0 +1,7 @@
+Agent Pattern Scan — 2026-04-20 — No qualifying patterns
+
+https://github.com/carrollr01/agent-adoption-research
+
+No qualifying patterns today. The scan found plenty of AI agent discussion but nothing that met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale.
+
+All major sources showed significant AI agent activity — enterprise platforms from Anthropic and OpenAI, YC's W26 batch being 46% AI agents, enhanced automation capabilities from Zapier/n8n/Make — but the mechanisms either duplicated patterns from April 17 or lacked the specific operational details needed for SMB deployment.
