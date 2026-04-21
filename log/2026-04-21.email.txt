@@ -1,9 +1,45 @@
-Agent Pattern Scan — 2026-04-21 — No qualifying patterns
+Agent Pattern Scan — 2026-04-21 — 3 patterns | Corvera-style inbound order desk for Sollos
 
-https://github.com/carrollr01/agent-adoption-research
+Ryan, Henry —
 
-No qualifying patterns today despite extensive agent platform activity. All major sources showed significant AI agent discussion — Claude Managed Agents launched with enterprise customers, YC W26 featured record AI agent funding, and platforms like Zapier reported growing SMB adoption — but nothing met the filter for concrete SMB-deployable mechanisms with clear triggers and replaced tasks.
+Full writeup: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-5NAnM/log/2026-04-21.md
 
-The closest candidate was NisonCo's lead research automation (daily news scanning to Google Sheets, replacing 3-5 researchers), but this duplicates the Monday morning report pattern already captured April 17th. Most findings were platform announcements, enterprise case studies, or market trends rather than actionable SMB workflows.
+Three patterns today after three empty days. The one worth acting on first is Corvera, a YC W26 company whose agents parse inbound purchase orders (PDF or email) and process them end-to-end with human approval. It's the mirror of the Crisp pattern from April 17 — not a brand reaching into its retailers' telemetry, but orders arriving in the brand's own inbox as unstructured text and getting parsed into Shopify. Direct Sollos fit: every new distributor order Stephen gets shows up as an email thread, and the copy-paste between that inbox and Shopify is exactly the task this eats. In rough order of how excited I am:
 
-Sources remain productive for understanding the agent ecosystem but today yielded no new deployable patterns for the A3 Dev solution vocabulary.
+1. The inbound order desk (Sollos)
+
+Corvera launched out of YC W26 and went from $0 to $33K MRR in four weeks across 12 CPG brands, growing 130% week-over-week as of mid-March. https://www.ycombinator.com/launches/PES-corvera-ai-ops-for-cpg-brands
+
+An incoming email with a purchase order attached hits a shared brand inbox. The agent parses the thread, extracts line items, resolves each one against the brand's SKU catalog — "12 x YM Classic 16oz" gets matched even when the retailer uses their own naming convention — drafts an order confirmation, files the shipment request in Shopify or a 3PL, kicks off an invoice, tracks payment. It stops for human approval on anything new or ambiguous. It replaces the back-office ops coordinator a founder-led CPG brand hires when the inbox gets unmanageable.
+
+The interesting piece is entity resolution across unstructured buyer language. That's the actual hard part of the job; everything else is plumbing.
+
+Sollos fit is direct. Stephen is already fielding inbound orders from small grocers and cafes as one-off emails. Deploy an agent on a shared orders@ Gmail label — it reads the thread, resolves line items against the Sollos SKU list, drafts a confirmation in Stephen's voice, and files the shipment request in Shopify. It asks for approval on any new buyer or on anything above a dollar threshold. Stack: Gmail + Claude + a Shopify MCP + a catalog/entity-resolution layer, $150–300 a month at current volume. Replaces the 60–90 minutes a day Stephen doesn't have. Pitch: you don't need to hire an ops person yet — you need an agent that does the copy-paste between your inbox and Shopify and stops to ask when it hits something new.
+
+This is materially different from the April 17 Crisp pattern. That one was supply-side outbound (a brand reaching into its retailers' telemetry and emailing buyers). Corvera is demand-side inbound — orders arriving in your email as unstructured text and needing to get into structured systems.
+
+2. The photo of the invoice becomes the invoice (restaurants, landscaping, HVAC)
+
+Square and MarketMan shipped a joint integration on April 2 that bakes AI invoice scanning into the Square POS workflow. https://www.businesswire.com/news/home/20260402238712/en/Square-and-MarketMan-Launch-Advanced-Inventory-Management-Integration-for-Restaurants
+
+The mechanism: a chef takes a photo of a paper supplier invoice, or forwards a PDF, or drops it in a shared folder. MarketMan's models — custom-tuned per supplier's invoice format, SKU list, and pricing — extract line items, match each to a known SKU in the restaurant's catalog, update on-hand inventory, recalculate recipe costs against POS sales, and flag any line that looks off. When the model is 100% sure on every line, it processes instantly. Anything uncertain goes to review.
+
+The trigger matters. This isn't an end-of-week reconciliation. It fires the moment the photo hits. The chef's phone became the data-entry device.
+
+For our cold-outreach verticals, the same shape runs on off-the-shelf parts. An independent restaurant owner sets a forward rule on invoices@theirdomain; Claude with vision reads the PDF or photo, writes a row into a Google Sheet with vendor, date, SKU, quantity, unit price, and flags anything where unit price moved more than 5% from the last delivery of that SKU. Same shape for a landscaping company buying fertilizer and nursery stock, or an HVAC shop getting distributor invoices the warehouse manager used to staple to a clipboard. Stack: Gmail + Claude + Google Sheets + a small catalog file + a Friday digest SMS, $40–70 a month. Replaces about 90 minutes a week of hand-entry plus catches the price creep nobody is tracking. Pitch: take a picture of the invoice. Your on-hand sheet is updated before the truck pulls out, and you find out about price hikes before your margin does.
+
+Different in direction from the April 17 supply-pager pattern, which watched outgoing supplier emails for delay language. This one fires after a delivery lands, and the thing it catches is price and quantity errors — the stuff nobody notices until month-end P&L.
+
+3. Drafting in the counselor's actual voice (Jenn, and generalizes to every owner-led vertical)
+
+CollegeVine's Rec Letter Assistant is the clearest in-the-wild example of voice-fingerprinted drafting. https://www.collegevine.com/rec-letters
+
+The counselor uploads two or three prior rec letters and a student's brag sheet. The agent outputs a draft in the counselor's voice — cadence, turns of phrase, transitional tics — populated with the student's specifics. The corpus is used as a style reference, not as content. The mechanism is prior writing corpus + structured facts about a subject + a prompt that treats the corpus as style grounding. What makes it agentic rather than a chatbot is that the flow is triggered by a lifecycle event (a student moves into application season) and the output lands in the right place as a draft the counselor edits, not a chat transcript.
+
+Jenn writes 30 to 60 letters of support, supplements, and admissions-officer follow-ups each fall. Blank page at 9 pm. Build: a small web form or a labeled Google Doc folder. She tags a student, the agent pulls that student's file plus the last 40 letters she's written as voice reference, and outputs a draft she edits instead of writes. Stack: Claude + a folder of her prior letters + her student database + a simple form, $80–120 a month. Replaces 4–6 hours a week during application season. Pitch: your letters are the part of your work that nobody else can copy. The agent does the typing so you can do the thinking.
+
+Generalizes cleanly. Justin writes recital-prep and parent update emails in a recognizable voice. Stephen writes investor and buyer update emails. Debbie writes parent progress reports. Each owner already owns the voice corpus — it's in their sent folder. The moat is the corpus. The agent just unlocks it.
+
+—
+
+X/Twitter remained inaccessible for search this run. Today's signal came from specific YC launch pages, the April 2 Square/MarketMan press release, and CollegeVine's documented product. The three empty days in a row pushed the methodology toward going directly to launches and press releases rather than keyword searches that surfaced mostly vendor roundups. That's probably the right general move.
