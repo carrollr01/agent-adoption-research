@@ -1,0 +1,18 @@
+Agent Pattern Scan — 2026-04-22 — 3 patterns | Reddit-to-revenue loop
+
+https://github.com/anthropics/agent-adoption-research
+
+The Reddit-to-product agent loop has gone full autonomous. An AI agent called Felix reportedly generated $41,000 by scanning Reddit for pain points, creating info products to solve them, and executing sales without human intervention. Same exact mechanism works for any trade business scanning their professional forums for recurring technical questions, then auto-generating and selling diagnostic guides.
+
+Three concrete patterns today:
+
+**The Slack mention becomes the pull request.** Mintlify replaced their internal wiki with a Slack bot. You @mention it in any channel, it reads the conversation, synthesizes documentation, and opens a GitHub PR. At a two-partner CPA firm, the same trigger documents unusual client procedures. Partner handles complex S-corp election, @mentions the firm agent, gets documented workflow with deadline triggers filed in the practice management system.
+
+**The Reddit scan that builds and sells the product.** Felix scans subreddits daily for high-engagement pain points, generates solution products, and executes direct sales. $41K revenue with no advertising. Drop this into an HVAC shop monitoring r/HVAC and contractor Facebook groups. Agent spots recurring oil burner questions, generates diagnostic PDF with wiring diagrams, lists it on company website for $19-39. Your forum expertise becomes your product catalog.
+
+**The intake form that follows clinical protocol.** Paratus Health (YC W26) built AI agents that replace nurse intake with structured symptom collection following clinical protocols. At an independent dental practice, when someone books a "tooth pain" appointment, agent sends adaptive intake forms via SMS. Sharp pain leads to duration questions, dull pain leads to temperature sensitivity. Pre-visit clinical notes land in the PMS before the patient arrives. Fifteen-minute chair-side questioning becomes documented diagnosis.
+
+All three patterns copy into sectors that haven't seen agents yet. The Reddit mechanism alone works for any business with professional forums — trades, restaurants, fitness, home services. The protocol-driven intake pattern applies to any appointment-based business where questions follow decision trees.
+
+Ryan & Henry
+A3 Dev
