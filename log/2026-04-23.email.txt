@@ -1,0 +1,13 @@
+Agent Pattern Scan — 2026-04-23 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+No qualifying patterns today after scanning all required sources.
+
+The signal-to-noise ratio remains challenging. Reddit discussions showed concrete HVAC contractor automation examples and small business lead qualification workflows, but these duplicate patterns we've already logged. Product Hunt featured extensive AI agent launches (Noiz AI, Fixa.dev, multiple coding agents), but nearly all target developer tools rather than SMB operations. YC's W26 Demo Day showcased 190 companies with strong B2B focus, including several promising automation startups, but they're building for enterprise compliance and technical workflows rather than cross-sector SMB patterns.
+
+Zapier's analysis of 10,000 AI workflows confirmed lead management as the dominant use case with measurable ROI, while n8n's academic study demonstrated 151x speed improvements over manual processes. However, these reinforce existing pattern categories rather than revealing new mechanisms.
+
+Platform maturation is evident across all sources — from OpenAI's 1M business customers milestone to Anthropic's enterprise case studies — but the innovation is happening at infrastructure and enterprise scale rather than in deployable SMB patterns that cross sectors.
+
+The scan methodology worked correctly. Today was genuinely empty of qualifying patterns despite extensive agent activity across the ecosystem.
