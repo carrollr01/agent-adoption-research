@@ -1,13 +1,40 @@
-Agent Pattern Scan — 2026-04-23 — No qualifying patterns
+Agent Pattern Scan — 2026-04-23 — 3 patterns | skill library + long-running agent replaces the zoo of bots
 
-https://github.com/anthropics/agent-adoption-research
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-3BODg/log/2026-04-23.md
 
-No qualifying patterns today after scanning all required sources.
+The most interesting thing today is a structural shift: operators shipping one general-purpose agent with a library of "skills" that non-engineers author, instead of a zoo of narrow bots. OffDeal is doing it for M&A, Anthropic's own growth marketer is doing it for Google Ads. That architecture is the copy for any SMB professional-services or marketing function that currently owns ten disconnected mini-workflows.
 
-The signal-to-noise ratio remains challenging. Reddit discussions showed concrete HVAC contractor automation examples and small business lead qualification workflows, but these duplicate patterns we've already logged. Product Hunt featured extensive AI agent launches (Noiz AI, Fixa.dev, multiple coding agents), but nearly all target developer tools rather than SMB operations. YC's W26 Demo Day showcased 190 companies with strong B2B focus, including several promising automation startups, but they're building for enterprise compliance and technical workflows rather than cross-sector SMB patterns.
+1) The skill library replaces the zoo of bots
+   (accountants, college-counselors, insurance-brokers, real-estate-brokers)
 
-Zapier's analysis of 10,000 AI workflows confirmed lead management as the dominant use case with measurable ROI, while n8n's academic study demonstrated 151x speed improvements over manual processes. However, these reinforce existing pattern categories rather than revealing new mechanisms.
+OffDeal, an AI-native investment bank selling $1–20M-profit businesses, consolidated 12+ separate agents into a single general-purpose agent called Archie on the Claude Agent SDK, wired to 20+ data sources. Non-engineers author new capabilities as "skills" — a banker wrote the branded-pitch skill, not an engineer. The killer demo is buyer sourcing: experienced bankers use about ten methods to narrow millions of companies to 300–400 likely acquirers; OffDeal encoded those methods as a skill and a long-running agent runs for up to four hours, recursively refining. A list that used to cost $12,000 and take a week now runs for about $200 in compute. Eval accuracy jumped 25% to 85%. Source: claude.com/customers/offdeal.
 
-Platform maturation is evident across all sources — from OpenAI's 1M business customers milestone to Anthropic's enterprise case studies — but the innovation is happening at infrastructure and enterprise scale rather than in deployable SMB patterns that cross sectors.
+The architecture ports directly. At a two-partner IEC firm, the skill is college-fit: read the student's CollegePlannerPro profile, then run a long-horizon search across Common Data Sets, Niche, IPEDS, program-level outcomes, r/ApplyingToCollege, and the counselor's own placement history for similar students. Agent returns a shortlist with per-school rationales; the counselor edits instead of researches. New skills get added by the counselor typing out how she thinks about fit for a BFA applicant — that becomes the next skill. Stack is Claude Agent SDK plus a CollegePlannerPro shim plus a few public-data MCP servers, $300–600/month. Pitch: stop building college lists on Sunday; your method is the skill and the agent runs it.
 
-The scan methodology worked correctly. Today was genuinely empty of qualifying patterns despite extensive agent activity across the ecosystem.
+Same move at a small insurance broker: the skill is carrier fit. Pull the client's business type, loss history, AMS360/EZLynx record, territory, prior quotes; research appetite across every carrier you appoint — rate filings, bind/decline patterns, underwriter memos, broker-group chatter. Agent returns a ranked carrier list with rationale. About $400–700/month at a 5-producer shop. Pitch: your best producer's appetite intuition, written down once and applied to every submission.
+
+2) The marketer with a skill file and a memory
+   (college-counselors, sat-prep, cpg-small-brands, trades)
+
+Austin Lau runs Anthropic's entire growth-marketing function solo with Claude Code. Each marketing function is a skill file (brand voice, Google RSA format rules, etc.). On top of that he built a memory system that records every hypothesis and its outcome from each round of ad iteration — so when he kicks off a new variant round, Claude retrieves what worked, what didn't, which angles are exhausted, before writing the next batch. A Google Ads RSA set (15 headlines, 4 descriptions, CSV-ready) that used to take 30 minutes now takes 30 seconds. Creative output up 10x. Sources: mejba.me/blog/one-person-marketing-team-claude-code and claude.com/blog/how-anthropic-uses-claude-marketing.
+
+The memory layer is what makes it worth copying. The Stripe Slack-reaction pattern we logged 4/17 is reactive. This one is iterative — it compounds across rounds because the agent knows what it tried last time. Every SMB running paid ads is doing that memory work in a spreadsheet or not at all.
+
+At a solo counselor running local Google Ads for rising juniors, skill files are "Jenn's voice," "IEC compliance," and "RSA format rules." Memory records every ad set since fall — which headlines got click-through at $2 CPC, which landing pages converted calls. Monday cron generates next week's variants against last week's results. Stack is Claude Code + Google Ads API + a Google Sheet for memory, about $60/month. Replaces a $1,500/month freelance marketer. Pitch: your ad account now remembers itself.
+
+For Sollos running Meta ads, skill files are "Sollos voice," "mate-category claims rules," "Meta ad formats." Memory tracks creative-audience-hook triads and their CTR and CPA. Each round generates new variants informed by what worked, not a clean-slate prompt. ~$80/month. Replaces the agency retainer at 10x the cost. Pitch: your ad account learns; the agency's doesn't.
+
+3) The opportunity-matching agent that flips the question
+   (nonprofits, small-construction, landscaping, attorneys)
+
+Kindora (small nonprofit-tech company in Anthropic's recent customer roundup) flipped fundraising from "who might fund us someday" to "what can we apply for right now." A weekly-refreshed grant database is exposed to Claude as an MCP connector. The nonprofit plugs in its org profile and current projects; the agent surfaces currently-open grants that match, summarizes eligibility, maps each to a project, drafts concept notes. Justin Steele (co-founder) previously oversaw ~$700M in giving; his prototype nonprofit raised $100K in year one via eight cold-outreach grants. 328 nonprofits on the platform as of March, signups roughly doubling monthly. Sources: claude.com/customers and academy.evalcommunity.com.
+
+The mechanism is sector-neutral: weekly-refreshed database + MCP connector + match-to-profile + draft-the-application. Any sector where public opportunities get posted on a clock and somebody burns hours scanning them.
+
+At a small GC chasing public-works jobs, the same mechanism hits BidNet, DemandStar, state/county procurement portals, school-district RFP feeds. Agent reads bonding capacity, license class, union status, service area, past-project portfolio; surfaces matching open solicitations and drafts the eligibility cover letter plus a first pass at the technical response. Weekly or on new-RFP triggers. Stack is a bid scraper + Claude + Google Drive templates, $150–300/month. Replaces the estimator's Monday-morning portal sweep. Pitch: your bid calendar fills itself.
+
+At a commercial landscaper, the agent watches municipal groundskeeping contracts, HOA RFPs, and property-management recurring-service bids. Reads your equipment, crew size, certified-arborist status, region. Surfaces matches and drafts recurring-service proposals with pricing pulled from your last three comparable jobs. $100–200/month. Replaces the owner's Friday afternoon city-website sweep. Pitch: every new contract that fits your shop lands in your inbox already drafted.
+
+---
+
+Sources checked: see markdown log linked above for the full per-source audit.
