@@ -1,0 +1,17 @@
+Agent Pattern Scan — 2026-04-24 — 3 patterns | Healthcare billing calls insurance for you
+
+https://github.com/anthropics/agent-adoption-research
+
+Healthcare billing voice agents have cracked the collections problem with 10x productivity gains and $764K ARR in 10 months. The same mechanism drops into dental billing, veterinary A/R, and small law firm collections.
+
+Three concrete patterns from today's scan:
+
+**The voice agent that calls insurance companies for you.** LunaBill from YC W26 built agents that call insurance companies when claims hit aging thresholds, navigate phone trees, wait on hold, and update billing systems with next actions. $764K contracted ARR with 10x productivity gains per biller. At dental practices, the agent calls Delta Dental when claims sit unpaid for 45 days. At vet clinics, it calls pet insurance after 60 days. Around $400-600 per provider monthly. Replaces billing coordinators spending two hours daily on hold. Every unpaid claim gets followed up automatically while staff focuses on patients and new claims.
+
+**The Google Form that becomes real-time operations.** Relay.app user replaced a specialized SaaS tool costing double their subscription using Google Form plus AI agent plus workflow automation. Form captures requests, agent reviews against policies, routes to right person or auto-resolves, updates all systems in real-time. At HVAC contractors, website leads trigger agents that check ServiceTitan for customer history, classify urgency, schedule emergencies immediately or route to dispatch. At restaurants, catering inquiries get automatic quotes based on kitchen capacity and past orders. Around $50-80 monthly. Every web lead becomes a qualified work order instantly.
+
+**The front-office replacement that never sleeps.** Bravi from YC W26 built AI agents that handle all customer communication for home services - calls, chats, emails, follow-ups. Agents understand products, pricing, technical docs well enough to qualify leads and book appointments autonomously. At plumbing companies, agents pull customer service history, check dispatch availability, provide drain cleaning pricing, book appointments. At vet clinics, they triage "limping dog" versus "ate chocolate" and book appropriately. Around $300-600 monthly. Replaces dispatchers fielding calls between job sites and answering services customers hate. Every lead gets qualified and booked with immediate customer response.
+
+All three patterns copy proven mechanisms from one sector into adjacent ones that do the same work but haven't adopted agents yet.
+
+Generated daily at github.com/anthropics/agent-adoption-research
