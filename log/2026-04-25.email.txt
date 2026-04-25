@@ -1,0 +1,13 @@
+Agent Pattern Scan — 2026-04-25 — 3 patterns | Equipment dealer 24/7 sales copy
+
+https://github.com/RCarroll6/agent-adoption-research
+
+Equipment dealers and manufacturers are deploying AI agents that handle the entire sales cycle around the clock. Chasi from YC W26 plugs directly into dealer management systems to handle sales, rentals, and service requests without human involvement — maintaining context across phone, email, and web inquiries before handing qualified leads to sales reps with complete history.
+
+The pattern copies perfectly into auto parts distribution, construction equipment rental, and industrial supply. An auto parts distributor deploys the same agent to check inventory across locations, cross-reference compatibility databases, and generate bulk quotes for fleet accounts based on service bay availability. Stack is parts management API plus Twilio plus Claude plus accounting integration. Around $400-600/month replaces counter staff juggling phone orders while helping walk-ins.
+
+Real estate scanning agents are going operational for SMB expansion. Kim Lewis Howard runs two agents that scan commercial MLS listings across three Florida markets every morning, filtering for exact investment parameters and delivering prioritized reports while she sleeps. The mechanism transfers to any business seeking physical expansion — auto repair shops scanning for service bay properties, contractors hunting storage yard space.
+
+Manufacturing RFQ processing reached autonomous execution through Korso's YC W26 platform. Agents read technical drawings, calculate material requirements, check production capacity, and generate detailed proposals with delivery timelines. A sheet metal fabricator deploys the same pattern to handle standard quotes automatically while flagging engineering questions for human review. Every RFQ gets professional response within 2 hours versus 3-day competitor delays.
+
+The thread connecting all three: inventory-heavy businesses with complex workflows where timing matters and human bottlenecks kill deals. Auto parts, equipment rental, metal fabrication, industrial supply — sectors that haven't touched agents yet but handle identical operational patterns to those already proven in YC portfolios.
