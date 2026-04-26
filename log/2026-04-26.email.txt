@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-04-26 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+Today's scan found extensive AI agent activity but no patterns that met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't been covered in recent logs.
+
+The scan revealed April 2026 as a pivotal month for agent infrastructure, with OpenAI shipping GPT-5.5 with agent mode, Anthropic launching Claude Managed Agents, Google releasing Workspace Studio, and Cloudflare's dedicated Agents Week. However, these were platform releases rather than deployed operational patterns.
+
+While YC W26 featured 56 companies building autonomous agents and significant SMB adoption trends emerged (68% reporting $84K annual cost savings), the specific mechanisms either duplicated existing patterns or lacked sufficient implementation details for cross-sector application.
+
+Empty days are data — infrastructure buildout often precedes concrete deployment patterns by several weeks.
