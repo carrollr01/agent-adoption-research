@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-04-27 — 1 pattern | dispatch scheduling automation
+
+https://github.com/anthropics/agent-adoption-research
+
+Leonard Splaine Co. and other HVAC contractors are deploying AI agents that automatically build daily schedules by pulling work orders, checking technician skills, calculating routes, and assigning jobs. When delays or cancellations happen, the agent reshuffles the entire day in real-time. Companies report 2x capacity per dispatcher.
+
+The same dispatch-scheduling loop works for any field service business managing mobile teams. Home health agencies can auto-route caregivers based on certifications and patient needs. Pest control companies can cluster routes by service type and equipment requirements. The pattern replaces manual scheduling overhead while maximizing billable hours and route efficiency.
+
+Stack: field service software API + dispatch system + routing + SMS notifications. Around $300-600 monthly. Replaces 4+ hours daily of manual schedule juggling.
+
+Today's scan found extensive agent activity across all sources but most fell into existing patterns or lacked concrete mechanisms. The dispatch automation pattern from HVAC contractors represents a proven workflow ready for cross-sector deployment.
