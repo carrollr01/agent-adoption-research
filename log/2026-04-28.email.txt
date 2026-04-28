@@ -1,7 +1,33 @@
-Agent Pattern Scan — 2026-04-28 — No qualifying patterns
+Agent Pattern Scan — 2026-04-28 — No qualifying patterns | Avoca $1B, Yelp Host, Naadam validate logged patterns
 
-https://github.com/anthropics/agent-adoption-research
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-nYl3L/log/2026-04-28.md
 
-No qualifying patterns today. The scan found extensive agent activity—YC W26's 88% AI-first batch with 56 autonomous agent companies, Cloudflare's Agents Week infrastructure launches, and mature ROI data from automation platforms—but nothing met the filter for concrete SMB mechanisms with clear triggers, actions, and replaced tasks that haven't been covered in recent logs.
+# 2026-04-28 — Agent Pattern Scan
 
-The patterns emerging (automated morning briefings, social media agents) either lacked the specificity needed or overlapped with existing coverage. Platform maturity is accelerating, but novel cross-sector deployment mechanisms remain elusive.
+## TL;DR
+No qualifying patterns today. Three concrete data points worth noting — Avoca's $125M raise at a $1B valuation (4/27), Yelp Host's $149/mo restaurant voice agent rolling out with native Guest Manager and Waitlist integration, and Naadam's DTC cashmere brand replacing its entire frontline CS team with agents — but all three are variants of voice/text agent patterns already logged (Avoca 4/17, Bravi 4/24, dispatch loop 4/27). Market is validating the patterns we've already captured rather than producing new mechanisms.
+
+## What was strong but not new
+
+**Avoca raised $125M at a $1B valuation** (Fortune, 4/27 — https://fortune.com/2026/04/27/avoca-ai-agents-missed-calls-hvac-plumbing-roofing-kleiner-perkins-chen-shrivastava-braswell/). Same operator already logged 4/17. The funding is signal that the "voice agent answers the phone and books the job" pattern for HVAC/plumbing/roofing has cleared the validation bar at venture scale. Worth keeping in our pocket as a credibility marker when pitching the Avoca-style mechanism to dental, vet, or test prep prospects — "the same pattern that just got valued at $1B in trades is unbuilt in your sector."
+
+**Yelp Host and Yelp Receptionist** (Yelp blog — https://blog.yelp.com/news/yelp-host-yelp-receptionist-launch/, TechCrunch 4/21 — https://techcrunch.com/2026/04/21/yelps-updated-ai-assistant-can-answer-questions-and-book-a-restaurant-or-service-in-one-conversation/). Voice agent at $149/mo ($99/mo for Guest Manager users) that takes reservations, modifies/cancels, joins the Yelp Waitlist, sends menu links via SMS, takes credit card holds. Native to Yelp's reservation infrastructure. This is the Avoca pattern from 4/17 specifically wrapped for restaurants. Not a new mechanism — but the price point matters. $149/mo is the floor we'd need to undercut or differentiate against if pitching restaurants. The differentiator we have is integration with whatever POS the operator already runs (Toast, Square, Resy) rather than locking them into Yelp's ecosystem.
+
+**Naadam replaced its entire frontline CS team with AI agents** (Shopify retail AI agents writeup — https://www.shopify.com/blog/ai-agents-retail). Founder Matt Scanlan: "Customers email to say 'I love so-and-so; they were so helpful,' and I'm like, 'That's not a person; that's an AI agent.'" Concrete and named, but Naadam is a mature DTC brand on Shopify, not SMB scale, and the underlying mechanism (email/chat agent reads order data + product catalog + policies, drafts replies) is the email-triage-and-draft pattern from 4/17. The Sollos angle is interesting though: a pre-launch CPG brand can deploy this from day one and never staff a CS function at all, rather than replacing one that exists.
+
+**Simon Willison on Lenny's Podcast** (Simon's writeup, 4/2 — https://simonwillison.net/2026/Apr/2/lennys-podcast/). Inflection point thesis around GPT-5.1 and Claude Opus 4.5 in November shifting agents from "mostly works" to "actually works." Useful framing for discovery calls — explains why now is different from the last two years of agent hype — but not a deployment mechanism.
+
+## Sources checked
+- X/Twitter — search operators not supported; broader queries surfaced platform launches and OpenAI GPT-5.5 agent positioning but no SMB sector-specific operator stories
+- Reddit (r/AI_Agents, r/automation, r/smallbusiness, r/HVAC, r/restaurantowners, r/ApplyingToCollege, r/musicschool) — discussions but nothing concrete enough; Felix Reddit-to-product loop already on 4/22
+- Hacker News — Show HN featured Broccoli (one-shot coding agent on cloud), runtime security agents, and the usual developer tooling; nothing SMB-operational
+- Podcasts — Lenny's had Simon Willison (state of agents, useful framing); Service Business Mastery had Dennis Steele from Podium on AI agents at AHR Expo (duplicate of existing voice agent patterns); How I AI 4/23 was an AI design tools roundup, not deployment patterns; Owned and Operated had no specifically new April episode
+- Newsletters — Ben's Bites not directly accessible; broader scans showed enterprise orchestration trends rather than SMB mechanisms
+- Product Hunt — AI agent launches skewed to developer tools and enterprise platforms; no SMB cross-sector operational mechanisms
+- Platform case studies — Zapier, n8n, Make, Lindy, Relay all running mature comparison content; no new deployment stories beyond the lead management and customer follow-up patterns already covered
+- Anthropic and OpenAI customer stories — Claude Managed Agents (4/8) continues enterprise rollout (Notion, Rakuten, Sentry, Asana); OpenAI's 1M business customers milestone is enterprise-scaled
+- Vertical-specific searches — IEC/college counseling space has many vendor pitches (Kollegio, Athena, GradGPT, Orbit, AppTrack, Sups, Parallel AI) but these are student-facing or counselor-tool platforms, not concrete operator deployments with named firms; SAT/ACT prep similar (MentoMind, Acely, AlphaTest, EdisonOS, Whiz); music studio space mostly Jotform/AgentZap chatbot templates without operator stories; pest control space dominated by phone-agent platforms (Goodcall, ServiceAgent, Solea) replicating the Avoca pattern
+- YC — W26 batch already mined heavily on 4/22, 4/24, and 4/25 (Paratus, LunaBill, Bravi, Chasi, Korso, Modern); no new W26 reveals today
+
+## Note for tomorrow
+Three runs out of the last twelve have produced patterns; the rest were empty or near-empty. The thesis the user laid out for this routine — that 30 days of operation should produce 3+ patterns per active prospect — is on track if today's signal density holds. But the source list is starting to feel saturated for general-purpose AI news; future runs need to lean harder on operator-side communities (vertical subreddits, IECA forums, music teacher Facebook groups, restaurant operator Discords) where mechanism-level detail actually gets posted. X being inaccessible from search continues to be a meaningful gap.
