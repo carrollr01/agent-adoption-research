@@ -1,0 +1,7 @@
+Agent Pattern Scan — 2026-04-28 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+No qualifying patterns today. The scan found extensive agent activity—YC W26's 88% AI-first batch with 56 autonomous agent companies, Cloudflare's Agents Week infrastructure launches, and mature ROI data from automation platforms—but nothing met the filter for concrete SMB mechanisms with clear triggers, actions, and replaced tasks that haven't been covered in recent logs.
+
+The patterns emerging (automated morning briefings, social media agents) either lacked the specificity needed or overlapped with existing coverage. Platform maturity is accelerating, but novel cross-sector deployment mechanisms remain elusive.
