@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-05-01 — 1 pattern | Creator recruitment agent saves $24k monthly
+
+https://github.com/your-org/agent-adoption-research
+
+The UGC creator recruitment agent has automated the entire influencer outreach cycle, saving $24k monthly in labor costs. The agent finds creators, negotiates rates, and handles outreach autonomously — running the entire pipeline from discovery to contract while teams focus on creative direction.
+
+This same pattern drops into any business hiring creative freelancers at volume. At small law firms, it finds expert witnesses by searching databases, evaluating credentials, and handling initial outreach with case-specific context. For manufacturing companies sourcing specialized components, it monitors supplier databases, evaluates certifications, and negotiates preliminary pricing before human buyers take over.
+
+The mechanism works wherever you need to find, qualify, and negotiate with specialized service providers at scale. The agent handles the repetitive screening and initial outreach while humans focus on final selection and relationship management.
+
+Most other sources showed extensive agent infrastructure development but nothing meeting the filter for concrete mechanisms with clear triggers and replaced tasks that haven't been covered recently. April 2026 appears to be an infrastructure consolidation month rather than novel deployment patterns.
