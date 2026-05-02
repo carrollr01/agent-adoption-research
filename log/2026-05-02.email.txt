@@ -1,0 +1,5 @@
+Agent Pattern Scan — 2026-05-02 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+No qualifying patterns today. Sources showed significant agent infrastructure development and case studies of platform consolidation, but nothing met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't been covered in recent logs.
