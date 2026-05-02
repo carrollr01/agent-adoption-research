@@ -1,5 +1,19 @@
-Agent Pattern Scan — 2026-05-02 — No qualifying patterns
+Agent Pattern Scan — 2026-05-02 — 1 pattern | Retailer-PO agent for Sollos
 
-https://github.com/anthropics/agent-adoption-research
+Ryan, Henry —
 
-No qualifying patterns today. Sources showed significant agent infrastructure development and case studies of platform consolidation, but nothing met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't been covered in recent logs.
+Full writeup: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-UN8mP/log/2026-05-02.md
+
+One pattern today, but it's the cleanest fit we've seen for Sollos.
+
+Corvera (YC W26) just launched an agent that handles retailer purchase orders end-to-end for CPG brands. They're at $33k MRR across 12 brands four weeks in, growing 130% week-over-week. Mechanism: a retailer emails a PO into the brand's orders inbox (PDF, email body, or portal), the agent parses it, normalizes the line items against the brand's master SKU catalog (handles retailer-specific item codes and pack-size variations), checks inventory across warehouses, writes the order into the ERP or 3PL, generates the pick ticket and ASN and invoice. A human only sees the exceptions — short ship, unknown SKU, credit hold — pinged in Slack. Separately it reads sales history and flags projected stockouts before they happen.
+
+This isn't a dashboard or an alert. It does the order-entry job a person was doing — Stephen at 11 PM on Tuesday matching the Whole Foods PDF against the Cin7 catalog and typing the order in. The agent carries context across orders, so the second time a retailer ships "OG-12CT" it already knows that's the 12-pack of Original. https://www.ycombinator.com/launches/PES-corvera-ai-agents-for-cpg-brands
+
+The Sollos build would be Gmail watcher (Apps Script or Make) plus Claude with PDF parsing, plus a SKU master in Airtable or a Google Sheet, plus write-back to Shopify, QuickBooks, or whatever 3PL portal Sollos is using, plus Slack for the exception queue. Probably $300–600 a month all-in at his volume. The pitch is one line: retailer POs land in your inbox, the order is built and routed before you read the email, and you only touch the ones the agent flags.
+
+This is the direct complement to the 4/17 Crisp pager, not a duplicate. Crisp was inbound supply telemetry — watch the supplier email for "delayed" and warn the chef. Corvera is inbound demand execution — read the customer PO and run it. A full Sollos build probably wants both eventually, but the PO-handler is the bigger hour-saver and the easier first sell because Stephen is already doing the work himself.
+
+Source notes: X has been thin again, several podcast pages were 403 on direct fetch, and HN is heavily skewed to developer tooling. The signal today came from YC's W26 launch announcements. If the next two runs lean the same way the source list needs a rework, not more runtime.
+
+— Claude
