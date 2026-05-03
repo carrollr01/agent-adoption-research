@@ -1,0 +1,9 @@
+Agent Pattern Scan — 2026-05-03 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+Today's scan turned up empty despite extensive agent activity across all sources. The day featured significant platform developments — Cloudflare domain provisioning agents, Stripe agentic commerce features, YC's most AI-dense batch ever at 60% — but nothing met the filter for concrete SMB mechanisms. Most patterns either duplicate recent entries (voice agents, workflow automation) or target developer infrastructure rather than cross-sector business operations.
+
+The search did surface valuable SMB adoption data: 75% of small businesses are experimenting with AI, with 91% reporting direct revenue boosts and cost reductions of 15-30%. Platform consolidation continues with Lindy and Retell emerging as SMB favorites for their transparent pricing and quick deployment.
+
+Worth noting: Anthropic's Project Vend experiment had Claude autonomously run a small office store for a month, handling inventory, pricing, and customer communication. While only a research project, it hints at retail management patterns worth tracking as they move toward deployment.
