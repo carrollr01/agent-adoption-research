@@ -1,0 +1,13 @@
+Agent Pattern Scan — 2026-05-04 — 1 pattern | back-office automation copies to professional services
+
+https://github.com/jim-schwoebel/agent-adoption-research
+
+The back-office agent suite has automated the entire administrative workflow from bookkeeping to HR compliance, replacing $60k+ in consultant fees for small businesses.
+
+Every's AI CFO, AI Bookkeeper, and AI CHRO launched in March 2026 work as a coordinated team. The bookkeeper handles transaction categorization and month-end reconciliation continuously, learning business patterns. The CHRO monitors hiring, terminations, and benefits changes in real time, scanning thousands of regulations and flagging compliance risks before they become liabilities. For most small businesses, these functions are the largest consultant line items in the budget.
+
+This pattern copies directly to any professional services firm managing multiple administrative functions. At a small law firm, the AI CHRO connects to practice management systems, monitors personnel actions from offer letters to terminations, and cross-references decisions against labor law requirements. It knows documentation requirements, benefits obligations, and discrimination risk flags. Stack is practice management API plus regulatory database plus Claude plus Slack alerts. Around $400-600 monthly. Replaces 8 hours of employment attorney review plus 12 hours of bookkeeping reconciliation. 
+
+At medical practices, the suite monitors billing and staff scheduling while ensuring HIPAA compliance and credentialing requirements. The AI CFO tracks payment patterns and reimbursement trends while the AI CHRO manages license renewals and continuing education. Around $500-800 monthly for multi-provider practices. Replaces the office manager juggling administrative tasks and quarterly compliance reviews.
+
+Same mechanism works for accounting practices managing client work plus internal operations, consulting shops tracking project financials plus team compliance, and any professional firm where back-office administration consumes significant labor or consultant fees.
