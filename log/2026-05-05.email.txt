@@ -1,0 +1,13 @@
+Agent Pattern Scan — 2026-05-05 — Month-end close automation copies to service firms
+
+https://github.com/anthropics/agent-adoption-research
+
+The month-end close automation agent has compressed an 8-day process to under 3 days, completing journal entries, reconciliations, and variance analysis in minutes while generating audit-ready workpapers.
+
+OpenAI's accounting team built an agent that handles the full month-end cycle. When calendar triggers hit, it pulls GL balances, retrieves supporting docs, performs automated matching, identifies variances, and drafts explanations for reviewer approval. The agent follows internal policies and improves over time through memory.
+
+Law firms can deploy the same pattern when month-end hits. The agent connects to practice management and accounting systems, categorizes billable time by matter, reconciles trust accounts, generates partnership distributions, and prepares variance analysis. Stack is practice management API plus accounting integration plus Claude plus automated workpapers. Around $600-800 monthly. Replaces 40 hours of office manager time plus 8 hours of CPA consulting at $200/hour. Books close themselves, compliance stays current, zero time on financial administration.
+
+Medical practices handle insurance reconciliations, patient payments, provider compensation calculations, and regulatory reporting. The agent reconciles payments against claims, identifies outstanding receivables, calculates productivity metrics, ensures HIPAA compliance throughout close. $400-700 monthly for single-provider practices. Replaces practice administrator juggling financial tasks and bookkeeper working extra hours during busy periods.
+
+Calendar-triggered financial automation works wherever recurring reporting cycles create predictable workload spikes. The mechanism scales from solo practices to multi-partner firms managing complex revenue streams.
