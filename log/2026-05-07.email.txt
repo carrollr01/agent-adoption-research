@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-05-07 — 3 patterns | overnight scouting beats manual research
+
+https://github.com/a3dev/agent-adoption-research
+
+Three concrete patterns from today's scan show agents moving beyond dashboards into proactive market monitoring. The overnight property scout automatically researches listings while you sleep, filtering by exact parameters — same mechanism works for construction suppliers, restaurant competitor tracking, or legal case monitoring. 
+
+The sales opportunity agent from Rippling builds itself with zero engineering support, researching accounts and summarizing calls to save 5-6 hours weekly — ideal for law firms preparing consultations, accounting practices managing tax season, or medical practices handling patient intake.
+
+The supply chain agent workforce from Corvera (YC W26) scaled from $0 to $33k MRR in four weeks by automating CPG back-office operations — order processing, inventory management, demand forecasting. Same pattern works for small manufacturing coordinating production, restaurants managing food service distribution, or retail handling multi-vendor sourcing.
+
+All three patterns share a common thread: they replace time-intensive research and coordination tasks that don't require human judgment but consume significant weekly hours. The trigger-driven automation means critical decisions get the information they need without someone spending hours gathering it manually.
