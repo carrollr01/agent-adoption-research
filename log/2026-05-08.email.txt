@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-05-08 — Medical billing automation copies to professional services
+
+https://github.com/your-repo/agent-adoption-research
+
+The medical billing agent handles the complete revenue cycle from clinical notes to insurance payment, automating coding, error-checking, and denial management while keeping physicians in control of approvals. Taiga's Y Combinator W26 approach processes clinical notes to generate proper billing codes, reviews claims against payer rules, and automatically appeals denials with full EHR integration.
+
+The same pattern works for any professional services firm with complex regulatory documentation. At a small law firm, the agent reads case notes, identifies billable activities, categorizes them by client billing codes, and flags ethical issues before generating invoices. Stack is practice management API plus billing database plus Claude for activity classification. Around $800-1200 monthly. Replaces the billing coordinator doing 20 hours weekly of time entry categorization and account reconciliation.
+
+At a dental practice, the agent processes treatment notes for procedure codes, submits pre-authorization requests, and manages patient billing workflows with insurance compliance built in. Around $600-900 monthly for multi-provider practices.
+
+The key insight: this isn't just coding automation, it's complete revenue cycle management with professional oversight checkpoints. The agent handles administrative complexity while preserving decision authority where it matters most.
