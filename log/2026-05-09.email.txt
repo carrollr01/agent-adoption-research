@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-05-09 — 1 pattern | multi-role dev team
+
+https://github.com/rcarrol6/agent-adoption-research
+
+The multi-role development agent team automates the complete software development cycle from requirements to deployment, replacing traditional PM-SWE-QA workflows with an orchestrated AI system. The orchestrator creates GitHub issues, launches implementation pipelines, and only commits work after final acceptance validation.
+
+Alexey Grigorev built a system where specialized agents handle PM requirements, software engineering implementation, and QA verification, with each role interacting through structured handoffs. The orchestrator monitors repositories, creates detailed issues from requirements, assigns tasks between specialist agents, ensures process compliance, and commits changes only after complete validation cycles.
+
+This pattern translates directly to consulting firms managing client engagements, where the orchestrator reads project briefs, creates work breakdown structures, assigns tasks to analyst and specialist agents, manages quality review cycles, and delivers completed components with documentation. At law firms, it handles corporate transactions from intake through document preparation and regulatory filing, with agents managing research, drafting, compliance checking, and deadline tracking.
+
+The mechanism replaces 25+ hours weekly of project coordination work and operations management across concurrent deliverables. Stack is project management integration plus client databases plus Claude orchestration plus automated reporting, running around $800-1200 monthly for multi-partner practices. Works wherever structured review cycles are required for professional service delivery.
