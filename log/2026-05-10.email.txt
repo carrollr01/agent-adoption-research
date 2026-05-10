@@ -1,9 +1,32 @@
-Agent Pattern Scan — 2026-05-10 — No qualifying patterns
+Agent Pattern Scan — 2026-05-10 — 1 pattern | Satellite autoquote agent for landscaping cold-outreach
 
-https://github.com/your-repo-url/agent-adoption-research
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-fgXRX/log/2026-05-10.md
 
-No qualifying patterns today. Sources showed extensive agent platform development, infrastructure improvements, and general automation case studies, but nothing met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't been covered in recent logs.
+# 2026-05-10 — Agent Pattern Scan
 
-The research revealed significant activity across all sources — YC's W26 batch is 60% AI-focused with infrastructure becoming the dominant bet, SMB adoption has reached 82% with documented ROI patterns, and platform comparisons show agent orchestration as the primary 2026 use case. However, the mechanisms either duplicate patterns from the last week (property scouting agents 5/7, medical billing automation 5/8, development teams 5/9) or lack the specific operational details needed for cross-sector application.
+## TL;DR
+The satellite-imagery autoquote agent turns a street address into a priced, sendable estimate in under two minutes by tracing turf, beds, driveway, and roof from aerial photos and applying the operator's own rate card. Direct match for our landscaping cold-outreach pipeline and a clean adapt for HVAC and pest control where billable area drives price.
 
-Empty days are data. The shift from novel deployment patterns to infrastructure consolidation suggests the market is maturing rapidly, with fewer breakthrough mechanisms surfacing as the underlying plumbing gets built out.
+## Patterns
+
+### 1. The satellite autoquote agent that prices the job before the truck rolls — `landscaping`
+**Source:** [SatQuote SatMeasure AI launch](https://www.lawnandlandscape.com/news/satquote-introduces-satmeasure-ai-technology/) and [QuoteIQ MapMeasure Pro](https://myquoteiq.com/best-ai-estimating-software-landscaping-2026/) — small lawn-care and landscape ops are now running address-in / quote-out workflows on Nearmap-grade aerial imagery; Lawn & Landscape coverage and the QuoteIQ 2026 estimating roundup show contractors completing the customer-facing portion of an estimate in under two minutes.
+**Mechanism:** Trigger is a homeowner pasting their address into an "InstaQuote" web form (or the contractor dropping it in a CRM record). Agent pulls high-res satellite tiles for that parcel, runs a CV pass to segment turf, beds, driveway, walkways, and roof; applies the operator's stored rate card (per-sqft mowing, fert/squirt, mulch, plow, soft-wash, gutter, etc.); writes a line-itemized PDF estimate plus a CRM contact, fires a confirmation SMS/email with a one-click "accept and schedule" link, and pushes the job to the route-planning system once accepted. Replaces the estimator's drive-out-and-measure visit (1.5–2 hrs each) and the office manager retyping numbers into the CRM.
+**Why agentic:** Multi-step autonomous workflow with a vision model in the middle: it doesn't just display a measurement, it segments the property, decides which surfaces are billable under the rate card, generates a document, contacts the prospect, and books the work. A dashboard would show the imagery; this finishes the deal.
+**SMB translation:**
+- *Vertical:* landscaping (cold-outreach pipeline). Realistic trigger: Squarespace/WordPress quote form, Jobber/Service Autopilot lead webhook, or Google Local Services Ads inbound.
+- *Stack:* Nearmap or Google Static Maps API for imagery, Roboflow- or off-the-shelf SatQuote/Attentive AI for segmentation, n8n or Make as the orchestrator, Claude for tone-matching the proposal copy and handling exception cases (e.g., "lot has a pool, route around it"), Jobber/HCP for the CRM and route write-back, Twilio for the SMS confirmation. Around $250–500/month all-in for a 2–6 truck operation.
+- *Role replaced:* the owner-estimator who currently spends mornings doing free site visits, plus the office admin retyping quotes.
+- *Pitch sentence:* "Every spring inquiry comes back with a priced, branded estimate and a one-click accept button before your competitor has loaded the truck — and you only roll out for the jobs that actually closed."
+- *Adjacent fits:* HVAC (use roof footprint plus year-built to pre-size replacement systems and quote duct cleaning per linear foot), pest control (use parcel sqft plus structure perimeter for termite barrier and rodent exclusion quotes), roofing (already happening with EagleView-style measurements; the new piece is the agentic close, not the measurement).
+
+## Sources checked
+- X/Twitter — search access constrained today; no operator-level posts surfaced that weren't already covered in the 5/9 dev-team or 5/7 property-scout entries.
+- Reddit — r/AI_Agents, r/n8n, r/automation discussions skewed to platform comparisons and Reddit-monitoring agents (already logged 4/22); r/landscaping and r/HVAC threads referenced QuoteIQ and SatQuote workflows but without new mechanism detail beyond what the vendor pages describe.
+- Hacker News — Show HN this window leaned developer-tooling (Tilde.run sandbox, agent security work); nothing SMB-operational that hasn't been captured.
+- Podcasts — How I AI continues on Claire Vo's nine-OpenClaw setup (covered 5/10 prior); Small Business Big AI replays the IMPACT framework and Kim Howard property-scout (logged 5/7); Owned and Operated and Service Business Mastery had no new May episodes with fresh deployment detail.
+- Newsletters — Ben's Bites covered Cursor SDK, Lightfield's plain-English Skills, and Cloudflare Agents Week recap; infrastructure not mechanism.
+- Product Hunt — launches skewed dev-tool (Codex 3.0, Staff.rip, BNA Code, Sim Studio); nothing SMB-operational.
+- Platform case studies — n8n's lead-routing template and Aloware's HubSpot transcript-to-CRM pipeline are real but functionally equivalent to patterns already in the log (4/17 email triage, 5/7 sales-opportunity).
+- Anthropic / OpenAI — Anthropic Code w/ Claude conference (5/6–5/8) shipped Managed Agents updates (dreaming, multi-agent orchestration), Vapi voice-agent partnership, Pendo dev workflow, Wall Street financial-services agents — all enterprise dev or infra, not SMB ops.
+- YC — W26 and S26 commentary continues to consolidate around agent infrastructure (~41% of the batch) rather than new vertical SMB mechanisms; no new launches today that beat the Taiga (5/8), Corvera (5/7), Chasi/Korso (4/25) entries.
