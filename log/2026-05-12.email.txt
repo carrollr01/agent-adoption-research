@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-05-12 — 2 patterns | broker negotiation breakthrough
+
+https://github.com/rcarrol6/agent-adoption-research
+
+The broker negotiation agent automates trucking dispatch's most tedious work—calling brokers to negotiate rates and confirm details—using natural conversation to query market rates and handle deals end-to-end. This pattern works for any business needing human-to-human negotiation at scale.
+
+Numeo's Spot Finder Pro voice agents hold natural conversations with freight brokers, negotiate based on carrier profitability goals, and only involve dispatchers when deals are ready to sign. Same mechanism works for construction companies bidding projects—agents call subcontractors and suppliers to negotiate current pricing in real-time, compare quotes against project budgets, and present pre-negotiated packages to project managers. Also applies to real estate wholesaling where agents contact property owners directly to negotiate initial purchase terms.
+
+YC W26's Modern handles complete IT, HR, and Finance workflows by letting teams define processes in plain language and executing everything from password resets to expense approvals. Construction companies can use the same pattern for project workflows—agent reads specifications, generates work orders, routes permits, and tracks completion. Law firms can automate estate planning workflows from intake through document execution.
+
+The shift is from agents that help with tasks to agents that own entire processes while humans focus on exceptions and strategy.
