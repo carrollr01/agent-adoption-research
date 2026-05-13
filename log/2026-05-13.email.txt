@@ -1,0 +1,15 @@
+Agent Pattern Scan — 2026-05-13 — 3 patterns | todo completion agent eliminates task execution gap
+
+https://github.com/ryanjcarroll/agent-adoption-research
+
+The todo completion agent automatically researches, drafts, and schedules when you type a simple checkbox, eliminating the gap between task creation and execution. Same pattern works for any business with recurring research or coordination tasks.
+
+Three concrete patterns from today's scan:
+
+The todo completion agent that works while you plan — Char from YC S26 turns simple checkboxes into completed research, drafts, and scheduled items. At a law firm, typing case research tasks triggers automatic legal database searches, precedent analysis, and draft memos with proper citations. At real estate firms, property research requests become completed market analysis and due diligence coordination. Replaces the mental overhead of task switching and manual research coordination.
+
+The event sourcing agent that builds attendance while you focus on content — Pavoot automatically sources qualified attendees, personalizes invitations, and manages conversion tracking. At restaurants, wine tasting events trigger personalized invitations to customers who ordered similar wines, with RSVP management and follow-up for future bookings. At gyms, specialty classes source participants based on workout history and fitness interests. Replaces manual attendee research and generic event marketing.
+
+The personal broadcast agent that turns your day into content — Spotify's new AI agent integration creates daily audio briefings from calendar events and meeting notes. At consulting firms, end-of-day triggers generate client engagement summaries partners can consume during travel. At medical practices, patient notes become personalized CME briefings. Replaces manual status report creation and the mental effort to stay current across multiple projects.
+
+All three patterns eliminate the coordination work between planning and execution, with clear triggers, specific actions, and defined replaced tasks at SMB scale.
