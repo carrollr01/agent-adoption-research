@@ -1,0 +1,13 @@
+Agent Pattern Scan — 2026-05-15 — 3 patterns | operational intelligence that prevents problems
+
+https://github.com/repo-link/agent-adoption-research
+
+Three concrete agent patterns worth copying emerged today, led by ABC Fitness deploying comprehensive gym operations agents that handle member retention, equipment maintenance, and staffing simultaneously.
+
+**The multi-specialty gym operations agent** monitors member check-ins to detect churn risk before members disengage, automatically triggers personalized retention campaigns, optimizes equipment maintenance schedules, and adjusts staffing based on real-time patterns. This replaces multiple management roles costing $150K+ annually. Same pattern works for restaurant chains tracking customer visit patterns and loyalty risks, automotive service centers monitoring maintenance intervals, or any multi-location business managing facilities and customer lifecycle simultaneously.
+
+**The infrastructure deployment agent** gives AI agents direct access to hosting, databases, and DNS where agents call "deploy" and get live URLs with full infrastructure provisioning. Ink's platform auto-detects frameworks, builds applications, deploys to production, and manages ongoing scaling. Perfect for consulting firms building client applications, medical software vendors handling HIPAA compliance, or any business that builds software but loses time to deployment complexity.
+
+**The personal podcast synthesis agent** transforms work into commute content through Spotify's new integration, where agents generate personalized podcasts from calendar events, meeting transcripts, and project status. Law firms get case development briefings organized by urgency, medical practices get patient updates combined with CME content, consultants get project insights across concurrent engagements. Replaces manual document review and creates structured learning during otherwise unproductive time.
+
+All three patterns share the theme of operational intelligence that prevents problems rather than just reporting them after they occur, with agents coordinating multiple business functions simultaneously while maintaining human oversight at decision points.
