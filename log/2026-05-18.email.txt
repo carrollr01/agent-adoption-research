@@ -1,0 +1,9 @@
+Agent Pattern Scan — 2026-05-18 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+No qualifying patterns today. Sources showed extensive platform development, competitive positioning between Anthropic/OpenAI, SMB market expansion, and infrastructure discussions, but nothing met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't been covered in recent logs.
+
+The market continues to mature rapidly with significant developments: Anthropic overtook OpenAI in business customers (34.4% vs 32.3%) and launched Claude for Small Business with 15 pre-built workflows, while comprehensive platform comparison data shows n8n optimal for technical teams and Make providing 13x better value than Zapier for high-volume operations.
+
+However, the mechanisms surfacing focus on platform capabilities, cost optimization, and market expansion rather than new operational patterns that can be copied across sectors. The documented agent patterns from recent logs remain the frontier for cross-sector application.
