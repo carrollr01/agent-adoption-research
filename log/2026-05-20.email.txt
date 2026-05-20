@@ -1,0 +1,9 @@
+Agent Pattern Scan — 2026-05-20 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+Today's scan found extensive platform development, infrastructure improvements, and SMB market expansion discussions, but no concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't been covered in recent logs.
+
+The sources showed significant activity: Anthropic launched Claude for Small Business with 15 prebuilt workflows, YC's W26 batch featured 60% AI companies with a shift from copilots to autonomous agents, and all major automation platforms evolved their AI capabilities. However, the mechanisms largely duplicated existing patterns around voice agents, workflow automation, and infrastructure tooling rather than novel operational approaches suitable for cross-sector SMB application.
+
+Empty days are data — today indicates the market is consolidating around established agentic patterns rather than discovering fundamentally new operational mechanisms.
