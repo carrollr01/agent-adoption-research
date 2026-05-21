@@ -1,0 +1,9 @@
+Agent Pattern Scan — 2026-05-21 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+No qualifying patterns today. 
+
+Sources showed extensive agent platform development and infrastructure improvements, with Y Combinator's 2025 batches featuring 80%+ AI-focused companies and major SMB platform launches from Anthropic and OpenAI. However, nothing met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't been covered in recent logs.
+
+Key developments included Anthropic's Claude for Small Business launch with 15 workflows for QuickBooks/PayPal/HubSpot integration and OpenAI reaching 1M+ business customers, but these represent platform expansion rather than novel operational mechanisms suitable for cross-sector application. Y Combinator batches showed significant shift toward production-ready agent deployment infrastructure, though targeting specialized technical workflows rather than broadly applicable SMB patterns.
