@@ -1,0 +1,9 @@
+Agent Pattern Scan — 2026-05-22 — No qualifying patterns
+
+https://github.com/anthropics/agent-adoption-research
+
+No qualifying patterns today. Sources showed extensive agent platform development, infrastructure improvements, and SMB market expansion, but nothing met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't been covered in recent logs.
+
+Key developments included Anthropic's Claude for Small Business launch (May 13) with 15 prebuilt workflows, OpenAI's Deployment Company with $4B investment and 1M+ business customers, and YC's W26 batch showing 60% AI focus with heavy agent infrastructure investment. Platform case studies demonstrated strong ROI (Zapier's NisonCo case reducing research staff from 3-5 to 1, n8n SMB implementations showing 70%+ error reduction), but mechanisms largely extended established automation patterns rather than providing novel cross-sector applications.
+
+While agent adoption continues accelerating across sectors, today's scan reinforced the pattern from recent logs: significant platform maturation and market expansion, but no new deployable patterns that meet A3 Dev's filter for concrete, cross-sector applicable mechanisms.
