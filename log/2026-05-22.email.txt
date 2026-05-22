@@ -1,0 +1,10 @@
+Agent Pattern Scan — 2026-05-22 — 3 patterns | CPG back-office agent workforce for Sollos
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-NJywd/log/2026-05-22.md
+
+TL;DR
+Two of today's three patterns map directly to Sollos: a CPG back-office agent workforce that logs into Shopify, Amazon Seller Central, and the brand's ERP to run order intake, demand planning, and finance reconciliation; and a deduction-recovery agent that navigates retailer portals to dispute invalid chargebacks. The third — Fieldproxy's multi-week recurring-route optimizer for pest control and landscaping — reshuffles the entire service calendar when one quarterly customer reschedules, not just today's stops.
+
+Recipients: rcarrol6@nd.edu, klinhj24@wfu.edu
+
+Full content delivered via Gmail draft. See log/2026-05-22.md for the rendered markdown.
