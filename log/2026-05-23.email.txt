@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-05-23 — 3 patterns | overnight property scouting
+
+https://github.com/anthropics/agent-adoption-research
+
+Three concrete deployment patterns emerged from today's scan that SMBs can copy across sectors.
+
+**Morning Property Scouting Agents** - Kim Howard runs an insurance agency with two agents that scan commercial real estate listings across three Florida markets every morning at 6AM, filtering by her exact parameters while she sleeps. By day start, she has prioritized leads with extracted details and contact info ready. This overnight scanning pattern works anywhere property matters - construction companies could scan permit databases and bid opportunities, property managers could check rental listings and distressed properties, trades could monitor municipal project postings. The trigger is automated scheduling, the stack is MLS/permit APIs plus Google Workspace, and it replaces 2+ hours of manual lead hunting each morning.
+
+**Business Process Documentation Agents** - Y Combinator's Flowscope deploys agents on-site for weeks to learn exactly how businesses operate, documenting workflows, bottlenecks, and repetitive tasks, then producing automation recommendations. This replaces $50-200K consulting discovery phases. The pattern copies well to owner-operator businesses - dental practices, restaurants, HVAC companies, accounting firms - where agents could monitor operations for two weeks via practice management software APIs, phone transcripts, and staff interviews, then deliver workflow maps and automation plans instead of hiring expensive consultants.
+
+**Desktop Skill Orchestration Agents** - One developer runs his entire company using four specialized OpenClaw agents (scheduling, financial, development, operations) triggered by 25 systemd timers based on calendar events, email patterns, and file changes. Each agent handles specific applications and APIs, replacing coordination overhead that typically requires multiple part-time assistants. Professional services could deploy similar skill-based coordination - accounting practices with agents that trigger on client email types to prepare documents and schedule reviews, home health agencies coordinating aide schedules with patient needs, restaurants managing inventory triggers based on POS data.
