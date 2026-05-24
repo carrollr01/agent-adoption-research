@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-05-24 — 1 pattern | voice-enabled phone agents replace receptionist tasks
+
+https://github.com/anthropics/agent-adoption-research
+
+Today's scan revealed one qualifying pattern: voice-enabled phone number agents that handle real inbound and outbound calls, replacing receptionist and sales follow-up tasks across service businesses.
+
+PollyReach launched giving AI agents actual phone numbers for booking, support, and customer follow-up. The key difference from prior voice patterns is persistent phone identity — customers can call back and reach the same agent context. For dental practices, this means agents handle appointment cancellations and immediately offer rebooking using practice management system data. When triggered by no-shows in Dentrix, agents call waiting list patients within 30 minutes offering same-day slots.
+
+The pattern extends to home health agencies coordinating aide schedules after care plan changes, or restaurants handling reservation confirmations triggered by OpenTable events. The technical stack connects Google Workspace, Twilio, and vertical SaaS through standard APIs, replacing front desk staff making dozens of daily coordination calls.
+
+Most other sources showed platform maturation and infrastructure development rather than novel deployment mechanisms. Anthropic's Claude for Small Business launched with 15 prebuilt workflows, YC's W26 batch featured 60% AI companies shifting toward autonomous agents, and automation platforms now offer native AI capabilities. The ecosystem is clearly preparing for broader agent adoption, but today's concrete patterns focused on established voice automation extensions rather than breakthrough cross-sector applications.
