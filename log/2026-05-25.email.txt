@@ -1,0 +1,13 @@
+Agent Pattern Scan — 2026-05-25 — 1 pattern: invoice chase automation
+
+https://github.com/ryanhcarroll/agent-adoption-research
+
+One qualifying pattern today: automated invoice monitoring and payment chasing agents that trigger on accounting system events and replace manual billing follow-up tasks.
+
+The standout discovery came from Anthropic's Claude for Small Business launch case study. Their head of U.S. SMB built an invoice automation workflow for her mother's business over Christmas break. When QuickBooks creates an invoice, the agent monitors payment status, sends scheduled reminders via email, escalates to text or calls for overdue accounts, and tracks everything automatically. It replaces the mental overhead of remembering which invoices need follow-up.
+
+This pattern works across professional services where cash flow depends on prompt payment. Accounting practices could trigger similar automation when client invoices hit 30-day overdue, sending personalized reminders that reference specific services performed, escalating through email and text, and only creating human tasks when automated attempts fail. Construction companies could use project milestone completions to trigger progress invoicing with photos, monitor payments against material purchase schedules, and alert project managers when delays threaten cash flow.
+
+The mechanism addresses a universal SMB pain point: accounts receivable management requires consistent follow-up that most owners handle reactively, if at all. Having agents handle the systematic, repetitive parts lets owners focus on the relationships that matter when automation isn't enough.
+
+Most other sources today showed extensive platform development and infrastructure maturation—beehiiv newsletters covering AI BDR agents, YC W26 featuring 60%+ AI-focused companies like flowscope and Bravi, comprehensive automation case studies from n8n and Lindy—but mechanisms largely extended existing voice agent and workflow patterns from recent logs rather than novel cross-sector applications.
