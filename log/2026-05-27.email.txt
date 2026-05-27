@@ -1,0 +1,35 @@
+Agent Pattern Scan — 2026-05-27 — 5 patterns | vision-based estimate takeoff for trades
+
+https://github.com/rcarrol6/agent-adoption-research/blob/claude/epic-fermat-dHl1t/log/2026-05-27.md
+
+Five qualifying patterns today, and the headline is a fresh mechanism class we have not seen yet: vision-based estimate takeoff. Rudus reads structural PDFs, expands every concrete element into priced line items, and writes back a bid in 70% less time than the human estimator. The same trick ports to landscaping plans, HVAC rough-ins, and any trade where the proposal still starts with somebody printing PDFs and a highlighter.
+
+1. Vision-based estimate takeoff for trades — small-construction, landscaping, trades
+
+Rudus (YC) is a concrete-contractor takeoff agent. Upload structural PDFs, computer vision classifies each sheet (foundation, footing schedule, section detail), follows cross-references across sheets to resolve dimensions and reinforcement, then expands every concrete element into a full assembly with concrete volume, formwork, and rebar bend factors, prices each from the firm's catalog, and lands the bid inside Rudus or exports to HCSS HeavyBid, Sage, or B2W. Two to five times more bids per estimator.
+
+For a landscaping firm bidding off architect site plans, the same flow runs on a Google Drive watch: drop the plan in a shared folder, the agent reads plant schedules, hardscape areas, irrigation zones, prices against the nursery catalog and labor rates, and lands the estimate in LMN, Aspire, or Jobber. Replaces the estimator's evening of hand-counting. Same shape for HVAC bidding off mechanical drawings and small GCs doing rough takeoffs from architectural sets. Pitch: drop the plan in the folder, by the time you finish coffee you have a bid with line items you can defend.
+
+2. Insurance verification and claim resubmission as a closed loop — dental-and-vet-clinics, medical-practices, chiropractic
+
+Toothy.ai (YC) runs the full insurance lifecycle for dental practices. Trigger is a new patient or appointment in Open Dental, Dentrix, or Eaglesoft. Agent calls insurance providers, fills the 50+ code benefit breakdown, submits claims, and — the part that's new — when a claim comes back denied, reads the denial reason, updates and resubmits, drafts the appeal letter. Practices cut back-office headcount 50-75% and lift collected revenue 5-10% because claims actually get worked.
+
+Same closed loop fits veterinary clinics with Trupanion and Nationwide pet pre-auths, chiropractic billing, and small physical-therapy practices. Stack is PMS API plus clearinghouse plus Twilio plus Claude. Pitch: you stop leaving five figures a year on the table because nobody had time to call Trupanion back.
+
+3. Ambient case-presentation coaching — dental-and-vet-clinics, iecs, chiropractic
+
+Avora (YC) sits in a dental operatory. One tap at the start of an appointment, the agent records the patient-provider conversation, auto-charts perio readings, drafts the SOAP note, and scores the case-presentation conversation against a rubric — did the provider name the treatment plan, address the objection, make the financial offer. Replaces both the scribe and the quarterly clinical sales coach.
+
+Ports to IECs running parent-and-student kickoff meetings: the agent listens, drafts the family summary into CollegePlannerPro, and scores the founder-counselor's associate on whether they surfaced the test-prep upsell or got a yes on the next meeting before the family left. Same fit for chiropractic and high-ticket consultative practices (fertility, plastic surgery). Pitch: your associates get coached on every meeting, not the ones you have time to sit in on.
+
+4. Multi-step close execution for bookkeeping shops — accountants, bookkeepers, fractional-cfo
+
+Basis (OpenAI customer story) runs at 30% of the top-25 US accounting firms. Trigger is a scheduled close cadence. Agent reads GL, bank feeds, AP/AR docs, categorizes transactions, and actually executes the multi-step reconciliations and journal entries — it does not just propose them. Outputs a close packet. 30% time savings on close work. Distinct from the invoice-chase pattern we logged 5/25 because the action is the close itself.
+
+For a two-or-three-person bookkeeping shop with twenty SMB clients on QBO or Xero: trigger the 25th of the month, agent pulls feeds via Plaid, categorizes against client-specific rules, posts recurring JEs (depreciation, payroll accruals, sales tax), flags anomalies, drops a one-page close packet into Drive for the bookkeeper to review. Stack is QBO/Xero API plus Plaid plus Claude plus Drive. Replaces three days of close per client. Pitch: your firm does 60 closes a month with the same headcount you do 20 with today.
+
+5. Live warm handoff from agent to human, mid-call — iecs, sat-act-prep, real-estate, gyms
+
+Fello (Inman, May 22) launched Felix, a real-estate lead-follow-up agent. Trigger is a new lead in the Fello CRM. Agent pulls the property record (ownership, equity, mortgage, AVM, MLS activity), dials and texts on an adaptive cadence, qualifies on the call, and live-transfers the qualified prospect to a human agent while they're still on the line. Voice is third-party (Vapi-class) but the live-transfer choreography is the differentiator. 30 live handoffs/day per beta team.
+
+For an IEC, the same flow runs against a Squarespace "free consult" form. Agent calls within five minutes, qualifies (junior or senior, target schools realistic, parents on board, budget), and warm-transfers a qualified parent to the founder-counselor's cell if she's available or books to Calendly if she's not. Stack is form webhook into n8n plus Claude plus Vapi/Retell plus Twilio plus CRM. Replaces the admin assistant who screens leads two days late. Same shape for SAT/ACT prep and gyms doing trial-conversion calls. Pitch: every parent who fills out your form gets a real call within five minutes, and you only get on the phone with the ones ready to enroll.
