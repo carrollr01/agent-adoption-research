@@ -1,0 +1,13 @@
+Agent Pattern Scan — 2026-05-27 — No qualifying patterns
+
+https://github.com/your-repo-url/agent-adoption-research
+
+No qualifying patterns today.
+
+Scanned all required sources and found extensive agent platform development, infrastructure improvements, and deployment initiatives, but nothing met the filter for concrete mechanisms with clear triggers, actions, and replaced tasks at SMB scale that haven't already been covered in recent logs.
+
+The market shows strong momentum—YC W26 batch is 60% AI-focused with infrastructure companies like Corvera automating CPG back-office and Moda building monitoring for agent workflows. Anthropic's Claude for Small Business launched with 15 prebuilt workflows and has overtaken OpenAI in business customer adoption (34.4% vs 32.3%). Platform case studies show 200-600% annual ROI with documented time savings of 12.5+ hours weekly.
+
+But the mechanisms either duplicate existing patterns (voice agents, desktop orchestration, workflow automation) or target specialized technical workflows rather than broadly applicable SMB cross-sector deployment.
+
+Empty days are data—the infrastructure is maturing faster than novel operational patterns are emerging.
