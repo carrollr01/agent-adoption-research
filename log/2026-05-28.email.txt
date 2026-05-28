@@ -1,0 +1,13 @@
+Agent Pattern Scan — 2026-05-28 — 1 pattern: project milestone invoicing automation
+
+https://github.com/a3-dev/agent-adoption-research
+
+One concrete pattern emerged today: project milestone completion triggers that automatically handle invoicing, templating, and client communication workflows. While sources showed extensive infrastructure maturation and SMB adoption growth, most mechanisms duplicate established patterns from recent logs.
+
+The standout pattern comes from Anthropic's Claude for Small Business launch, showcasing design agencies where agents monitor project milestone completion in Asana, automatically generate QuickBooks invoices using project details, create branded templates through Canva, and send formatted invoices via email. This replaces the manual tracking of project progress and milestone billing creation.
+
+The pattern translates well to construction companies triggering from project phase completions in BuilderTREND or CoConstruct, with agents pulling progress photos to generate visual milestone invoices. For consulting firms, agents trigger from deliverable approvals, automatically invoicing with work summaries and attached final deliverables.
+
+Today's scan revealed significant platform evolution — Zapier launched Agents for 8,000+ apps, Make introduced Maia AI assistant, n8n 2.0 shipped LangChain integration — but these represent infrastructure advancement rather than novel cross-sector deployment mechanisms. YC's W26 batch showed 190 companies with 64% B2B infrastructure focus, indicating the agent ecosystem is maturing rapidly for enterprise deployment.
+
+The most telling trend: 79% of enterprises now run AI agents in production with 171% average ROI, suggesting the experimental phase has ended and operational deployment is becoming standard practice.
