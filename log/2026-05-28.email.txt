@@ -1,0 +1,16 @@
+Agent Pattern Scan — 2026-05-28 — 3 patterns | photo-to-quote field estimating for trades
+
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/claude/epic-fermat-IvHpH/log/2026-05-28.md
+
+Three deployable patterns today, all in sectors we actually pitch.
+
+1. Photo-to-quote field estimating agents (landscaping, HVAC, small construction, painting/roofing)
+A contractor snaps jobsite photos or uploads drawings, and the agent estimates area and conditions from the images, runs the takeoff against a rate card, and returns a line-item quote in under a minute. BuildFolio, Handoff, and QuoteIQ all shipped versions of this; one BuildFolio contractor went from 5 quotes a week to 18 with better close rates because the customer gets the number while still in the yard. For a landscaping crew: owner texts three photos of a yard to a number, the agent measures bed and turf area, applies per-square-foot rates, and sends a quote plus a booking link. Stack is a Twilio number or upload form, Claude API with vision, a Google Sheet rate card, Google Workspace. Replaces the owner doing takeoffs at the kitchen table after dark. Pitch: quote every lead the day it comes in instead of losing half to whoever answered first.
+
+2. Review-response agents that triage by star rating (restaurants, dental/vet, gyms, music lessons, trades)
+Trigger is a new Google Business Profile review. The agent reads the rating and branches: 4-5 stars get an auto-posted thank-you and a team ping; 1-3 stars pull the business's response policy from a knowledge base, draft a compliant reply to the specific complaint, fire an urgent text/Slack alert to the owner, and hold for approval before posting. Everything logs to a sheet. Zapier and n8n both ship this. For The Music Space: positive reviews answered and reposted to Instagram, a one-star "teacher kept cancelling" routed to Justin's phone with a drafted apology and make-good he approves in one tap. For a clinic it protects the rating that drives new-patient search ranking. Pitch: you'll never miss an angry review again, and you'll never write a thank-you note by hand.
+
+3. Threshold reorder agents that email the supplier for you (CPG, restaurants, retail, auto repair)
+Trigger is a SKU crossing its reorder point in Shopify, Square, or a tracking sheet. The agent reads stock, supplier lead time, minimum order quantity, and recent sell-through, drafts a purchase order, emails the vendor, logs it, and pings the owner. YC W26's Corvera is productizing this for CPG back-office ($0 to $33k MRR in four weeks across 12 brands). For Sollos the painful inputs are long-lead raw materials, not finished cans: an agent that knows each input's lead time and emails a draft PO when projected runway drops below it turns "we almost ran out of cans again" into a Tuesday email the founder approves. Honest scope: threshold-plus-velocity math, not demand-forecasting ML, so it runs on Make or n8n plus Claude API and Gmail. Pitch: your inventory emails its own POs and you just hit approve.
+
+Held back: inbound-lead qualify-and-book agents (n8n/RetellAI templates) were strong but overlap the voice booking pattern logged 5-24, so they're noted, not counted. Full mechanism notes and all sources checked are in the repo file linked above.
