@@ -1,0 +1,49 @@
+Agent Pattern Scan — 2026-06-11 — 4 patterns | scheduled metrics-narrative agent replaces analytics dashboards
+
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-06-11.md
+
+# 2026-06-11 — Agent Pattern Scan
+
+## TL;DR
+Anthropic shipped cron schedules and credential vaults for Claude Managed Agents on June 9. Rakuten's launch quote is the interesting bit: their PMs read scheduled agent-written narrative reports of production logs and metrics "without creating an analytics dashboard." The pattern is dashboards-as-prose-on-a-timer, and it generalizes far beyond engineering ops.
+
+## Patterns
+
+### 1. Scheduled metrics-narrative agent (the dashboard killer)
+Source: Anthropic — What's new in Claude Managed Agents (https://claude.com/blog/whats-new-in-claude-managed-agents). Rakuten teams running scheduled Claude agents in production, announced June 9, 2026.
+Mechanism: Cron schedule fires, agent starts a fresh session, reads production logs, metrics endpoints, and spreadsheets via authenticated CLI tools and credentials pulled from a vault, writes a narrative report or slide deck summarizing what changed and what's healthy, posts the output to a Slack channel, doc, or email. Replaces the analytics dashboard a PM would otherwise build and check.
+Why agentic: It's not displaying data; it's re-deciding each run what's worth saying. The trigger is time, the work is judgment, and the output is prose, not panels.
+Generalizable core: scheduled cron, agent queries authenticated data sources, composes narrative summary of state and deltas, writes to a destination people already read.
+Deployability: Claude Managed Agents + credential vault, or Claude API + cron + MCP, or n8n schedule + Claude + Slack. Weekend build for one data source. Replaces the BI analyst's weekly status email and the dashboard nobody opens. Works at any scale.
+
+### 2. Prior-authorization denial appeal agent
+Source: Insight Health — AI in prior authorization appeals (https://www.insighthealth.ai/blog/prior-authorization-appeal-ai). Health systems running this in production; one referenced reducing appeals from 15–16 days to 1–2.
+Mechanism: New denial letter arrives in the payer portal or fax inbox, agent OCRs and parses the denial reason, pulls relevant clinical notes and prior records from the EHR, matches the documentation against the payer's published criteria, drafts the appeal letter with specific citations to the chart, routes to a clinician for sign-off, submits to the payer. Replaces the RN reviewer or revenue-cycle staffer who normally spends an hour per appeal.
+Why agentic: It reads unstructured denial text, reasons about which clinical evidence rebuts the stated reason, and assembles a payer-specific argument. A form can't do this.
+Generalizable core: rejection event in any approval workflow, agent reads the reason, pulls supporting evidence from the system of record, drafts a tailored rebuttal, human signs.
+Deployability: Google Document AI or Azure OCR + EHR API + Claude/GPT + a sign-off queue. Month build; once one payer + one EHR is wired, more payers are days of work. Replaces or augments the revenue cycle clerk. Note: payer-side AI is generating more denials in parallel, which makes the asymmetry favor clinics getting their own.
+
+### 3. Post-call deal-state reconciliation agent (Smart Deal Progression)
+Source: HubSpot Spring 2026 Spotlight (https://www.hubspot.com/company-news/spring-2026-spotlight). Shipped to all Sales Hub customers; HubSpot's own product.
+Mechanism: A sales call ends, transcript becomes available, agent reads the transcript plus the deal's full history (prior emails, notes, activity, pipeline definition, stage criteria, forecasting rules), proposes specific field updates to deal properties, drafts a contextual follow-up email referencing what was actually said on the call, surfaces next steps that fit the team's pipeline conventions, rep approves with one click. Replaces 10–20 minutes of post-call CRM hygiene that reps normally skip.
+Why agentic: Reasoning is over a moving graph (deal history) and a domain ontology (the team's specific pipeline rules), not just transcript summarization. Same call produces different CRM updates depending on stage.
+Generalizable core: conversation completes in any channel, agent assembles the relevant entity's history and the org's rules, proposes typed updates to the system of record plus a tailored outbound action, human approves.
+Deployability: Native in HubSpot now; portable to other CRMs via call-recording webhook (Gong/Fathom/Zoom) into Claude + CRM MCP. Weekend build for a custom Salesforce or Pipedrive version. Replaces the "rep updates CRM" task that, in practice, never happens.
+
+### 4. Proactive recall-and-reminder voice agent
+Source: Famulor — AI voice agent for veterinary practices (https://www.famulor.io/blog/ai-voice-agent-for-veterinary-practices-247-front-desk) and VoiceFleet — AI receptionist for vet clinics 2026 guide (https://voicefleet.ai/blog/complete-guide-ai-receptionist-vet-clinics-2026). Running in single-location dental and vet practices; vendors report 50% no-show reduction.
+Mechanism: Nightly cron queries the practice management system (Dentrix, ezyVet, Cornerstone), pulls patients with appointments in 48 hours and patients overdue for a recall (wellness, hygiene, vaccine boosters), places outbound voice calls in a low-volume window, agent confirms or reschedules or books, then writes the result back to the PMS as a confirmed slot, a rebooked slot, or a logged contact attempt. Replaces the front-desk task of working a recall list, which most small practices simply skip.
+Why agentic: It's outbound, schedule-driven, and writes structured PMS state from a free-form conversation. Distinct from the inbound voice receptionist pattern logged 2026-05-24.
+Generalizable core: scheduled query of a system of record, agent identifies records needing outreach, initiates conversation in the right channel, writes structured outcome back to source.
+Deployability: Vapi or Retell + PMS API + a small policy layer. Week build for a single PMS integration. Replaces the part-time recall coordinator most clinics can't afford. Caveat: PMS integration depth is the real moat.
+
+## Sources checked
+- X/Twitter — inaccessible this run.
+- Reddit (r/AI_Agents, r/automation, r/smallbusiness, r/dentistry, r/veterinary, r/healthIT) — tool recommendations only.
+- Hacker News — Show HN skewed to coding agents and observability.
+- Podcasts — How I AI, Owned and Operated, Small Business Big AI leaned framework/philosophy this week.
+- Newsletters — Builder Radar week of June 4 (403 on fetch), O'Reilly Radar June 2026 covered the Anthropic Managed Agents schedule launch.
+- Product Hunt — coding/observability tilt, nothing SMB-applicable.
+- Platform case studies — Vapi/Retell/Famulor/VoiceFleet recall-calling deployments distinct enough from May 24 entry to log.
+- Anthropic and OpenAI customer stories — Anthropic shipped Managed Agents cron + vault June 9 with Rakuten as lead customer.
+- YC — W26 launches skewed to agent infrastructure.
