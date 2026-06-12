@@ -1,0 +1,40 @@
+Agent Pattern Scan — 2026-06-12 — 3 patterns | Agent-as-CI-step from GitHub Agentic Workflows
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-06-12.md
+
+TL;DR
+GitHub Agentic Workflows went into public preview yesterday, turning agent behavior into a first-class CI/CD step defined in Markdown — the cleanest example yet of "inbound record triggers agent, reads context, drafts response, writes back" as deployable infrastructure rather than a SaaS product. Salesforce shipped Agentforce Operations with "digital blueprints" that compile process docs into structured multi-system execution plans, and Mistral Vibe's remote agents made chat-triggered long-running cloud work the default mode for coding agents.
+
+1. Agent-as-CI-step driven by repository events
+Source: GitHub Agentic Workflows public preview (June 11, 2026), https://github.blog/changelog/2026-06-11-github-agentic-workflows-is-now-in-public-preview/. The Agentics sample pack at github.com/githubnext/agentics ships ~30 prebuilt workflows including issue-triage and ci-doctor.
+Mechanism: A repository event fires (new issue, CI failure, PR comment, cron). The compiled Action spins up a sandboxed coding agent inside an Agent Workflow Firewall, which reads the triggering record plus the codebase, similar past issues, and CI logs. It runs a defined sequence — for issue-triage, that's Gather Context, Spam/Quality Check, Triage Type and Labels, Detect Duplicates, Post Report. Outputs are constrained through a safe-outputs validator before being written back as labels, comments, or new issues. Replaces the maintainer's first-pass triage and the on-call's CI-failure investigation.
+Why agentic: The workflow is one Markdown file invoking reasoning ("determine if this is a bug, enhancement, or question"), not a regex/label-map. The same definition can call MCP tools, search the codebase semantically, and decide whether to escalate.
+Generalizable core: Inbound record in a queue → agent enriches with similar-record search and system context → classifies and drafts response → writes back to the record under output-shape constraints.
+Deployability: GitHub Actions + Markdown workflow file + GITHUB_TOKEN (no PAT needed as of June 11) + any configured model. Weekend build for the first workflow. Replaces the human first-touch on any ticketing queue.
+
+2. Process-doc-to-blueprint compilation as the deployment primitive
+Source: Salesforce Agentforce Operations launch, https://www.salesforce.com/news/stories/agentforce-operations-announcement/. 30+ out-of-the-box blueprints for PO rescheduling, invoice auditing, onboarding. Slack/Teams integration arriving in June.
+Mechanism: Operator drops an existing process document or workflow diagram into the platform. The system parses it into a "digital blueprint" — a structured set of agent instructions describing each step, the systems involved, the approval gates, and the success criteria. An inbound event (vendor email about a delayed PO, AP queue receives an invoice, new hire record created) triggers the matching blueprint. Specialized agents run the steps across email, ERP, and Salesforce: pulling the PO line, checking inventory and contract terms, drafting the supplier reply, routing the approval, updating the PO record. Replaces the back-office coordinator chasing approvals across disconnected systems.
+Why agentic: The blueprint encodes intent ("reschedule this PO to minimize stockout risk while staying within contract terms"), not a fixed branching script. Agents decide which fields to read, which approver to pull in, and when to escalate.
+Generalizable core: Existing SOP/diagram → compiler turns it into a structured agent execution plan → triggered by a system event → agent runs the plan across heterogeneous systems with human approval at defined gates.
+Deployability: Salesforce list pricing is enterprise. The transferable idea is the compilation step: Claude with MCP servers per system plus a structured-output prompt can do the same blueprint translation for a fraction of the cost. Month build to replicate with Claude + n8n + per-system MCPs. Replaces operations coordinators and AP/AR clerks who shuttle data between systems. Scale caveat: Salesforce's version assumes enterprise data volumes; open-stack version works at SMB scale but the operator has to write the SOP first.
+
+3. Chat-message-triggered cloud agents with persistent sessions
+Source: Mistral Vibe remote agents, https://mistral.ai/news/vibe-remote-agents-mistral-medium-3-5/. Slack and other third-party triggers shipping in June for engineering teams that want background work without keeping a laptop awake.
+Mechanism: User posts a task in Slack ("rewrite the auth flow on the staging branch and open a PR"). The trigger hits Vibe, which spins up a sandboxed cloud session running Mistral Medium 3.5, connects to GitHub, reads the repo plus any tool connectors the team has wired, and runs for as long as the work takes — minutes or hours. Sessions persist across user device shutdowns and can run in parallel. When the agent reaches an approval gate or finishes, it notifies the user in Slack and surfaces the diff for review. Replaces the developer babysitting a local agent session and the manual approval-loop tedium of long-running coding tasks.
+Why agentic: The session is goal-driven over hours, not request-response. It plans, executes across tools, hits checkpoints, and resumes — the user just posted a sentence.
+Generalizable core: Inbound chat message → durable cloud agent session is created → agent works against the goal across connected systems → checkpoints come back to the same chat thread for approval.
+Deployability: Stack as built is Vibe + GitHub + Slack. The reusable pattern works with Claude Code via Anthropic's Agent SDK + a Slack bolt app + a sandbox runtime (Modal, Fly, or a managed service). Week build to wire Slack triggers to a hosted agent runtime with persistent sessions. Replaces the human keeping an IDE open while an agent works. Scale caveat: developer-tool pattern today, but chat → durable session → checkpoint loop generalizes to any long-running judgment work.
+
+Sources checked
+- X/Twitter — platform-level announcements rather than operator-level deployments
+- Reddit — search access limited; aggregate trends only
+- Hacker News — agent governance and trust focus rather than new operational mechanisms
+- Podcasts — How I AI and Small Business Big AI ran episodes on patterns already documented in May
+- Newsletters — Ben's Bites covered Cloudflare provisioning (already logged), Vercel AI Gateway, interactive cookbook
+- Product Hunt — Mistral Vibe remote agents (qualifying), Dune Keypad with Claude, Mina Meeting Assistant, Databox MCP
+- Platform case studies — comparison guides this week, not new customer deployments
+- Anthropic and OpenAI — Skills Marketplace growth (~600 skills), PwC partnership, Workspace Agents
+- YC — Bravi (already logged), Hessian, Vortexify; thin public mechanism detail
+- Salesforce Agentforce Operations — qualifying pattern
+- GitHub Agentic Workflows — qualifying pattern
