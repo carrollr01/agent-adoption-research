@@ -1,0 +1,54 @@
+Agent Pattern Scan — 2026-06-14 — 3 patterns | Property manager market intel agent replaces $1K/mo VA spreadsheet
+
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-06-14.md
+
+# 2026-06-14 — Agent Pattern Scan
+
+## TL;DR
+Three patterns today, all with clean trigger-action skeletons. A property manager's $1,000/month comp-tracking spreadsheet was replaced by a scheduled scraping/diff agent. SaaStr ran the operating model further: 20 specialized sales agents supervised by 1.2 humans replaced a 10-person SDR/AE team. ShowAndTell's post-visit dental agent generates an interactive treatment plan the patient chats with, then re-engages on a schedule until accepted.
+
+## Patterns
+
+### 1. Competitor market intel agent for property managers
+Source: Jon Matzner on X, June 2026 (https://x.com/MatznerJon/status/2053824192173502598) — cofounder of Sagan describing a residential property manager that had paid $1,000/month for a VA-maintained spreadsheet for 12 years, tracking competitor vacancies, rent changes, days-on-market, and local supply trends. Sagan replaced the spreadsheet with an AI agent.
+
+Mechanism: scheduled daily trigger → agent scrapes competitor unit listings across Zillow, Apartments.com, Realtor.com, Rent.com and local MLS feeds within the operator's submarkets → diffs against yesterday's state (listed, delisted, rent changed, days-on-market crossed a threshold, new supply in a zip) and classifies each change as noise or price-signal → writes the synthesized comp grid into the operator's existing Sheet/Airtable and pings Slack/email when a material change crosses a threshold ("two 2BRs at 0.5mi just dropped $75; you're now $90 over the new median") → replaces the VA who maintained the spreadsheet and the owner's weekly comp-check ritual.
+
+Why agentic: the agent owns the daily diff and the classification of what's worth surfacing, not a passive scrape feeding a chart. It decides what's a signal and who hears about it.
+
+Generalizable core: scheduled scrape of public competitor data → daily diff + threshold classification → write to operator's existing workspace + ping on material change → replaces a manual analyst seat.
+
+Deployability: Firecrawl/Apify for the scrape, Make or n8n for orchestration, Claude API for diff classification and the change summary, Google Sheets + Slack for output. Roughly a week build, ~$200-400/month in tools. Replaces ~$1,000-1,500/month of VA time. Same pattern ports into hotels (OTA pricing), independent restaurants (DoorDash/Grubhub menu pricing in the neighborhood), self-storage (SpareFoot/SiteLink rates), used-car lots (CarGurus inventory), and HVAC/plumbing (competitor service-call pricing scraped from Yelp/Angi).
+
+### 2. SaaStr's 20-agent sales floor
+Source: Jason Lemkin on Lenny's Podcast (https://www.lennysnewsletter.com/p/we-replaced-our-sales-team-with-20-ai-agents) — SaaStr replaced its ~10-person outbound/inbound sales team with 20 specialized AI agents supervised by 1.2 humans. The trigger was two SDRs quitting during their annual event.
+
+Mechanism: each agent owns one narrow motion. Outbound agents trigger on a fresh ICP list (or hiring signal, podcast appearance, event registration) → read enrichment data + CRM history → draft and send personalized cold sequences → log replies. Inbound qualification agents trigger on form submission → read prospect context + intent signals → respond, qualify, and route hot leads onto a calendar. Support agents trigger on tickets → read knowledge base + account history → draft replies and escalate edge cases. The 1.2 human role is a technical marketer/RevOps person managing segmentation, prompt drift, and approving high-stakes outbound.
+
+Why agentic: each agent runs an end-to-end motion (read context, draft, send, log) rather than scoring leads for a human to act on. The human supervises segments, not deals.
+
+Generalizable core: inbound or outbound event in a channel → agent assembles prospect/customer context → drafts and sends the action → logs and routes the result → one ops human supervises segmentation and quality across a fleet of narrow agents.
+
+Deployability: HubSpot or Salesforce as system of record, Clay or Apollo for enrichment, Claude API or GPT for drafting, Smartlead/Instantly/Lemlist for sending at deliverability, Calendly/Chili Piper for booking, Twilio for SMS. Each motion is a 1-2 week build; the full fleet is a month-plus. Replaces the $70-90K SDR seat outright at SaaS-style funnels; the same shape works in any sector running an intake pipeline — insurance brokerages, recruiting agencies, MSPs, B2B services, home services qualifying inbound estimate requests.
+
+### 3. ShowAndTell's post-visit dental treatment plan agent
+Source: ShowAndTell (YC F24) Launch page (https://www.ycombinator.com/launches/MIQ-showandtell-ai-agents-for-dental-patient-operations) — AI agents for dental patient operations; bootstrapped to ~$110K ARR by mid-2026. The pitch is that practices lose up to 70% of presented treatment dollars because patients leave without understanding or trusting their plan.
+
+Mechanism: trigger = visit completes in the practice management system (Dentrix, Open Dental, Eaglesoft) → agent reads the dentist's recommended treatment plan (procedures, tooth numbers, clinical justification), the patient's chart and imaging, and the insurance coverage estimate → generates a personalized interactive treatment plan that explains each procedure, why it matters, and the out-of-pocket cost → delivers it by SMS link, where the patient can chat with the plan to ask questions in the doctor's voice and book a follow-up → if the plan hasn't been accepted after N days, the agent sends a personalized check-in message → acceptance state is written back to the PMS so the front office sees status without chasing it → replaces the treatment coordinator's manual follow-up calls and the front desk's recall outreach.
+
+Why agentic: it doesn't email a PDF estimate. It runs a multi-turn conversation with the patient, decides when to re-engage, and writes acceptance state back into the practice's system on its own schedule.
+
+Generalizable core: completed customer encounter → agent reads the recommended next action and the customer's situation → generates a conversational explanation the customer can interact with → re-engages on its own schedule until accepted or declined → replaces a coordinator chasing unsold work.
+
+Deployability: PMS integration via APIs (Dentrix Ascend, Open Dental, Eaglesoft Cloud) + Claude API for explanation + Twilio SMS + optional Stripe for deposit at acceptance. Productized as ShowAndTell; custom build is a 2-3 week project for a single PMS. Replaces the treatment coordinator's follow-up motion (and a chunk of the $50-150K/yr salary). Ports cleanly to vet clinics (post-exam treatment estimates from ezyVet/AVImark), optometry (glasses/contacts plans), elective medical (PT, fertility, dermatology, plastics), and home services (post-inspection HVAC/roof replacement quotes that today get faxed in a folder and then ghosted).
+
+## Sources checked
+- X/Twitter — Jon Matzner's property-manager comp agent post qualified. Cloudflare Agents Week wrap-up was mostly platform infrastructure (Dynamic Workers, Workflows V2, Agent Memory, Browser Run, Agent Lee in-dashboard agent), not customer-side mechanisms.
+- Reddit — direct subreddit fetches blocked; search-engine coverage of the relevant subs surfaced general adoption discussion but no mechanism-level posts I could confirm.
+- Hacker News — June 12 front page light on mechanism-level deployments; Show HN traffic skewed to agent infrastructure (debugging, sandboxing, eval harnesses).
+- Podcasts — Lenny's Lemkin episode on the 20-agent SaaStr sales floor qualified. Lazy Leverage covered the property-management space but the comp-agent mechanism came from Matzner's X post.
+- Newsletters — Builder Radar and Ben's Bites blocked by 403 on fetch; search snippets showed agentic-engineering tips and Cloudflare provisioning, no new SMB mechanisms.
+- Product Hunt — June launches led by Gigacatalyst and AGNT.Hub — platforms rather than deployed customer mechanisms.
+- Platform case studies — n8n marketing-agency lead processing and Delivery Hero account-lockout automation (covered prior). Pine Park Health using Retell for senior-care scheduling largely duplicates voice-agent patterns.
+- Anthropic and OpenAI — Anthropic's June activity centered on the June 15 Agent SDK credit-pool change and Dynamic Workflows for codebase-scale subagent fan-out — developer tooling rather than SMB mechanisms.
+- YC — Spring 2026 Demo Day on June 16; pre-Demo-Day Launch YC posts skewed to agent infrastructure. ShowAndTell from F24 qualified on mechanism.
