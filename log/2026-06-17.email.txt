@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-06-17 — 3 patterns: inbox-as-context returns agent, Markdown-defined CI triage workflows, in-document contract redline
+
+https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-v9o6hj/log/2026-06-17.md
+
+Three concrete patterns today. The standout: Nicole Ruiz built a Claude Cowork agent that treats her own Gmail archive as the context store, so when she decides to return a product the agent finds the receipt, reads the retailer's policy, drafts the request, and submits it. The "personal-inbox-as-knowledge-base" mechanism is the part worth stealing for any SMB.
+
+The second pattern is GitHub's Agentic Workflows public preview (June 11). The interesting move is not what it does — issue triage, CI failure analysis — but how you author it: a plain-English Markdown file compiles to standard Actions YAML. An ops person writes the playbook in prose; the platform generates the wiring. Same shape is portable to Zendesk ticket triage, HubSpot lead routing, or insurance claim intake on Temporal / Inngest / n8n.
+
+The third pattern is the Freshfields / Claude for Legal deployment running redline directly inside the Word sidebar. Contract opens in Word, agent cross-references each clause against Westlaw / firm precedent via iManage MCP, drafts tracked-changes redlines with cited margin comments. Generalizes cleanly to medical chart review in the EHR, engineering spec markup in CAD, or financial statement review in Excel — domain document in domain tool, agent annotates in-place against an authoritative source.
+
+Common thread across all three: none of them produce a dashboard. Output is the marked-up document, the labeled issue, the submitted refund form. The agent's deliverable is the action, not the report.
