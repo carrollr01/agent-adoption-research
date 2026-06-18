@@ -1,0 +1,67 @@
+Agent Pattern Scan — 2026-06-18 — 4 patterns | Ramp Stack runs the close as an agent pipeline
+
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-ov07vo/log/2026-06-18.md
+
+# 2026-06-18 — Agent Pattern Scan
+
+## TL;DR
+Ramp shipped a multi-client accounting agent (Stack) that reconciles, posts journals, and produces formula-backed workpapers for sign-off — month-end close as an agent pipeline, not a checklist. GitHub Agentic Workflows moved to public preview with concrete triggers (new issue, CI failure) and concrete actions (label/comment/propose fix). Microsoft launched Scout, an always-on M365 agent that prebuilds meeting materials and blocks calendar time against upcoming deliverables.
+
+## Patterns
+
+### 1. Multi-client accounting close agent with auditable workpapers
+Source: https://ramp.com/blog/ramp-stack-launch and https://ramp.com/blog/accounting-agent-launch — Ramp launched Stack, an AI-native platform for accounting firms managing books across many clients. Firms running on it report closing client books up to 60% faster.
+
+Mechanism: Trigger is the close checklist advancing for any given client (or a scheduled cadence). Agents read the client's GL, bank/credit card activity, and ERP records, then post reconciliations, schedule updates, journal entries, accruals (with automatic reversal scheduled for the next month), and flux analyses. Every action lands as a formula-backed workpaper that shows its reasoning; nothing posts to the GL without the accountant's sign-off. Replaces the staff/senior accountant doing repetitive reconciliations and accrual entry across a client book.
+
+Why agentic: It's not a report of what's missing in close — it's the agent actually drafting the entries, scheduling the reversals, and chasing variances across many clients in parallel, with the human as approver rather than doer.
+
+Generalizable core: Recurring deadline + per-account state → agent reads transactional sources → drafts the state-changing artifacts (entries, reconciliations) → writes to a reviewable queue → human signs off.
+
+Deployability: Stack itself is a managed platform for accounting firms, but the pattern is buildable: QuickBooks/Xero/Sage API + bank feed API + Claude with codified SOPs as skills + a review UI (Retool/Next.js) + Google Workspace for sign-off. Week-to-month build for a single-client version; value multiplies when you point it at a portfolio. Replaces or augments staff accountants; works at SMB scale because the per-client cost amortizes across the firm's book.
+
+### 2. Code-repo agents triggered by issues and CI failures
+Source: https://github.blog/changelog/2026-06-11-github-agentic-workflows-is-now-in-public-preview/ — GitHub moved its agentic workflows feature from technical to public preview on June 11. You write the automation in natural-language Markdown and it compiles to standard Actions YAML.
+
+Mechanism: Two canonical triggers. (a) New issue opened → triage agent reads the issue body, searches the codebase and prior issues, comments with its analysis, and applies labels from a predefined taxonomy. (b) CI run fails → investigation agent reads the failing job logs and the diff, proposes a targeted fix (sometimes as a PR), and posts it on the failing run. Agents run in sandboxed containers with read-only defaults and outputs gated through a safe-outputs check. Replaces the maintainer triage shift and the on-call dev poking at red CI.
+
+Why agentic: It's not a dashboard of issue counts or failed builds — it's the agent reading the actual artifacts and producing labels, comments, and patches that change state in the repo.
+
+Generalizable core: Inbound event in a system of record (ticket, build, alert) → agent reads the artifact + neighboring history → drafts the next-step action (label, comment, fix) → writes back to the same system → human approves writes.
+
+Deployability: If you're already on GitHub, this is a weekend build per workflow — the cost is the prompt and the safe-outputs policy, not infrastructure. Same pattern translates immediately to Jira/Linear/Zendesk where the trigger is "new ticket created," the read is "look up similar past tickets and the customer's history," and the action is the labeled, routed, replied-to ticket. Replaces L1 triage. No ML headcount required.
+
+### 3. Always-on M365 agent that prebuilds the work behind your meetings
+Source: https://www.microsoft.com/en-us/microsoft-365/blog/2026/06/02/introducing-microsoft-scout-your-always-on-personal-agent/ — Microsoft shipped Scout at Build 2026, an OpenClaw-based, always-on personal agent integrated across M365, email, calendar, and the browser. Each Scout instance runs under its own governed Entra identity.
+
+Mechanism: Trigger is continuous and event-driven: upcoming meeting on the calendar, a stalled decision detected in a thread, a deliverable approaching its due date. It reads the relevant emails, documents, and prior meeting notes, then takes three classes of action: schedules and coordinates the meeting across time zones, generates the prep materials (briefing doc, agenda, the relevant attachments) and drops them on the calendar invite, and blocks focus time on your calendar against upcoming deliverables. It also surfaces "stalled" items proactively — work that's missed a checkpoint — before they become blockers. Replaces the chief-of-staff/EA coordination layer for individual knowledge workers.
+
+Why agentic: Not a list of upcoming meetings — it actually drafts the prep materials and writes calendar holds based on what it sees coming.
+
+Generalizable core: Scheduled scan of personal/team systems → agent assembles context from across tools → drafts and places the artifact (calendar block, prep doc, follow-up draft) → human edits or accepts.
+
+Deployability: Scout itself is gated behind Frontier enrollment + Copilot license, so it's a buy-not-build at the moment. But the core pattern is a 1-2 week build on Google Workspace MCP + Claude: scan calendar each morning, for every meeting check if a brief exists in Drive, if not draft one from related emails/docs and attach it to the invite. Especially valuable for solos and 2-3 person teams who can't justify an EA but burn an hour a day on meeting prep.
+
+### 4. Self-healing exception agents on top of a transactional system
+Source: https://www.businesswire.com/news/home/20260609967701/en/Volante-Technologies-launches-Vol360i-Agentic-AI-at-the-core-of-payments-setting-a-new-global-standard-for-intelligence-in-banking — Volante embedded a four-class agent system (Prevent, Repair, Predict, Sense) into its core payments platform on June 9, claiming straight-through-processing rates above 95%.
+
+Mechanism: When a payment fails or is held for exception (bad routing data, missing field, sanctions hold edge case), a Repair agent reads the payment context plus the institution's rules and historical fixes for similar exceptions, then proposes or executes the fix — correcting fields, rerouting, retrying — under a confidence-based operating model. Below a confidence threshold, it surfaces to a human operator with its reasoning attached. Every action is logged and auditable. Replaces the payments-ops queue and the analyst who manually researches each held transaction.
+
+Why agentic: Not an exceptions dashboard. The agent does the actual repair on the actual payment record and only escalates the residual.
+
+Generalizable core: Any failed/held transaction in any pipeline → agent enriches with prior-exception history and rule context → attempts the repair action → escalates below a confidence threshold with reasoning attached. Works for any pipeline where humans handle "things the system rejected" (shipping holds, EDI rejections, ad-account flags, claim denials, invoice mismatches).
+
+Deployability: Volante's version is enterprise-bank scale and is sold embedded into their platform — flag it. The SMB-scale version is buildable in a week per exception class on top of any system that emits failure events: webhook trigger → Claude with rule context + last-N-resolved-cases as examples → write back via API → fall through to a Slack approval message for low-confidence cases. Replaces an ops coordinator. Doesn't require dedicated ML headcount; does require clean access to historical resolutions to bootstrap.
+
+## Sources checked
+- X/Twitter — Jon Matzner posted a property-manager competitor-vacancy tracking agent replacing a $1,000/month spreadsheet; adjacent to 5/23 morning property scouting (different replaced task), included as honorable mention but not primary because only source is the post itself and the mechanism details aren't fully documented; LlamaIndex sandboxed-lit CLI agent (infra, not deployment); Microsoft Build coverage of Scout (qualifying)
+- Reddit (r/AI_Agents, r/n8n, r/smallbusiness, sector subs) — search access to specific recent threads remained limited; surfaced aggregate adoption/ROI material (171% average, 192% US) but no fresh mechanism-level posts
+- Hacker News — Show HN restricted for new accounts due to Claude Code-driven volume per HN moderator note; Ask HN: Who is hiring (June 2026) thread heavy on agent-infra hiring including stealth property-management ops agent and healthcare RCM ops; no qualifying Show HN mechanisms surfaced
+- Podcasts — How I AI continued Claire Vo's nine-agent personal stack (already documented 5/23, 5/26); no fresh mechanism-level deployments in last 7 days
+- Newsletters — Ben's Bites flagged Microsoft Scout (qualifying) and Ramp Stack (qualifying); rest of week was build-tools/engineering-values content
+- Product Hunt — AI category continued voice agent and workflow launches extending prior patterns; nothing mechanism-level beyond logged patterns
+- Platform case studies — n8n SMB template library (Intuz) continued bookkeeping/lead/social automation patterns previously logged; no fresh case studies
+- Anthropic and OpenAI customer stories — Warp (terminal/coding, June 3), JAKALA (production agents for European enterprise clients, May 29), Notion delegating coding/slides/spreadsheets to Claude with dozens of parallel tasks, Rakuten launching specialist agents across product/sales/marketing/finance/HR each live under a week, Asana AI Teammates assigned tasks inside projects — Asana's pattern overlaps the 5/15 OpenClaw skill-orchestration pattern; the multi-function Rakuten deployment is enterprise-only and skipped
+- YC — W26 batch continuation; no fresh non-software vertical agent companies surfaced in last 7 days
+- GitHub — Agentic Workflows moved to public preview June 11 (qualifying)
+- Banking/payments — Volante Vol360i June 9 (qualifying as enterprise pattern with clear SMB-translatable core)
