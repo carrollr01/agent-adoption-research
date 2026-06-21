@@ -1,0 +1,62 @@
+Agent Pattern Scan — 2026-06-21 — 5 patterns | Cron-scheduled spreadsheet-to-deck agent at Rakuten
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-j6bo33/log/2026-06-21.md
+
+# 2026-06-21 — Agent Pattern Scan
+
+## TL;DR
+Five qualifying patterns from the last 14 days, anchored by Anthropic's Managed Agents launch (June 9). Most interesting: Rakuten running cron-scheduled agents that read a spreadsheet and write a finished, narrated report or deck — a direct replacement for the recurring "build the Monday deck from this sheet" task that most teams currently solve with a dashboard. Two voice patterns surfaced (Travelers FNOL, Scarlyfy WhatsApp+voice fallback) and are flagged as variations of the previously-logged voice-receptionist pattern.
+
+## Patterns
+
+### 1. Cron-scheduled spreadsheet → narrated report/deck agent (Rakuten)
+**Source:** Anthropic — What's new in Claude Managed Agents (June 9, 2026) https://claude.com/blog/whats-new-in-claude-managed-agents — Rakuten's GM of AI for Business, Yusuke Kaji, quoted naming the workflow; deployed across product, sales, marketing, and finance teams.
+**Mechanism:** A cron expression (weekly or monthly) fires a managed-agent session. The agent pulls credentials from a vault at the network boundary (model never sees the keys), reads the target spreadsheet or BI source, reasons over the numbers, and writes a finished narrative artifact — a Slides deck or Docs report with takeaways, anomalies, and follow-on questions — into the doc system. Replaces the analyst rebuilding the same recurring deck from the same source every cycle.
+**Why agentic:** It produces the synthesized narrative a human would build, not a chart for a human to interpret. The deck lands in the shared drive without anyone opening the spreadsheet.
+**Generalizable core:** schedule trigger → read structured data store → interpret and synthesize → write decision-ready document into a doc/slide system.
+**Deployability:** Claude Managed Agents + vault credential for the data source + cron config. Stack: Anthropic API + Sheets/Snowflake/Looker + Slides/Docs. Weekend build for a single recurring deck; week to generalize. Replaces FP&A / BI analyst recurring-reporting hours. This is the single clearest "agentic substitute for a dashboard" we've seen — useful inspiration the next time a prospect asks for "weekly visibility."
+
+### 2. Conversation-thread nudge agent (Ando)
+**Source:** Anthropic — What's new in Claude Managed Agents (June 9, 2026) https://claude.com/blog/whats-new-in-claude-managed-agents — Ando (ando.so, hiring/sales messaging) running this on their own ops and using it as a product mechanism.
+**Mechanism:** Cron fires every few hours during business hours. Agent reads Slack and email threads tied to active hiring loops or sales deals, identifies "proposed next steps" that are now overdue (interview not scheduled, intro not made, follow-up not sent), and writes the nudge itself — either a follow-up DM to the candidate/prospect or a reminder DM to the recruiter/AE. Replaces the recruiting coordinator or junior CSM whose entire job is reading every thread, remembering commitments, and chasing.
+**Why agentic:** It doesn't show a list of stale threads to a human. It reads them, decides who owes what, and sends the message.
+**Generalizable core:** schedule trigger → read conversation channel(s) → infer outstanding commitments → write the follow-up back into the channel.
+**Deployability:** Claude Managed Agents + Slack/Gmail OAuth in vault + a "channels-to-watch" config. Week to build for one channel type. Replaces recruiting coordinators, sales ops, junior CSMs.
+
+### 3. Multi-agent software-delivery pipeline (Endava — "DavaFlow")
+**Source:** OpenAI — Endava customer story (June 9, 2026) https://openai.com/index/endava-frontiers/ — Endava, large IT services firm, running ChatGPT Enterprise + Codex across client engagements.
+**Mechanism:** A new client intake meeting transcript is the trigger. A Requirements Agent reads the transcript and writes user stories and functional specs into the project tracker, collapsing a weeks-long analysis phase to hours. A Boilerplate Agent then reads those specs and writes scaffolded code plus unit tests into the repo. On every PR (separate trigger), a Review Agent reads the diff and writes inline review comments flagging vulnerabilities and formatting issues. Agents hand off via shared filesystem artifacts (specs, code, PR comments), not a monolithic prompt.
+**Why agentic:** Each agent autonomously writes back to a different system of record (Jira-equivalent, the repo, the PR review thread). No human reads a chart and decides — the agent ships the artifact.
+**Generalizable core:** stage-entry event → read upstream artifact → write structured downstream artifact → next-stage agent triggers on that artifact and repeats.
+**Deployability:** ChatGPT Enterprise + Codex + repo and Jira webhooks + a custom orchestrator. Month of integration work for a mid-sized agency to copy the spec-gen + PR-review legs. Replaces BA hours on requirements drafting and senior-engineer hours on first-pass review. The handoff-via-artifacts design is the lesson — agents per stage, glued by files in a known location, not one mega-prompt.
+
+### 4. First-notice-of-loss voice agent at scale (Travelers)
+*(variation of voice-receptionist pattern logged 2026-05-24 — new angle: enterprise FNOL with policy-DB read and claim-record write, plus pre-provisioned downstream digital journey)*
+**Source:** OpenAI — Travelers customer story (June 3, 2026) https://openai.com/index/travelers/ — Travelers Insurance, US auto claims, now nationwide; 85-90% of claims that touch the assistant complete filing through it.
+**Mechanism:** Inbound auto-damage call hits the AI Claim Assistant built on the OpenAI Realtime API. The agent reads the caller's policy from Travelers' policy database to answer coverage questions in conversation, gathers FNOL details via voice, writes a new claim record into the claims system, and pre-provisions the customer's downstream digital journey — photo upload links, appraisal scheduling, rental reservation. Only complex carve-outs route to a human adjuster.
+**Why agentic:** Reads policy state mid-call, decides whether to file, writes a real claim, and configures downstream steps. No human on the happy path.
+**Generalizable core:** inbound call → read customer record + account state → write new transactional record + provision downstream digital flow → replaces Tier-1 phone intake.
+**Deployability:** Realtime API + telephony provider (Twilio/Plivo) + read/write connectors to the system of record. Week-to-month build for a single happy path. Enterprise-scale claim-DB integration is the cost driver, not the voice piece. Useful angle for any business where the inbound call is currently being transcribed into a form by a human.
+
+### 5. WhatsApp inbound → calendar booking → voice fallback (Scarlyfy)
+*(variation of voice-receptionist pattern logged 2026-05-24 — new angle: text-first inbound with voice as deterministic escalation for unconfirmed bookings, not outbound voice-first)*
+**Source:** Indie Hackers — solo founder log, ~June 7-9 2026 https://www.indiehackers.com/post/i-built-a-whatsapp-ai-bot-for-doctors-in-peru-launched-3-weeks-ago-0-paying-customers-and-stuck-waiting-for-meta-to-approve-my-app-ffc73befd1 — Scarlyfy, indie founder targeting independent clinics in Peru and LatAm. Zero paying customers yet, stuck in Meta Business API review.
+**Mechanism:** Patient sends an inbound WhatsApp message. Agent reads intent, queries the doctor's calendar in PostgreSQL for availability, negotiates a slot in chat, writes the booking, and schedules timed pre-appointment WhatsApp reminders. If the patient does not confirm within the reminder window, the agent escalates to a Twilio outbound voice call. The doctor never opens a screen until the appointment is on the calendar.
+**Why agentic:** The reschedule conversation and the channel-escalation decision are both taken by the agent. Calendar writes and voice triggers are direct actions, not surfaced as a queue for a human.
+**Generalizable core:** inbound message in primary channel → read availability → write booking + schedule reminders → escalate to secondary channel on non-response.
+**Deployability:** FastAPI + PostgreSQL + OpenAI + Meta WhatsApp Business API + Twilio Voice. Week of build, several weeks of compliance for medical-use Meta approval — the Meta queue is the real bottleneck, worth knowing before scoping any WhatsApp-first proposal. Replaces clinic receptionist's scheduling work. The takeaway is the multi-channel fallback design, not the medical vertical.
+
+## Sources checked
+- X/Twitter — inaccessible via WebFetch this run (Nitter 403, X requires auth). Builder posts from the last 14 days could not be pulled directly; noted as a coverage gap.
+- Reddit (r/AI_Agents, r/n8n, r/automation, r/smallbusiness, r/Entrepreneur, r/ChatGPTCoding, r/LocalLLaMA) — Reddit blocks WebFetch on both www and old subdomains. Indirect search surfaced only "best frameworks 2026" thought-leadership; no datable June 7-21 builder posts with mechanism detail.
+- Hacker News — front page, /show, and Algolia search all 403'd from WebFetch. Search snippets pulled Show HN vendor/tool launches (Zot coding harness, Statewright state machines, Broccoli cloud sandbox, SkillFortify verification); no qualifying "we deployed this at our company" posts surfaced.
+- Indie Hackers — site blocks WebFetch; one qualifying post surfaced via search snippets (Scarlyfy, included above). Other operator content was either out-of-window or marketing-template patterns.
+- Podcasts — How I AI June episodes (Mistral Vibe review, Claude returns demo, Gemini Omni, no-code iPhone build) were consumer/personal, no system-of-record writes. Lenny's Podcast June episodes (Cat Wu / Snap, Hamza Farooq / Jaya Rajwani) stayed at vision altitude. Owned and Operated and Service Business Mastery had no new June agent-deployment episodes with mechanism detail (Dennis Steele / Podium episode is March, out of window). Small Business Big AI no new qualifying mechanisms beyond patterns already logged.
+- Newsletters — Ben's Bites June issues led with the OpenAI/Tomoro acquisition, NotebookLM agent mode, SpaceX/Cursor; model and M&A news, no concrete SMB deployments.
+- Product Hunt — June AI-tagged launches dominated by Mistral Vibe and embedded-MCP tools; product launches, not deployments.
+- Platform case studies — Delivery Hero / n8n manager-approved account-recovery surfaced again but is already covered in the 2026-05-27 sources-checked note; skipped. No new qualifying Zapier / Make / Lindy / Relevance / Gumloop customer stories with novel mechanisms in the window.
+- Anthropic and OpenAI customer stories — Anthropic Managed Agents launch (June 9) yielded Rakuten and Ando patterns (above). OpenAI customer stories yielded Travelers (June 3) and Endava (June 9). Other June activity was the Anthropic Services Track / Partner Hub launch (channel news, not a deployment) and Managed Agents GA infrastructure.
+- YC — P26 demo day wrapped June 16 (~196 startups, ~56 building autonomous agents). Public lists are at pitch altitude; no engineer-tone mechanism descriptions of a customer running a P26 company's product yet.
+
+## Note
+Routine had a 24-day gap since the last run on 2026-05-28. Resumed today on schedule.
