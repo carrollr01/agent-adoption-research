@@ -1,0 +1,52 @@
+Agent Pattern Scan — 2026-06-22 — 5 patterns | Brand-as-MCP turns brand assets into a callable service for every agent
+
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-4reu1j/log/2026-06-22.md
+
+TL;DR
+Bloom turns a company's brand into a callable MCP server so any agent (Claude, Cursor, ChatGPT, an internal bot) can generate on-brand assets without humans pulling files. Same week, GitHub shipped Agentic Workflows in public preview — repo automations defined in natural-language Markdown that compile to YAML and run agents on issue, PR, and schedule triggers. The week's signal is a clear move from "agent you talk to" toward "agent bound to events and exposed as infrastructure."
+
+1. Brand-as-MCP — your brand becomes a callable service for every agent
+Source: Bloom (YC) — https://www.ycombinator.com/launches/Qd6-bloom-the-brand-layer-for-agents and https://www.trybloom.ai/mcp/. YC-backed, MCP and API live.
+Mechanism: Operator points Bloom at the surfaces that define their brand — website, decks, Figma files, social profiles, code style. Bloom unifies these into a canonical brand ontology (voice, palette, typography, logo rules, product imagery, approved copy) and exposes it over MCP and a REST API. When an agent in Claude, Cursor, ChatGPT, or a custom workflow needs an asset, it calls Bloom and gets back an on-brand deck slide, ad creative, one-pager, or product mockup. Trigger: any downstream agent invocation. Read: brand ontology plus the prompt. Write: a generated artifact returned inline. Replaces: a designer or marketer hand-pulling brand files and reformatting.
+Why agentic: The brand stops being a static asset library humans grep through and becomes a tool other agents call mid-task.
+Generalizable core: Canonical org knowledge → MCP-exposed callable service → any agent fetches and uses it in-flow. Same skeleton works for "company tone of voice," "pricing rules," "legal contract clauses," "SOP library," or "approved supplier list."
+Deployability: SaaS sign-up + brand ingestion. MCP/API on all plans. Weekend integration into existing agent stacks. Replaces/augments brand designer, marketing ops, sales-deck-builder. No ML headcount.
+
+2. Natural-language workflow files — agents that run on repo events with whitelisted actions
+Source: GitHub Changelog, June 11, 2026 — https://github.blog/changelog/2026-06-11-github-agentic-workflows-is-now-in-public-preview/. Carvana running it across multi-repo work; Marks & Spencer building reusable workflows across security, quality, and delivery.
+Mechanism: A developer drops a Markdown file into .github/workflows/ describing in plain English what should happen — "when a new issue lands, triage it, label it, and route it to the right team" or "when CI fails on main, diagnose and open a PR with the fix." The gh aw CLI compiles the Markdown into standard Actions YAML. At runtime, GitHub's coding agent reads the issue, PR, or CI log, decides what to do, and is allowed to take actions only from a pre-approved "safe outputs" list (add a comment, create a PR, apply a label). Write operations outside that list need explicit approval. Replaces: the human triager, the human reviewer, the on-call engineer debugging flaky CI.
+Why agentic: The agent isn't called by a person; it's bound to repo events. It reads unstructured context (issue body, stack trace), reasons about it, and writes back through a permission-scoped action surface.
+Generalizable core: Event in system → NL spec defines agent behavior → agent reads context → action restricted to a whitelisted set of operations on the same system. Applies anywhere an operator wants a system to react intelligently to its own events — Linear, Jira, Notion, Zendesk.
+Deployability: GitHub-native, install gh aw CLI extension, write Markdown. Days to first useful workflow. Read-only by default — you can ship one without giving an agent write access until you trust it.
+
+3. Event-bound triggered agents — agents attached to SaaS events instead of chat prompts
+Source: Triggered Agents by Adaptive on Product Hunt — https://www.producthunt.com/products/triggered-agents-by-adaptive.
+Mechanism: Operator picks an event from a connected business tool (new Stripe dispute, closed-won deal in HubSpot, support ticket at priority threshold, Calendly booking from a target-account domain) and binds an agent to it. When the event fires, the agent spawns automatically, reads context across the operator's connected tools, decides what to do, and acts — drafts an email, updates a CRM field, posts in Slack, kicks off a refund. Replaces: a person scanning their inbox or CRM for "did anything important happen?" and manually chaining follow-ups.
+Why agentic: The agent isn't a chat surface a human invokes. It lives on the event bus of the operator's stack and runs at the moment the event happens, not on the operator's next check-in.
+Generalizable core: Connected SaaS event → agent spawns with cross-tool read access → reasons and acts via the same set of tools → operator gets notified, not prompted. Zapier shape, with reasoning instead of a fixed path.
+Deployability: SaaS, point-and-click event picker plus prompt. Weekend build. Replaces the "I'll deal with that later" gap between an event and a response.
+
+4. Payment webhook fans out the entire onboarding stack
+Source: n8n blog — practical AI agent examples 2026 — https://blog.n8n.io/ai-agents-examples/. EdTech platform with 800 students replaced three ops staff with one workflow.
+Mechanism: Razorpay (or Stripe, or any payment processor) fires a payment.captured webhook the moment a course payment clears. The n8n workflow listens and, within forty-five seconds, creates the LMS account, sends a welcome email with login credentials, adds the student to the correct WhatsApp group via the WhatsApp Business API, and writes a new contact into the CRM. An AI agent node handles the parts that vary per student — picking the correct WhatsApp group from course metadata, writing a personalized welcome line, deciding which CRM tags apply. Replaces: three ops staff manually copying data between four systems, with a 1-4 hour wait and a non-trivial error rate.
+Why agentic: The branching decisions — which group, which tags, which welcome variation — are made by an agent reading the student and course record, not by a static map.
+Generalizable core: Inbound transaction event → fan-out to N downstream systems → agent fills in the per-record variability that a static automation can't. Works for gym membership purchases, software trials, paid community joins, insurance policy issuance, contractor onboarding after a signed quote.
+Deployability: n8n self-hosted or cloud, plus the vertical SaaS (LMS, gym CRM), plus WhatsApp Business API or Twilio. Week build. Replaces 2-3 ops headcount on the front end of a paid-customer lifecycle.
+
+5. The memory-curating meta-agent — a scheduled process that reads other agents' sessions
+Source: Anthropic Code with Claude 2026 — Claude Managed Agents and "Dreaming" — https://www.infoq.com/news/2026/05/code-with-claude/. Running internally at Anthropic and at early enterprise users (Notion, Asana, Sentry).
+Mechanism: Dreaming is a scheduled, off-hours process. It reads through the transcripts and memory stores of every agent session that ran during the working day, extracts recurring patterns (a function the coding agent keeps misnaming, a workflow three different agents converged on independently, a class of mistake that shows up across customers), and writes curated entries back into the shared agent memory. The next day, agents in that fleet boot up with the new memory and avoid the mistake or follow the better workflow. Replaces: the ops lead who manually reviewed agent logs, wrote SOPs, and updated prompts.
+Why agentic: A meta-agent reads, reasons about, and writes back into the memory layer other agents use. The improvement loop runs without a human in it.
+Generalizable core: Scheduled nightly job → reads operational logs from yesterday → extracts patterns and lessons → updates a knowledge store the system reads tomorrow. Applies to support-ticket retros, sales-call post-mortems, incident reviews.
+Deployability: If you're on Claude Managed Agents you get this directly. To build it yourself: a cron, a long-context model, a structured memory store (Postgres, vector DB, doc), and read access to wherever yesterday's work is logged. Week build for a working prototype.
+
+Sources checked
+- X/Twitter — 4-agent X-content systems and "X Autopilot"; mechanism-level but adjacent to prior creator/content-synthesis patterns; passed.
+- Reddit (r/AI_Agents, r/n8n, r/automation) — no qualifying direct posts; n8n EdTech enrollment story surfaced via web search.
+- Hacker News — Show HN over 48h dominated by infrastructure (Trigger.dev, deploy tooling); no qualifying patterns beyond GitHub Agentic Workflows.
+- Podcasts — How I AI, Lenny's, Owned and Operated: no new qualifying episodes in last 7 days.
+- Newsletters — Ben's Bites flagged Smallest AI, Bloom, Devin Desktop; Bloom logged.
+- Product Hunt — Adaptive Triggered Agents was the standout; rest were launch-day voice vendors.
+- Platform case studies — n8n EdTech enrollment story strongest; logged.
+- Anthropic/OpenAI customer stories — Dreaming logged for the first time as a pattern; GitHub Agentic Workflows referenced Carvana and M&S.
+- YC — Bloom standout; brand-as-MCP a new pattern shape.
