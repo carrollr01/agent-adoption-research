@@ -1,0 +1,54 @@
+Agent Pattern Scan — 2026-06-23 — 3 patterns | Goal-loop bug-finder with verifier subagent
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-06-23.md
+
+# 2026-06-23 — Agent Pattern Scan
+
+## TL;DR
+Mozilla's Mythos harness is the standout: a goal-looping bug-finding agent gated by a deterministic crash signal and a separate verifier subagent, so the human reviewer never sees a false positive. The pattern is the most transferable thing in today's scan, because the structural idea (cheap binary success signal + verifier subagent before any human attention) works in any domain where output looks plausible but can quietly be wrong. Also today: ServiceTrade's pre-arrival tech briefing agent and Lightsprint's running-preview-URL review loop.
+
+## Patterns
+
+### 1. Goal-loop bug-finding agent gated by a deterministic crash signal and a verifier subagent
+Source: Mozilla Hacks — Behind the Scenes Hardening Firefox with Claude Mythos (https://hacks.mozilla.org/2026/05/behind-the-scenes-hardening-firefox/) and the How I AI episode with Brian Grinstead on June 22, 2026 (https://www.lennysnewsletter.com/p/how-i-ai-how-to-write-ai-agent-loops). Mozilla ran this against Firefox source and shipped 271 verified bugs in Firefox 150 plus a cumulative 423 fixes month-over-month, with under 15 false positives reaching engineers.
+
+Mechanism: A scheduled scan runs against an AddressSanitizer build of Firefox. An LLM judge scores each source file on two axes (likelihood of a memory-safety issue, ease of access from a webpage) and ranks the queue. For each top-ranked file the harness spawns a sub-agent with one goal: produce a runnable proof-of-concept that triggers an AddressSanitizer crash. The agent iterates against the sanitizer build until the crash signal fires (or a budget runs out). A second model then grades the report — checks it doesn't depend on test-only configs, that the trace and PoC are coherent — before any human sees it. Verified reports land in the engineer review queue with PoC attached.
+
+Why agentic: Three distinct LLM roles (prioritizer, exploit-builder loop, verifier) coordinated by a harness with an external, non-LLM truth signal (the sanitizer crash). It's not a passive scanner producing a list; the system iterates on its own output and refuses to surface anything until reality (a real crash) confirms it.
+
+Generalizable core: Scheduled scan over a large unstructured corpus → LLM prioritizer ranks units of work → per-unit sub-agent loops toward a binary external success signal → verifier subagent quality-grades the result → only verified items reach a human.
+
+Deployability: Claude (Mythos Preview here, model-agnostic harness) + custom orchestrator + a domain-specific verification target. Month-build minimum, because the hard work is the deterministic success signal — for code it's a sanitizer crash, but the equivalent in other domains (a contract that fails a compliance linter, a reconciliation that doesn't balance, a generated email that fails a policy regex, a PR that breaks a smoke test) has to be designed. Replaces a manual triage role that historically waded through high-false-positive scanner output; the verifier subagent is the part that buys back trust, not the bug-finder.
+
+### 2. Pre-arrival job briefing agent for field technicians
+Source: ServiceTrade — Smart Tech Prepare launch announcement, June 16, 2026 (https://servicetrade.com/company-news/smart-tech-prepare-ai-field-service-management/). Commercial fire, life-safety, and mechanical contractors; ServiceTrade cites a baseline that 32% of technicians flag missing work-order info as a regular friction and estimates ~$5,800/tech/year of recoverable billable time.
+
+Mechanism: Trigger is a job assigned to a technician on a given day. Before the tech opens the mobile app on site, the agent pulls that customer's prior service records, asset details (model, age, install history), deficiency history, prior tech comments, and location/site notes from ServiceTrade. It composes a job-ready brief — what this asset is, what's broken or watched, what the last tech did, what to bring, what the customer cares about — and serves it as the first screen when the tech opens the work order. Quick prompts let the tech drill into specific asset or job history without leaving the app.
+
+Why agentic: It's a scheduled pre-fetch and synthesis, not a dashboard. The tech doesn't search for context; the agent has already assembled it, scoped to that specific asset and customer, by the time the tech taps in. The replaced task is the call to dispatch or the "let me look this up real quick" moment in the customer's parking lot.
+
+Generalizable core: Calendar/queue event (someone is about to do work X on entity Y) → agent pre-assembles all history about Y the worker will need → delivers as the worker's opening screen → worker can drill deeper on demand.
+
+Deployability: When you own the system of record (ServiceTrade does), this is a week build on top of existing data: prompt template, retrieval over customer/asset records, dropped into the mobile app's job-open hook. Without owning the data, you need clean read access to the FSM/CRM. Augments rather than replaces the technician — but it eliminates the dispatcher-as-research-buddy role. Same skeleton works for any field role with a scheduled appointment: home health visits, in-home sales, building inspections, on-site IT, route sales.
+
+### 3. Auto-generated running-preview URLs as the review surface for non-engineers
+Source: Lightsprint launch on YC, P26 batch, Spring Demo Day June 16, 2026 (https://www.ycombinator.com/launches/QSs-lightsprint-the-collaborative-product-development-platform). Lightsprint is selling this as a team layer on top of coding agents; the explicit pitch is that non-engineers can sign off on agent work without reading diffs.
+
+Mechanism: A teammate writes a requirement in natural language. The platform breaks it into a structured plan (tasks, dependencies, visual options for "how should this look" choices) which the team annotates and approves. On approval, Lightsprint spawns multiple cloud agents working different parts of the codebase in parallel with cross-agent conflict prevention. Every PR each agent opens automatically gets a live preview URL — not a diff to read, a running instance of the app to click through. Designers, PMs, and stakeholders review by using the change, then approve.
+
+Why agentic: Multiple coordinated agents working in parallel against the same codebase, but the more interesting pattern is the review surface: the agent's output is rendered as a usable artifact before any human looks at it, so review becomes "does this feel right when I use it" rather than "do I trust this diff." Approval feedback flows back to the planning layer.
+
+Generalizable core: Specify intent → agent produces a working artifact in a sandboxed, throwaway environment → reviewer interacts with the artifact (not the underlying representation) → approval/feedback routes back to the agent. The pattern extends past code: a generated marketing landing page rendered live for a brand manager, a draft contract loaded into a clickable redline viewer for a lawyer, a rebuilt dashboard mock served as a working URL for a stakeholder.
+
+Deployability: End-to-end (the Lightsprint product) is a month-plus build with serious infra — sandboxed runners, preview URL routing, conflict resolution between parallel agents. The skeleton — agent output → ephemeral preview environment → reviewer signs off in the artifact, not the source — is achievable on a weekend if you're willing to use Vercel preview deployments or a sandbox runner per PR. Replaces the "engineer reads diff and explains it to PM" handoff for visual/UX-heavy changes.
+
+## Sources checked
+- X/Twitter — limited result depth from indexed search; surfaced Lightsprint's launch post, builder commentary on parallel cloud agents, no fresh independent-builder threads with clean mechanism detail today
+- Reddit (r/AI_Agents, r/automation, r/n8n, r/smallbusiness) — search access shallow; n8n/automation discussion centered on platform comparison and pricing, no novel concrete deployments past patterns already logged
+- Hacker News — Show HN traffic dominated by agent memory libraries (mem0, agentmemory, Mnemo) and the Mozilla Mythos discussion thread; the Mozilla harness was the most mechanism-rich item and is pattern #1
+- Podcasts — How I AI's June 22 episode with Brian Grinstead is the source for the Mythos harness mechanism details; the same episode covers Claude Code's daily PR-review loop and weekly skills loop, which overlap heavily with existing "development agent team" patterns from 5/9 and 5/15 and were not promoted to a separate entry
+- Newsletters — Ben's Bites cycle heavy on infrastructure announcements (GitHub Agentic Workflows public preview June 11, KPMG/Microsoft Agent 365 deployment June 9, Cloudflare Agents Week recap), platform-level not mechanism-level
+- Product Hunt — June leaderboard skewed toward coding agents and notetakers; Triggered Agents by Adaptive (event-driven spawning) is the closest to an entry but is a platform primitive, not a concrete customer deployment, so noted as context only
+- Platform case studies — n8n/Make/Zapier 2026 comparisons recycle StepStone, Delivery Hero, Toyota Orlando cases already covered
+- Anthropic and OpenAI customer stories — Anthropic JAKALA professional-services case study (May 29) is the freshest customer post but mechanism overlaps with prior logs; OpenAI's Travelers AI Claim Assistant countrywide rollout is a vertical FNOL voice agent — concrete but reads as a variation of voice-agent patterns covered 5/24
+- YC — Spring 2026 (P26) Demo Day wrapped June 16; standouts list published June 18 by TechCrunch. Lightsprint promoted to pattern #3. ServiceTrade's June 16 Smart Tech Prepare lines up in the same week (separate company, not YC).
