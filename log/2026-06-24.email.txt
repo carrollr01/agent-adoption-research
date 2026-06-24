@@ -1,0 +1,49 @@
+Agent Pattern Scan — 2026-06-24 — 4 patterns | Mozilla's verifier-gated bug-hunter loop
+
+https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-jczvgh/log/2026-06-24.md
+
+# 2026-06-24 — Agent Pattern Scan
+
+## TL;DR
+Mozilla's Firefox security pipeline is the standout today: it's a verifiable-loop pattern where a fast ground-truth oracle (Address Sanitizer) lets a Claude agent iterate against real evidence at scale, shipping 271 confirmed security fixes in a single month. The transferable lesson is broader than security — anywhere there's a fast yes/no oracle (test runner, type checker, schema validator, reconciliation engine), you can run a bug-hunter-style agent loop instead of stopping at "summarize and suggest."
+
+## Patterns
+
+### 1. Verifier-gated bug-hunter loop
+**Source:** Lenny's How I AI — Brian Grinstead, Mozilla (Jun 21 2026) — https://www.lennysnewsletter.com/p/how-i-ai-how-to-write-ai-agent-loops ; Help Net Security writeup — https://www.helpnetsecurity.com/2026/05/07/mozilla-firefox-claude-ai-security-bug-hunting/ — 271 of 423 fixes in Firefox 150 / 149.0.2 attributed to Claude Mythos Preview running this pipeline.
+**Mechanism:** A scheduled sweep walks every file in the Firefox source tree. An LLM judge scores each file on two axes — likelihood of a memory-safety issue and reachability from a webpage — and the top-scoring files enter a bug-hunting loop. Inside the loop, the agent is prompted with a deliberate lie ("we know there's a security bug in this file, find it") to push it past plausibility-checking, then it drafts candidate inputs, compiles and runs them against a build harness instrumented with Address Sanitizer, and only an ASan trigger counts as a confirmed finding. Confirmed bugs become structured reports (reproducer + severity + suspected root cause) routed to human security engineers for the fix-review-ship loop.
+**Why agentic:** The agent isn't summarizing — it iterates on candidate exploits, builds them, runs them, reads sanitizer output, and adapts. The sanitizer is the oracle that kills false positives at industrial scale.
+**Generalizable core:** scheduled sweep of a target corpus → LLM judge prioritizes by risk × reachability → agent searches each item in an environment that can execute candidate evidence → only oracle-verified results reach humans.
+**Deployability:** Custom Python harness around Claude API + sandboxed build env + existing test infra. Month-build for a real corpus. Replaces a tier of manual triage. Scale caveat: only works when you have a fast ground-truth oracle. Translates directly to: contract clause hunters with a policy linter, reconciliation-break finders with a finance ledger, schema-drift hunters with a CI step, regression hunters with a test suite.
+
+### 2. Markdown-as-workflow agentic runner
+**Source:** GitHub Changelog — Agentic Workflows public preview (Jun 11 2026) — https://github.blog/changelog/2026-06-11-github-agentic-workflows-is-now-in-public-preview/ ; docs — https://docs.github.com/en/copilot/concepts/agents/about-github-agentic-workflows.
+**Mechanism:** A .md file is checked into the repo with YAML frontmatter (trigger, allowed tools, permissions) and English instructions in the body. GitHub compiles it into a regular Actions YAML run. On trigger — issue opened, PR labeled, CI failure, schedule, doc-drift signal — GitHub spawns a sandboxed agent container with only the whitelisted tools, executes the natural-language goal, and routes every proposed write (PR, comment, label, file edit) through a safe-outputs validator plus a threat-detection scan before it touches the repo. The built-in GITHUB_TOKEN is enough; no PAT needed in public preview.
+**Why agentic:** The workflow file states a goal, not a script. The agent picks its own steps and tool order on each trigger, and the runtime constrains it via the firewall and validator rather than via pre-coded branches.
+**Generalizable core:** event in a system of record → declarative natural-language goal file → sandboxed agent with whitelisted tools → proposed writes pass a validation gate → applied to the system.
+**Deployability:** Native to Actions, no extra infra; weekend-build for a first workflow. Replaces the per-rule custom-Action tax. The pattern (declarative NL workflow file + sandbox + safe-output gate) is the reusable bit — directly portable to any platform with a triggers-and-actions surface (Linear, Notion, Slack, Salesforce) once those vendors ship equivalents, and worth replicating in-house today for ops teams running their own event bus.
+
+### 3. Competitor pricing-intelligence agent (multifamily)
+**Source:** Jon Matzner on X — https://x.com/MatznerJon/status/2053824192173502598 — property manager case study; pattern surfaced in 2026 thread.
+**Mechanism:** Replaces a $1,000/month data subscription the manager had been paying for 12 years to track competitor vacancies, asking rents, days-on-market, and submarket supply. The agent runs on a schedule, scrapes the public listings pages of named competitor properties, parses unit-level rent/availability/concessions, normalizes the data against a stable floor-plan taxonomy, computes deltas vs. the prior snapshot, writes structured time-series rows to a pricing database, and posts threshold-crossing alerts (e.g. "competitor X dropped rent on a comparable 2BR" or "submarket supply tightened 8%") to Slack.
+**Why agentic:** Output is structured decision-input plus exception alerts, not a chart you go look at. The agent reconciles wildly inconsistent competitor page formats into a comparable schema each run — that normalization is the work a junior analyst used to do.
+**Generalizable core:** scheduled scrape of named competitor surfaces → normalize against your taxonomy → diff vs. prior snapshot → write structured rows + alert on threshold crossings.
+**Deployability:** Playwright or Apify for scraping + Claude for normalization + Postgres + Slack. Week-build. Replaces either a paid market-intel feed or the analyst who manually compiles weekly comp sheets. Works for any vertical with public competitor surfaces — hotels, e-comm, gyms, daycares, dental, equipment rental, urgent-care clinics — provided you can define what counts as "comparable." Variation of 2026-05-23 overnight scouting; new angle is structured time-series capture for pricing decisions rather than lead discovery.
+
+### 4. Post-meeting deliverable generator
+**Source:** OstraconAI — Claude Code skills for sales — https://www.ostracon.ai/insights/claude-code-skills-for-sales/ ; pattern in production for a 5-person sales team saving ~70-80 hrs/week.
+**Mechanism:** A rep tags a meeting in the calendar as "proposal call." The skill pulls the Fireflies transcript from that meeting, the existing CRM account record, prior call notes, and the firm's proposal template library, then drafts the full proposal — situation overview, proposed scope, deliverables, timeline, pricing — and drops it in the rep's review queue as an editable document. The rep edits in place and sends; the skill does not auto-deliver to the client.
+**Why agentic:** The skill makes real scope/pricing/timeline judgments off the transcript and historical context — not template fill-in-the-blank. Output is a completed deliverable, not a summary or a CRM-field write.
+**Generalizable core:** human-tagged event ("this meeting is X kind") → agent assembles full context (transcript + prior records + template library) → drafts the deliverable in completed form → human edits and approves rather than authors.
+**Deployability:** Claude Code skill + Fireflies/Otter API + CRM API + template repo. Week-build per skill. Replaces ~half the senior-rep proposal-writing hours. Generalizes to any post-meeting deliverable that's a structured document — legal engagement letters, accountant scope-of-work, designer SOWs, M&A LOIs, insurance binder requests, architecture fee proposals, consulting statements of work.
+
+## Sources checked
+- X/Twitter — accessible via search snippets only; Matzner thread surfaced; ETHGlobal Credence (on-chain agent authority), Builder.io Clips (agent-native screen recorder), Steve Potter Pega Intern Iris all noted but lacked operator-level mechanism detail
+- Hacker News — front-page hits dominated by GitHub Agentic Workflows discussion, Statewright visual state machines, Skills-as-unit-of-agent-knowledge thread; one HN hiring-thread listing (Pango Agentic OS for e-commerce logistics) suggests a future pattern but no shipped mechanism yet
+- Podcasts — Lenny's How I AI: Grinstead (Mozilla, 6/21, qualifying), Claire Vo on AI loops in Claude Code/Codex (6/17, dev-process-focused so non-qualifying for the business-pattern brief); Lenny's Podcast: SaaStr 20-AI-agents-replace-GTM-team episode covered but mechanisms are GTM-stack-specific and overlap prior logged voice/AR patterns
+- Reddit (r/AI_Agents, r/automation, r/n8n) — secondary access via aggregator writeups only; consistent theme of narrow agents (resume parsing, form-enrichment, FAQ response) but no novel mechanisms not already in the log
+- Newsletters — Ben's Bites and Lenny's surfaced the Mozilla and Claire Vo content already captured above
+- Product Hunt — AirJelly (on-device meeting/doc context capture), Adapt (cross-tool workflow automation from Slack), Relay (phone-receptionist from business content); all variations of patterns already logged in the receptionist or desktop-orchestration clusters
+- Platform case studies — Lindy Agent Builder ("vibe-code" agents from a prompt), Relevance AI fleet-of-agents framing, n8n 2.0 LangChain integration; infrastructure rather than novel deployment shapes
+- Anthropic/OpenAI — OpenAI Workspace Agents announcement noted; no new customer-mechanism stories beyond Mozilla
+- YC — W26 batch continues the "$200B industry + clunky software + agent" formula (Chris Lu thread); nothing surfaced with shipped mechanism detail today
