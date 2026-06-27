@@ -1,0 +1,102 @@
+Agent Pattern Scan — 2026-06-27 — 6 patterns | Adversarial audit loop with a prioritized work queue
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-2brth3/log/2026-06-27.md
+
+# 2026-06-27 — Agent Pattern Scan
+
+## TL;DR
+Mozilla shipped 271 confirmed Firefox security bugs in a month using a Claude Agent SDK loop seeded with an adversarial prompt ("we know there's a bug in this file — find it") and a separate scoring workflow that picks which file to attack next. The interesting mechanism is the two-layer split: a queue picks the target, the agent does verifiable exploitation. The pattern generalizes to any large corpus you'd like adversarially audited.
+
+## Patterns
+
+### 1. Adversarial audit loop with a prioritized work queue
+Source: Mozilla on How I AI (Brian Grinstead, 2026-06-21). 423 security fixes shipped in one month, including a 15-year-old HTML <legend> flaw confirmed in Firefox 150.
+https://podpulse.ai/podcast/how-i-ai/how-mozilla-uses-agentic-ai-to-find-firefox-security-bugs
+https://www.lennysnewsletter.com/p/how-i-ai-how-to-write-ai-agent-loops
+
+Mechanism: A separate scoring workflow ranks files in the Firefox source tree and pops the highest-priority target. The main agent (Claude Agent SDK + their Mythos model) is handed the checkout, the target file, and the prompt "we know there's a security bug in this file — go find it." It reads code, writes test harnesses, runs builds under AddressSanitizer to confirm exploitability, and only files into Bugzilla when it has a reproducer. A follow-on agent drafts the patch.
+
+Why agentic: Multi-step tool use (read → harness → build → ASan → judge), self-directed exploration over a search space too large to script, and an executable verification gate before any human sees output.
+
+Generalizable core: prioritized work queue → adversarial prompt over one item → tool-using loop with executable verification → only verified findings written back. Replace "source file" with contract clause, claim file, log shard, lease, or grant application — same loop.
+
+Deployability: Claude Agent SDK + sandboxed runner + scoring/queue layer + the target system's ticket tracker. The scoring workflow is the hidden moat.
+
+### 2. Evidence aggregator that drafts a classification a human signs
+Source: Garvan Institute via Anthropic, June 2026. Institute-wide deployment targeting the rare-disease diagnostic backlog (current odyssey: five-plus years).
+https://www.garvan.org.au/news-resources/news/anthropic-ai-support-to-accelerate-genomics-research-at-garvan
+
+Mechanism: Trigger is a new patient variant landing from the sequencing pipeline. The agent reads ClinVar, gnomAD, OMIM and the published literature, weighs allele frequencies, prior reports, and functional evidence per the ACMG criteria, then drafts a classification (Pathogenic / Likely Pathogenic / VUS / Likely Benign / Benign) with cited evidence into a curator's review queue. A clinical geneticist signs off.
+
+Why agentic: Standing job, not a one-shot prompt. The agent processes a backlog autonomously, mixes structured DB queries with literature reasoning, and produces a structured artifact a domain expert can sign or reject.
+
+Generalizable core: queue of judgment-heavy items → agent aggregates evidence across structured + unstructured sources → drafts a structured verdict against a rubric → expert reviews. Maps cleanly onto insurance underwriting, IRB protocol review, building permit assessment, grant triage.
+
+Deployability: RAG over the domain corpora + MCP/tools for the structured DBs + the rubric in the prompt + an existing review-queue UI. Mid-to-high complexity; the rubric encoding and the queue UI matter more than the model.
+
+### 3. Orchestrator with specialist sub-agents over siloed data
+Source: Slack (Salesforce) Security Engineering. 7,500+ investigations and 500k+ tool calls in the first quarter of deployment.
+https://slack.engineering/streamlining-security-investigations-with-agents/
+
+Mechanism: An alert from the event ingestion pipeline fires a Director agent. The Director broadcasts open questions to four Expert personas (Access, Cloud, Code, Threat), each scoped to its own data source. Experts run queries and return findings; the Director enters a Trace phase, dynamically targets follow-up questions based on what came back, and a Critic agent scores finding quality before a Conclude phase writes a full investigation report onto the alert. On-call engineers supervise instead of grepping.
+
+Why agentic: The Director dynamically routes follow-ups based on partial evidence (not a fixed pipeline), the Critic gates output quality, and the whole thing wraps heterogeneous tool use across data sources humans would otherwise stitch by hand.
+
+Generalizable core: event arrives → orchestrator fans out to specialist sub-agents reading siloed systems → critic gates → structured report attached to the source event. Same shape for customer escalations, fraud reviews, compliance investigations, dispute resolution.
+
+Deployability: Custom service with a hub/worker/dashboard pattern. The hard work is the per-source tool inventory and the credibility rubric. High complexity if you're greenfield, but the architecture template is now in the open.
+
+### 4. Maintenance request triage with vendor dispatch
+Source: Property management AI vendors (Haven, Latchel, WorkflowStack). Multi-family PM companies report scaling from ~150 doors per PM to 400–600 with this in place.
+https://www.usehaven.ai/post/ai-for-maintenance-requests-apartments-guide
+https://workflowstackai.com/blog/property-management-ai-maintenance
+
+Mechanism: Tenant submits a maintenance request via portal, SMS, email, or voice. The agent reads the description, photos, the lease record, and unit history. It classifies severity (emergency / urgent / routine / tenant-responsible) — "gushing water," "sparking outlet" route to emergency. For tenant-responsible items it replies with a self-help walkthrough and closes the ticket. For dispatchable items it picks a vendor from the approved list filtered by trade, ZIP, and availability, sends the work order with photos attached, schedules with the tenant, and writes the work order back to AppFolio or Buildium.
+
+Why agentic: It reads multi-modal input, makes a routing decision, executes an external write (vendor dispatch), and closes the loop on scheduling. Not just classification — it takes the action.
+
+Generalizable core: inbound free-form service request → agent reads request + entity history + policy → classifies and picks an action path → executes external write (dispatch / self-help / escalation) → logs to system of record. Same shape for facility-management at multi-site retail, equipment-rental fleets, IT helpdesks, grounds-keeping at colleges or HOAs.
+
+Deployability: Common stack today is GoHighLevel + an LLM API in the $400–800/mo range, or buying Latchel/Haven. Low-to-mid build complexity; the vendor-selection routing rules are where the value lives.
+
+### 5. Sense, forecast, order, reconcile loop for physical inventory
+Source: Truffle (YC S26). Live with restaurants, cafes, and bars; claims 90% reduction in manual inventory counts and forecast accuracy around 97%.
+https://www.ycombinator.com/companies/truffle
+
+Mechanism: Trigger is a scheduled cycle (daily or per-shift) plus event triggers from shelf and walk-in cameras and POS sales. The agent reads real-time inventory from computer vision, historical sales from POS, the menu bill-of-materials, vendor catalogs, and the demand forecast. It sizes purchase orders against forecast and on-hand stock, places them with vendors via email or EDI, and later reconciles delivered invoices against the PO, flagging discrepancies. POs land in the back-office system; invoice exceptions land in the AP queue.
+
+Why agentic: Closed loop. Sensors and transactions trigger it, it forecasts and acts (placing real orders), and it closes the loop on the reconciliation side. The owner approves exceptions, not every PO.
+
+Generalizable core: sensor or transaction stream → forecast → execute external order → close-the-loop reconciliation against actuals. Any small-footprint physical operation with steady consumption fits: salon supply, dental consumables, auto parts depots, vending operators, school cafeterias.
+
+Deployability: High capex if you bring the cameras (Truffle ships them); skip CV and the same loop runs on POS + vendor email integration alone. The hard parts are the BOM and the vendor-EDI plumbing, not the model.
+
+### 6. Inbound contract triage against a playbook
+Source: Harvey, Contract Intelligence for In-house, announced 2026-05-21. 100k+ lawyers across 1,300 orgs use Harvey overall; GA for the in-house product is targeted Q3 2026.
+https://www.artificiallawyer.com/2026/05/21/harvey-announces-contract-intelligence-for-inhouse/
+https://www.harvey.ai/contract-intelligence
+
+Mechanism: Counterparty contract lands in a legal-ops intake mailbox or CLM (Ironclad, Agiloft). The agent matches the document to the firm's playbook (e.g., "NDA — standard mutual"), generates redlines against the playbook positions, scores risk against pre-set thresholds, and routes: auto-approve and return signature-ready for low-risk standard NDAs, send redlines back to the counterparty for medium-risk, escalate to a named lawyer for non-standard terms. Status and the redlined document write back to the CLM.
+
+Why agentic: Routing decision under thresholds, multi-document context (playbook + prior executed agreements), and an actual external write (signed-back document or counterparty redline) — not a chat helper.
+
+Generalizable core: inbound document → classify against a playbook → execute (auto-approve, redline, escalate) → write status back to system of record. The playbook is the moat; the LLM is commodity. Same pattern for vendor risk reviews, RFP intake, HR policy exceptions, insurance subrogation reviews, customer support ticket triage.
+
+Deployability: Medium. A codified playbook (the lift) + a CLM with API access + a risk-threshold table. Without the playbook the agent is a fancy redline tool; with it, it's a junior lawyer.
+
+## Sources checked
+- X/Twitter — inaccessible from research tooling this run; no X-sourced candidates.
+- Reddit (r/AI_Agents, r/n8n, r/smallbusiness, r/propertymanagement, r/Accounting, r/Trucking) — site:reddit.com queries returned little exploitable; appears largely de-indexed in the search backend. Property-mgmt mechanism corroborated via vendor blogs instead.
+- Hacker News — surfaced Metabase Repro-Bot (similar to Mozilla; dropped in favor of the Mozilla mechanism). Other front-page agent chatter consistent but not mechanism-level.
+- How I AI — Mozilla bug-hunting agent (kept as #1). Braintrust eval agent dropped as dev-internal.
+- Lenny's Podcast — SaaStr 20-agent GTM episode — strong but dropped this run for diversity (overlaps with prior "do everything business ops" entries); will revisit.
+- Owned and Operated — Avoca AI discussion; voice-phone pattern, filtered.
+- Modern CPA / accounting — Black Ore Tax Autopilot (April 2026 GA, continuing June coverage) — strong; held for a future run since six is the cap.
+- Anthropic customer stories — Garvan kept as #2. Cursor / Lovable / delight.ai / Replit dropped (coding-internal).
+- OpenAI customer stories — Workspace Agents at Oracle/State Farm/Uber — announcement level, no mechanism. Dropped.
+- Ben's Bites — agentic-engineering tips, no concrete deployments. Empty.
+- Product Hunt — R0Y, Crossnode, Adapt — vendor copy, no customer mechanism. Empty.
+- YC — Truffle kept as #5. Bravi, Sandra AI — voice phone, filtered.
+- Lindy / Relevance AI / Gumloop — no fresh mechanism-level June deployments retrievable.
+- Slack engineering — kept as #3.
+- Harvey / Artificial Lawyer — kept as #6.
