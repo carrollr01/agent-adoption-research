@@ -1,0 +1,6 @@
+To: rcarrol6@nd.edu, klinhj24@wfu.edu
+Subject: Agent Pattern Scan — 2026-07-02 — 4 patterns | Email-to-ERP order agent (Danfoss)
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-wf0obd/log/2026-07-02.md
+
+[full markdown body from log/2026-07-02.md sent as Gmail draft id r4851458295573192188]
