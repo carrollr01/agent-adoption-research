@@ -1,0 +1,62 @@
+Agent Pattern Scan — 2026-07-05 — 6 patterns | Self-verifying vulnerability agent (Mozilla Firefox Mythos)
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-07-05.md
+
+# 2026-07-05 — Agent Pattern Scan
+
+## TL;DR
+Six patterns qualified today across genuinely different mechanism shapes. The standout: Mozilla's Firefox security agent generates vulnerability hypotheses, builds a PoC, runs it inside an instrumented browser, and only reports the bug if it observed a real crash — a self-verifying loop that filters its own false positives before a human ever sees the output. That "verify before you report" shape generalizes to any domain where LLM outputs are cheap but wrong outputs are expensive to triage.
+
+## Patterns
+
+### 1. Self-verifying vulnerability agent (Mozilla / Firefox)
+**Source:** https://hacks.mozilla.org/2026/05/behind-the-scenes-hardening-firefox/ — Mozilla Firefox Security Engineering; shipped ~271 fixes in Firefox 150 using this loop.
+**Mechanism:** Batched pipeline points a Claude-powered agent ("Mythos") at a Firefox subsystem → agent reads the source tree and forms a specific vulnerability hypothesis → generates a reproducible HTML PoC → executes the PoC inside an AddressSanitizer-instrumented Firefox build via a `browser_evaluator` tool → *only if the agent observes an actual crash* does it propose a patch, rebuild Firefox, and rerun the PoC to confirm the crash is gone → files verified bug + candidate patch into Bugzilla for human triage.
+**Why agentic:** The dashboard version is "here are 500 things the LLM thinks might be bugs." This inverts it: the agent does its own verification via tool use and drops everything that doesn't crash. Humans see only what already reproduced.
+**Generalizable core:** Generate hypothesis → run a concrete test against real state → discard if the test doesn't confirm → only surface verified results.
+**Deployability:** Any domain where you can execute a candidate output against ground truth counts (parsers, config validators, spec conformance, refund eligibility, tax calc). Stack: Claude with a code-execution tool + a domain-specific "evaluator" that either returns a signal or doesn't. Complexity: week build for a narrow domain; the evaluator is the hard part. Replaces the "junior analyst triaging a queue of LLM guesses."
+
+### 2. Pre-standup cross-system compiler (Notion — "Hot Potato")
+**Source:** https://www.chatprd.ai/how-i-ai/ryan-nystrom-notion-workflows-for-engineering-velocity — Ryan Nystrom's engineering team at Notion.
+**Mechanism:** A recurring Notion automation creates a blank standup page at ~9am → a Custom Agent named Hot Potato fires against the empty page → reads the last 24h of the team's Slack project channel, merged GitHub PRs, Honeycomb CI performance metrics, recently closed tickets in the team's Notion task DB, and yesterday's standup notes → fills the page from a fixed template with status per person, CI/health delta, and follow-ups → team walks into the meeting with the page pre-filled.
+**Why agentic:** Not a status dashboard — it *writes* the exact document the team was going to type into anyway. The output is the artifact the humans consume, not a link to a chart.
+**Generalizable core:** Scheduled trigger → assemble state from N unrelated systems → drop into a fixed template that a human previously wrote by hand.
+**Deployability:** Fits any recurring meeting where the pre-work is "check five places and write it down": account reviews, weekly ops reviews, on-call handoffs, client status calls. Stack: Notion Custom Agents or Claude Code + MCP connectors to Slack/GitHub/Jira/PMS/whatever. Complexity: weekend build once the connectors exist. Replaces the EM/PM/AM half-hour before every recurring meeting.
+
+### 3. Vision-driven end-to-end QA agent (TesterArmy)
+**Source:** https://news.ycombinator.com/item?id=48586299 — Poland-based YC P26 startup; states "20+ companies from Seed to Series C using daily."
+**Mechanism:** PR event, on-demand run, or scheduled regression pass triggers the agent → reads natural-language test descriptions written by the customer's engineers (not selectors) → drives the actual deployed app across browsers and iOS/Android via vision, handling logins, OTPs, and file uploads like a human → writes screenshots, session recordings, and structured bug reports (broken flows, rendering bugs, misleading copy) back to the PR/dashboard.
+**Why agentic:** Traditional automated QA is a passive selector suite that goes stale the moment the DOM shifts. This is an agent that adapts to what it sees each run.
+**Generalizable core:** Change event → agent drives a real interface via vision using natural-language intent → structured findings back to the source system.
+**Deployability:** Applicable anywhere the process runs through a UI a human would otherwise operate — regulatory portal filings, vendor portals, insurance carrier sites, internal legacy tools. Stack: browser-use / Playwright + vision model + a per-flow prompt library. Complexity: week build per flow; brittleness at the edges is still real. Replaces the manual QA pass and the maintenance overhead on selector-based test suites.
+
+### 4. Internal work-order marketplace with agent fulfillment (Delight.ai — "Automators")
+**Source:** https://www.chatprd.ai/how-i-ai/john-kims-playbook-for-ai-transformation — Delight.ai (John Kim, ex-Sendbird), org-wide deployment.
+**Mechanism:** An employee posts a request ("I need a tool that…") into an internal Automators intake → intake reads the request plus the org's skills library and Slack/Notion context → routes to either an engineer or to a build-agent that scaffolds the tool (examples shipped: Stripe-integrated swag store, sales-team CRM tool, recruiter workflow) → shipped tools get versioned and awarded token scores based on adoption in a gamified leaderboard.
+**Why agentic:** Not a ticketing system with an AI classifier bolted on. The build-agent actually produces working internal tools that get used, and adoption gets measured downstream. It replaces the *supply* of internal tooling, not just the routing of requests.
+**Generalizable core:** Internal request → classify + assemble context → dispatch to human OR generative build agent → measure downstream adoption → route future requests using that signal.
+**Deployability:** Any org that currently either buys point SaaS or waits months for IT to build internal tools. Stack: Claude/OpenAI + Cursor/Bolt-style scaffolders + Slack/Notion intake + a lightweight usage tracker. Complexity: month build for the full loop; weekend build if you just do the intake + route stage. Replaces both internal-IT backlog *and* the "we bought SaaS for one workflow" habit. Caveat: needs an org culture that will actually adopt bespoke tools.
+
+### 5. Public-signal buyer-intent hunter (indie hacker on Reddit)
+**Source:** https://www.indiehackers.com/post/5-ai-agent-workflows-actually-making-money-in-2026-with-real-numbers-ea266790ba — described by a solo operator reporting ~30% reply-to-outreach conversion.
+**Mechanism:** Scheduled polling across 15–20 target subreddits → reads new posts, filters on intent phrases ("looking for a tool that…", "does anyone know a way to…", complaints about competitors) → classifies High/Medium/Low intent → drafts a non-promotional helpful reply, posts it from the operator's account → resolves the poster's identity via web/GitHub/LinkedIn lookups → enrolls them in a cold-email sequence in the outbound tool.
+**Why agentic:** Not a listening dashboard. The output is a posted reply and an enriched contact in an outbound sequence — actual actions taken in two external systems, per hit, in a loop.
+**Generalizable core:** Poll a public channel → classify each event's intent → take a first action in-channel and a follow-up action in a separate system of record.
+**Deployability:** Same pattern works against any public-conversation surface where your buyer surfaces intent (industry Slack communities, YouTube comments, Google Reviews, GitHub issues, StackOverflow). Stack: Reddit/X API + Claude + Apollo/Clay for identity + outbound tool (Instantly, Smartlead). Complexity: weekend build. Caveats: ethical and TOS edges are sharp — Reddit auto-posting is against site policy, and the reputational blowback if it reads as spam is real. Replaces a community-manager + SDR combo for early-stage outbound.
+
+### 6. Meeting-transcript-to-code chain with human checkpoints (Endava — DavaFlow)
+**Source:** https://openai.com/index/endava-frontiers/ — Endava, a global services firm, using OpenAI Codex + ChatGPT Enterprise across delivery teams.
+**Mechanism:** A recorded requirements meeting ends (up to 2h transcript dropped in) → a "requirements agent" reads the transcript, prior product artifacts, and produces user stories + functional specs → spec is marked ready → a separate "build agent" reads the codebase for the target module, scaffolds boilerplate logic, writes unit tests, and generates documentation → each stage lands in the DavaFlow pipeline with a defined human review checkpoint before advancing.
+**Why agentic:** Two specialized agents each produce a real artifact (specs, code) rather than a summary — and the humans review artifacts, not chat threads. The pipeline shape (agent → checkpoint → agent → checkpoint) is what makes it deployable at services-firm scale.
+**Generalizable core:** Multi-stage handoff chain: raw input → agent produces stage-N artifact → human checkpoint → agent produces stage-N+1 artifact from stage-N + external context.
+**Deployability:** Any workflow where a services firm currently bills for the analyst-then-junior-then-senior sequence: legal drafting (intake → memo → filing), tax prep (interview → workpapers → return), marketing (brief → creative → deployed asset). Stack: Claude/OpenAI + a workflow tool with explicit human-in-the-loop steps (Retool, Zapier Agents, custom Next.js). Complexity: month build for a real pipeline with checkpoints, auth, and audit trail. Replaces layered junior labor within a bill-per-hour service. Scale caveat: value hinges on the checkpoint UX being fast — if humans dread it, the pipeline stalls.
+
+## Sources checked
+- X/Twitter — direct fetches to x.com blocked (403); relied on Google-indexed operator posts. Found Jon Matzner property-manager competitor-tracking agent (outside window, flagged as variation of overnight scouting). Reddit egress blocked at proxy, so operator-native Reddit threads unreachable this session.
+- Hacker News — TesterArmy Launch HN was the strongest concrete deployment; also surfaced Spellbook ACM inbound-contract intake (contract lands in email/Slack/Salesforce → agent triages, redlines against firm playbook, routes to reviewer) — strong candidate held for a future entry to keep today's list distinct-shape, not padded.
+- Podcasts — How I AI (Claire Vo) produced three of the six patterns this run (Notion Hot Potato, Nicole Ruiz Cowork returns, Delight.ai Automators). Podcast site fetches largely blocked; leaned on Lenny's/ChatPRD episode write-ups. Also noted Claire's own aging-PR reviewer cron loop as a variation of deploy-from-code, not included today.
+- Newsletters — Ben's Bites and mean.ceo summaries surfaced Profound Aim (always-on AI-search marketing analyst) and nsKnox (outbound vendor bank verification voice calls — flagged as voice agent variation with an outbound/AP-fraud angle worth revisiting).
+- Product Hunt — mostly launches without disclosed operator mechanisms; nothing qualified over the top-tier picks above.
+- Platform case studies — Anthropic's Cowork rollout produced two candidates worth logging later: Blank Metal / PE deal-team CIM screening and data-room contract-clause extraction; held to avoid stacking two "point Claude at a folder" patterns in one entry.
+- Anthropic and OpenAI customer stories — Travelers FNOL claim-filing voice agent (auto property damage, autonomous end-to-end intake), OpenAI internal Finance month-end close agent, Easterseals six-agent RCM chain (eligibility → prior auth → coding → submission → denials → posting). All strong; DavaFlow selected as the multi-stage handoff exemplar because its human-checkpoint design is the more portable pattern.
+- YC — TesterArmy (P26) selected. Other batch companies (Cowork-adjacent tooling, deployment infra) surfaced but were product-level rather than mechanism-level.
