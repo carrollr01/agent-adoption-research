@@ -1,0 +1,23 @@
+Agent Pattern Scan — 2026-07-21 — 2 patterns | Plaintiff-firm case pipeline agent
+
+https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-5hjp2v/log/2026-07-21.md
+
+Two qualifying patterns today, both from Anthropic-adjacent SMB deployments published in the last week. Also worth flagging up top: the daily log went quiet after 2026-05-28. This is the first fresh scan since then. The two patterns below are net-new against the 5/15–5/28 dedup list.
+
+1) Plaintiff-firm case pipeline that drafts the demand letter (Eve Legal)
+
+Eve serves ~1,400 US plaintiff PI firms — 5 to 50 attorneys each, roughly 200k active matters. When a batch of medical records hits a case, a Medical Overview Agent runs unprompted. It reads the firm's own encoded playbook, the running chronology, and the new records (often tens of thousands of pages), then updates the chronology, pulls out "bad facts," refreshes the damages summary, and drafts the next artifact in the chain: chronology, damages summary, demand letter. Attorney gets a diff, not a blank page. Anthropic's write-up on this workflow reports 60 days off average settlement time. What used to be one to three weeks of paralegal work per case becomes a review pass.
+
+The skeleton — document arrival triggers a multi-step draft chain that respects a firm-authored playbook — ports cleanly to independent insurance agencies. New claim docs land in AMS360 or Applied Epic, Zapier or Make catches the folder event, Claude drafts a loss chronology and first-pass coverage analysis against the agency's playbook, output back into the matter file. Replaces the adjuster's first two hours per claim. Same pattern lands at small tax and accounting shops during return-prep: client uploads to SmartVault or TaxDome triggers a completeness memo plus first-pass Drake or UltraTax entry that the preparer verifies rather than types.
+
+Source: https://www.lawnext.com/2026/06/eve-builds-on-ai-workforce-launch-with-eveos-an-ai-native-operational-platform-for-plaintiff-firms.html
+
+2) Managed-services helpdesk agent that closes M365 tickets, not just triages (Mizo)
+
+Deployed at MSPs on ConnectWise, Autotask, and HaloPSA. An unnamed European MSP saw a 47% overnight-queue drop after enabling three scenarios; an Australian MSP on Autotask went from 55 minutes average resolution to under two on automated categories. Ticket lands in the PSA, agent classifies it, reads requester identity plus tenant state, pushes an MFA prompt to verify the human, then executes the fix end to end — password reset, license assignment, mailbox unblock, DL changes, MFA re-enrollment — posts the reply, files time entries and notes, closes the ticket. Out-of-scope requests escalate with a summary attached.
+
+The novel piece is not the triage. It's binding a real-time identity proof to the admin action, which is what makes "auto-close" trustworthy in a shop that's one bad password reset away from a breach. That step ports well beyond MSPs. Dental and vet clinics with outside IT are a clean copy: front-desk staff emails a ticket, agent triages, SMS code to the staffer's on-file mobile as identity proof, then unlock or mailbox action against the practice's M365 tenant, ticket closed in HaloPSA or Syncro. Stack: shared inbox, Twilio for SMS, Claude API plus an M365 admin MCP, existing PSA. Property management back offices are the other obvious port — tenant portal resets and document-request tickets against AppFolio or Buildium once identity is verified against the phone number on the lease.
+
+Source: https://www.prweb.com/releases/mizo-launches-end-to-end-autonomous-resolution-across-microsoft-365-302808540.html
+
+Sources checked: X/Twitter (inaccessible from this environment), Reddit (WebFetch network error, effectively inaccessible), Hacker News (403 on front page and /newest, nothing 7/14–7/21 met the bar), podcasts (How I AI 7/6 + 7/8 duplicated the overnight-code-agent pattern; Owned and Operated recent AI eps duplicated the voice-phone-agent pattern), Ben's Bites (7/14–7/21 window returned Codex/Claude Code/Fugu tooling updates only), Product Hunt (Rex enterprise-tilted, Deck no customer mechanism, AI Emaily thin, Framer AI dev-tool), platform case studies (Zapier/n8n/Make/Lindy/Relevance/Gumloop/Vapi/Retell — only comparison content, Retell citing older figures), Anthropic customer stories (Eve used above; Epilepsy Foundation Sage dropped as not agentic; UST dropped as enterprise), OpenAI (ChatGPT Work platform launch on 7/9, no SMB customer mechanism), YC (W26/S26 vertical-agent tilt but no in-production customer story in the 7-day window).
