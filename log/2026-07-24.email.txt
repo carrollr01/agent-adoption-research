@@ -1,0 +1,15 @@
+Agent Pattern Scan — 2026-07-24 — 4 patterns | payer-side "next best action" agent
+
+https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-n5v1uw/log/2026-07-24.md
+
+Four patterns today, all with clean SMB copies.
+
+The one to remember is the payer-side "next best action" agent Optum and UST are rolling out on Claude. A new claim or care event fires the agent, which reads the patient history, active payer rules, and clinical guidelines, then surfaces one recommended action — approve, deny, request docs — with citations. Every recommendation queues for a human before it touches the member. It replaces the multi-hop coordination between claims adjuster, utilization nurse, and outreach coordinator, not the decision itself. The same "inbound letter or event, agent does the file work, human approves" shape drops directly onto small insurance brokerages processing carrier correspondence and property managers handling tenant dispute letters. Pitch: every letter arrives already researched, with a draft reply ready to send.
+
+Second is the OpenAI Presence deployment pattern that launched July 22 — one agent, one job, only the access that job needs, tested in simulation against your own last-month call log before it takes a live call. The takeaway isn't the voice channel, it's the scoping and simulation discipline. That translates cleanly to a dental practice that runs one agent scoped only to insurance-verification callbacks, tested against fifty real front-desk transcripts before it picks up. Same for gyms doing freeze requests, home-care doing shift swaps, small law firms doing intake.
+
+Third is the GitHub Agentic Workflows pattern — issues and PR comments fire an agent that reads the repo and opens a PR. The novel bit for our purposes isn't the coding; it's the trigger being a normal task queue event. That shape moves into any business whose work lives in a shared task list: a new client task in Karbon triggers the accountant's document-chase agent, a new punch-list item in Buildertrend triggers material ordering and sub scheduling, a new maintenance ticket in a restaurant manager log triggers vendor outreach and quote comparison. Pitch: your task list stops being a to-do and starts being the trigger for the work.
+
+Fourth is the 2026 shift in call intelligence from summary-in-a-notes-field to field-level CRM write-back. Gong, Fireflies, Otter, and Sybill now extract stage, next step, budget signal, competitor, and timeline into specific Salesforce/HubSpot fields the moment the call ends. For solo insurance brokers and independent real-estate agents running client calls with no admin, this is close to life-changing — the CRM finally reflects what got said without the rep touching it. Same play for home-care intake calls, HVAC site walkthroughs on speakerphone, and residential contractor punch-walks.
+
+Full write-up with sources and sector copies in the repo file linked above.
