@@ -1,0 +1,19 @@
+Agent Pattern Scan — 2026-07-25 — 5 patterns | Nightly book-of-business re-scan that originates new work
+
+https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-j6rj51/log/2026-07-25.md
+
+Five qualifying patterns today. The one worth remembering: a distinct class of agents is showing up in the wild whose job is to periodically re-read the entire book of business and originate net-new work items — as opposed to reacting to incoming events. Eve Legal running a nightly sweep across a plaintiff firm's whole active caseload to surface unfollowed MRIs, undiagnosed TBI patterns, and existing clients newly eligible for active mass torts is the clearest example. The tasks it creates did not exist before the agent ran.
+
+The other four:
+
+Kanban column as agent control plane — Alessio Fanelli at Kernel Labs is shipping production code from a phone by treating Linear ticket state transitions as the agent trigger. Assigning a card spawns an agent that opens a PR; moving a card to "Rework" re-triggers the agent to address line-comments on the PR; merge auto-moves the card to Done. The mechanism worth stealing is not that code gets written unattended (already logged) but that the ticket board is the interface, with no chat thread to re-engage.
+
+Outbound voice with live warm-transfer on intent detection — Cars24 (OpenAI + ElevenLabs case study, 3M+ voice-minutes/month in 13 Indian languages) fires outbound calls from CRM events (missed appointments, cooling leads), detects purchase-intent mid-conversation, and live-transfers to a human sales rep with conversation state preserved so the human joins mid-dialogue. Different from the already-logged inbound receptionist pattern in both trigger direction and handoff mechanism.
+
+Multi-PDF contract-vs-invoice variance agent — FlowManual (YC S26) reads new construction PDF uploads across bid, signed contract, and invoice, then writes a dollar-ranked list of variances back to the PM with each finding pinned to the exact PDF line. Generalizes to any "signed spec vs delivered artifact" workflow — SOWs vs consultant timesheets, insurance claims vs coverage docs, PO vs receiving.
+
+Single-order post-purchase ops agent — Pango (YC S26, 30 DTC brands live) handles returns end-to-end from a customer portal event or carrier tracking exception: decides refund vs exchange vs reship, generates the label, routes the parcel, updates the TMS, and issues the refund. The pattern worth logging is that the same system that decides also executes across warehouse + carrier + refund + comms, not the return workflow itself.
+
+Sources: Anthropic customer page, OpenAI Cars24 case study, ElevenLabs blog, How I AI podcast (Lenny's Newsletter cross-post), YC S26 batch pages, MindStudio writeup on the Symphony spec.
+
+Notable dry sources this run: Reddit, Hacker News Algolia, and Product Hunt all blocked by their bot walls via the agent proxy. Signal came from podcasts, YC batch coverage, and vendor case study pages instead.
