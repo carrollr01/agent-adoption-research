@@ -1,0 +1,50 @@
+Agent Pattern Scan — 2026-07-26 — 4 patterns | Browser agent walks a competitor's onboarding flow
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-07-26.md
+
+# 2026-07-26 — Agent Pattern Scan
+
+## TL;DR
+The strongest new pattern today: a browser agent (Perplexity Comet on Claude Opus 4.6) that signs up for a competitor's product, walks the full onboarding flow, and files a differentiator report. It replaces hours of product-marketing "let me go poke at their trial." Three other concrete mechanisms landed: fleet-of-agents daily standups, chatbot idle-timeout as an agent handoff trigger, and coding agents that record video of their own work as PR evidence.
+
+## Patterns
+
+### 1. Browser agent walks a competitor's onboarding flow
+**Source:** Perplexity Comet review, SwitchTools 2026 (https://www.switchtools.io/blog/perplexity-comet-ai-agent-browser); Beginners in AI — Comet Deep Research (https://beginnersinai.org/whats-new-perplexity-2026/) — Comet added competitor-onboarding walkthroughs in April 2026 for Max subscribers and, on July 2026 releases, still runs Claude Opus 4.6 by default for these multi-step flows.
+**Mechanism:** User names a competitor → Comet opens the site in a real browser, creates an account with a scratch email, clicks through every onboarding step, captures screenshots at each screen, extracts product copy, notes the pricing/paywall structure, and writes a comparison doc against the user's own product → drops the doc into whatever workspace target the user set (Notion, Google Docs, Slack).
+**Why agentic:** It doesn't summarize a landing page. It behaves like a prospect: fills forms, dismisses modals, resolves the "verify your email" step, and keeps going. Multi-step, stateful, tool-using — not retrieval.
+**Generalizable core:** Named target → agent impersonates a real user in a browser → captures each artifact along the way → writes a structured comparison. Reusable for any "go be a customer of X and tell me what happened" task: competitor pricing, supplier RFQ flows, government portal submissions, insurance quote shopping.
+**Deployability:** Off-the-shelf via Comet Max, or a week's build on Playwright + Claude computer-use for a custom version scoped to specific target sites. Replaces the product-marketing analyst hour spent quarterly on "audit the competition." Caveat: the target may detect and block automated signups; scratch-email pool is part of the stack.
+
+### 2. Fleet-of-agents daily standup on a cron
+**Source:** Arthea — Running a daily standup with 83 autonomous agents (https://www.arthea.ai/blog/agent-standup-operations) — Arthea publicly runs 83 autonomous agents that file written standup reports at 09:00 UTC every weekday.
+**Mechanism:** Cron fires at 09:00 UTC → each of the 83 agents reads its own work log from the last 24 hours (tasks attempted, tools called, errors hit, work committed) → each files a short structured report to a rollup collector → coordinator agent groups by team/workstream, flags exceptions (stalled work, repeated errors, cost anomalies), and posts the roll-up to the operators' inbox before anyone opens their laptop.
+**Why agentic:** No human is asking the agents anything. The agents are the reporters and the readers. The coordinator's exception-flagging is a judgment call it makes over the reports, not a fixed template.
+**Generalizable core:** Cron trigger → many independent workers each summarize their own state → aggregator agent applies judgment across the pile → one-shot delivery to the human operator. Reusable for anything that manages a fleet: sales agents, dispatch drivers, fulfillment nodes, franchise locations, plant lines — the units don't have to be software agents.
+**Deployability:** LangGraph or Claude Agent SDK subagents for the fleet; a scheduled parent agent for the roll-up; posts to Slack/email/Notion. Weekend build for a small fleet, week for structured exception logic and cost tracking. Replaces the daily standup meeting and the human sifting through per-worker logs. Caveat: the pattern only pays off once the underlying "fleet" already produces machine-readable output.
+
+### 3. Chatbot idle-timeout as an agent handoff trigger
+**Source:** Zapier — Trigger run agent behavior when Zapier Chatbots conversation is completed (https://zapier.com/apps/agents/integrations/zapier-chatbots/255640634/trigger-run-agent-behavior-in-agents-when-a-zapier-chatbots-conversation-is-completed) — released in the Zapier Chatbots × Agents bridge; the "completed" event fires when a chatbot conversation goes inactive for 5 minutes.
+**Mechanism:** Prospect chats with a Zapier Chatbot on the site, then wanders off → 5 minutes of silence → "conversation completed" event → Zapier Agent reads the full transcript, classifies the intent, looks up whether the prospect already exists in the CRM, and decides one of: send a follow-up email tailored to what the person was asking about, create a lead record with the transcript attached, escalate to a human in Slack if the last message was a purchase signal, or do nothing if the conversation was low-intent.
+**Why agentic:** The trigger is silence, not action, and what happens next depends on the content of the abandoned conversation. It's not a "3-day nurture drip" template — the agent picks the branch.
+**Generalizable core:** Absence-of-event as trigger → agent reads what led up to the silence → decides the recovery move → writes to the right downstream system. Reusable for any workflow where the *lack* of a next step is the signal: unpaid invoice past due, ticket without a reply, cart abandoned mid-checkout, contract not signed after N days, patient who booked but didn't confirm.
+**Deployability:** Native inside Zapier Agents if the chatbot already lives there. Otherwise a weekend build on n8n or Make with a scheduled poll on inactivity. Complexity is entirely in the decision logic, not the plumbing. Replaces the SDR who was supposed to be re-engaging abandoned chats and usually isn't.
+
+### 4. Coding agent that records video of its own work as PR evidence
+**Source:** NxCode — Cursor Cloud Agents on isolated VMs (https://www.nxcode.io/resources/news/cursor-cloud-agents-virtual-machines-autonomous-coding-guide-2026); Cursor forum, July 2026 (https://forum.cursor.com/t/cloud-agents-api-auto-created-prs-switched-from-ready-for-review-to-draft-around-july-11-no-client-side-change/165483) — Cursor Cloud Agents (renamed from Background Agents in early 2026) are in active production use; the forum thread from July 11 confirms teams running them at API scale.
+**Mechanism:** Developer types (or dictates from mobile) a task like "add server-side pagination to the users list" → Cursor spins up an isolated Ubuntu VM, clones the repo onto a dedicated agent branch → agent writes the code, runs the tests, then launches a browser inside the VM, exercises the feature end-to-end, and records a screen capture of the working feature → opens a PR that includes the diff, the test results, and the video demo as attached evidence → notifies the developer to review-and-merge.
+**Why agentic:** The novelty is not "agent writes code," which is table-stakes now. The novelty is that the agent *proves* its own work worked by driving the app and filming it. The reviewer's first click is play, not read-diff.
+**Generalizable core:** Trigger from a natural-language task → isolated execution environment per run → agent both does the work and captures evidence of the outcome → deliverable is diff-plus-proof, not diff alone. Reusable for anything where "did it work" costs more than "did it compile": data migrations (before/after row counts as evidence), infra changes (dashboard screenshot), design changes (Percy-style visual diff), lab procedures with instrument output.
+**Deployability:** Cursor Cloud Agent covers the coding case out of the box. Custom versions on Claude Agent SDK + Playwright + a sandboxed VM per task = week-plus build, mostly on the sandboxing. Replaces the developer time spent verifying an agent's PR by hand. Caveat: only worth it where "the diff looks right but the feature is broken" is a real risk — for pure refactors it's overhead.
+
+## Sources checked
+- Perplexity — Comet browser competitive-intel walkthrough (qualifying pattern, April 2026 feature still current on July 2026 model default)
+- Arthea — 83-agent standup post (qualifying pattern; fleet-management primitive)
+- Zapier — Chatbots × Agents idle-timeout trigger (qualifying pattern; absence-of-event trigger class)
+- Cursor Cloud Agents — July 2026 forum activity confirms production use; qualifying pattern for self-demoing coding agents
+- Anthropic customer stories — Caylent (July 17, 2026) and Epilepsy Foundation Sage (August 2025 launch, still cited in July 2026 material) both showed up. Caylent details are behind claude.com/customers, which returned 403; Sage looks retrieval-plus-conversation, more chatbot than agent — did not include either
+- Hacker News — Show HN patterns for the last two weeks skew to agent infra (Oak, Hermes async subagents, MCP 2026-07-28 spec) rather than mechanism-level business deployments
+- Reddit r/n8n, r/AI_Agents — mostly template marketplaces and tutorials; no discovery-quality builder posts surfaced through search
+- Newsletters/Ben's Bites/Product Hunt — heavy on model releases and vendor launches; not a productive week for mechanism-level operator posts
+- X/Twitter — direct search inaccessible on this run; substituted with operator-adjacent secondary sources rather than left blank, but noting the gap
+- Workday Sana/Cloudberry supplier audit and Nepa GDPR agent looked promising but only surfaced as ROI headlines without the trigger/action-level detail this log requires; not included
