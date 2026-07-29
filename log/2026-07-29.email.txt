@@ -1,0 +1,62 @@
+Agent Pattern Scan — 2026-07-29 — 6 patterns | Shadow grader agent scoring draft-to-final drift
+
+https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-mcj4sd/log/2026-07-29.md
+
+Six patterns today, all mechanism-level. Standout: Erewhon's "shadow grader" agent that reads the human-edited final send of another drafting agent and scores drift — a cheap, generalizable way to close the "did the AI actually help" feedback loop without human eval. Also notable: Anthropic and Amp both shipping patterns where the unit of work isn't a ticket — it's a defect class or a webhook lifetime.
+
+---
+
+1. Shadow grader agent scoring draft-to-final drift
+Source: https://zapier.com/customer-stories/Erewhon — Erewhon (10-store LA grocer) CX ops, built by one Business Analyst on Zapier.
+Mechanism: Help Scout ticket lands, workflow checks membership status, routes members and non-members to different drafting agents, drafts grounded in a vector store of institutional policies, drops draft in the CX queue for human send. Then a second "English Tutor" agent reads the actually-sent human reply, diffs it against the AI draft, and scores how much the human changed. Score written to BigQuery for trend tracking.
+Why agentic: The second agent isn't a metric — it's an agent that reads a completed conversation, judges the delta between two versions of a reply, and produces a per-ticket drift signal.
+Generalizable core: Drafting agent plus a shadow agent that reads the human-approved final and scores delta. Any workflow with a draft-then-approve step can bolt this on.
+Deployability: Zapier + LLM + a table to write scores to. Weekend build. Replaces the manual eval loop for anywhere you're already running an assist agent. Scales down to a single support inbox.
+
+2. Class-scoped defect sweep agent
+Source: https://www.anthropic.com/institute/recursive-self-improvement — Anthropic engineering, April 2026 (still the reference deployment being cited this week).
+Mechanism: Engineer defines a class of production error, hands agent the signature and repo scope, agent iterates: reads codebase, finds each occurrence, generates a fix, opens an individual PR, moves on. Ran across ~800 PRs autonomously. Supervising engineer estimated ~4 years of human work.
+Why agentic: The unit of work is "eliminate this class of defect" — the agent plans its own file-by-file loop and generates N separately reviewable PRs, not one commit.
+Generalizable core: Defect class definition, repo scan, per-occurrence fix, N draft PRs. Fits dependency upgrades, deprecated API migrations, log-line renames, PII redaction sweeps, schema migrations.
+Deployability: Claude Code or Codex + agent SDK + repo/CI access. Higher complexity than one-off agent work (needs PR budgeting, review queue tooling), but repeatable once scaffolded. Replaces long-tail refactor debt that never gets scheduled.
+
+3. Assign-in-Kanban, get-artifact-back specialist agents
+Source: https://claude.com/customers/rakuten-qa — Rakuten, enterprise-wide (product, sales, marketing, finance, engineering).
+Mechanism: Employee opens a card in a Slack/Teams-integrated Kanban, assigns it to a specialist agent (QA agent, proposal-deck agent, internal-app agent), agent runs long-running work in a sandbox, returns a finished artifact (spreadsheet, deck, built app), artifact posted back into the shared workspace. The user assigns, doesn't converse.
+Why agentic: Artifact-out, not chat-out. Sandbox execution runs for minutes-to-hours. The interaction model is delegation, not conversation.
+Generalizable core: Ticket/card in a shared queue, specialist sandboxed agent, deliverable committed back to the same queue. Fits any org already routing "please prep this" requests through Jira, Linear, ServiceNow, or a shared form.
+Deployability: Claude Managed Agents (hosted sandbox) + a Kanban surface with agent-as-assignee. Each specialist took roughly a week to bring online at Rakuten. Task turnaround reported 24d to 5d.
+
+4. Agentic first-round conversational screen
+Source: https://zapier.com/blog/zapier-ai-recruiters/ — Zapier's internal Talent Acquisition team, piloting on high-volume roles (one drew thousands of applicants in 48 hours).
+Mechanism: Application submitted in ATS, agent invites candidate to an interactive screening, conducts a first-round interview where questions and follow-ups adapt to the candidate's answers, produces structured summary + rating, human recruiter reviews and decides. Candidate can opt out with no penalty.
+Why agentic: It's a real conversation with branching probes, not a form. Agent decides what to ask next based on prior answers. Reported 97% completion rate and 4.5/5 average candidate rating.
+Generalizable core: High-volume inbound, agent runs an adaptive structured discovery conversation, hands a scored summary to the deciding human. Fits sales qualification, tenant screening, insurance intake, benefits eligibility, patient intake.
+Deployability: ATS + voice-or-chat agent framework (Retell / Vapi / hosted LLM). Medium complexity. The opt-out UX and clear "AI does not decide" boundary are load-bearing — without those the pattern breaks socially even if the agent works.
+
+5. Event-driven durable coding orb
+Source: https://ampcode.com/news/event-driven-orbs — Sourcegraph/Amp, shipped July 23, 2026. Used internally at Amp and by their dev-team customer base.
+Mechanism: External event (CI failure on main, new Linear issue, PagerDuty alert, Stripe exception, GitHub PR opened) hits a signed webhook URL bound to a persistent worktree, wakes the orb, orb reads repo, CI logs, issue body, then investigates and writes back a comment, draft PR, or Slack message. State persists for the whole event lifetime, not one-shot.
+Why agentic: No human opens a session. The orb selects tools, iterates, self-terminates, and the durable state means it can resume across multiple related events.
+Generalizable core: Signed webhook, durable agent thread with trusted event metadata, investigation-and-write-back loop. Applies to any "an alert or ticket lands, someone has to go look" workflow, not just code.
+Deployability: Amp is the reference implementation; equivalents can be built with Trigger.dev + Claude Code, or Buildkite's agentic examples. Complexity is moderate — webhook signing, tool scoping, per-thread budget caps.
+
+6. Sentry issue → repro test + draft PR
+Source: https://blog.sentry.io/agents-need-production-context/ — pattern in production at Sentry itself and being cloned externally via the Sentry MCP (Datadog's Bits SRE agent uses it).
+Mechanism: Sentry fires webhook on a new or regressed issue, agent pulls full context (stack trace, breadcrumbs, tags, release, suspect commits, distributed traces), checks out the repo, reproduces the error or writes a regression test, opens a draft PR with the Sentry link, root-cause summary, files changed, and test results. Human reviews and merges.
+Why agentic: The agent decides whether the failure is small enough to attempt a fix, picks which files to open, and writes the test itself. Not templated.
+Generalizable core: Structured error/event with rich context, agent reads code + writes code + writes test, draft artifact for human sign-off. Replaces the first 30-60 minutes of a triage engineer's day.
+Deployability: Sentry webhook + a hosted coding agent (Claude Code, Codex, Amp) + repo access. Low-to-moderate complexity.
+
+---
+
+Sources checked
+- X/Twitter — direct fetch blocked by the proxy today (403 on x.com and twitter.com). Only reached via WebSearch snippets. Flagging so this shows up as a real gap, not a slow day.
+- Reddit (r/AI_Agents, r/n8n, r/automation, r/smallbusiness, r/Entrepreneur, r/ChatGPTCoding, r/LocalLLaMA) — direct fetch and JSON API both 403. No usable first-person operator posts surfaced.
+- Hacker News — direct fetch and Algolia API blocked; only search-snippet reach today.
+- Podcasts — Service Business Mastery had a Leaping AI voice-agent episode this week and Small Business Big AI continued the Kim Howard scouting arc; both duplicate patterns already logged (voice booking 5/24, market scouting 5/23).
+- Newsletters — Ben's Bites 403; picked up July 28 items via wire-service mirrors. Cyabra OSINT verdict agent noted but dropped for tightness (skeleton overlaps with Rakuten's artifact-out pattern).
+- Product Hunt — direct fetch 403; nothing above the mechanism bar this window.
+- Platform case studies — Zapier customer stories (Erewhon, Vendasta, Zapier internal recruiter) were the strongest source today. Vendasta post-call SDR admin dropped for tightness (skeleton overlaps with invoice-chase, 5/25).
+- Anthropic and OpenAI customer stories — Anthropic customer page 403s to WebFetch; Rakuten and internal Anthropic sweep patterns pulled via secondary sources.
+- YC — S26 Demo Day is Sep 10; nothing launched in anger this week that hit the mechanism bar.
