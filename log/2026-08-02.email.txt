@@ -1,0 +1,56 @@
+Agent Pattern Scan — 2026-08-02 — 5 patterns | Erewhon draft-and-grade support loop with critic agent tuning the prompt
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-el80ps/log/2026-08-02.md
+
+# 2026-08-02 — Agent Pattern Scan
+
+## TL;DR
+Five patterns today. Standout is Erewhon's "draft-then-grade" support loop on Zapier: a second LLM scores the semantic edit-distance between the agent's draft and the human-shipped reply, giving the ops owner an unattended quality signal to iterate the prompt without hand-labeling.
+
+## Patterns
+
+### 1. Draft-and-grade support loop with a critic agent tuning the prompt
+**Source:** https://zapier.com/customer-stories/Erewhon and https://zapier.com/blog/erewhon-ai-automation-builder/ — 10-store grocery chain Erewhon, built by one business analyst (Chris Morrison) as a 39-step Zap.
+**Mechanism:** Help Scout ticket lands → agent reads customer membership status from Erewhon's DB + purchase history from BigQuery + policy passages from a vector store → branches on member/non-member for tone → ChatGPT drafts reply grounded in policy → hands draft to human agent. Second "English Tutor" agent diffs the human-shipped reply against the original draft and scores how much changed. Score is logged as a live quality signal; 70% of drafts now ship unmodified.
+**Why agentic:** Two-agent loop where the critic's output isn't shown to the customer; it feeds prompt regression tuning. That's a workflow, not a display.
+**Generalizable core:** For any drafting workflow, ship the draft, log the human edit, and have a second model score semantic edit-distance so you can iterate the prompt without a labeling process.
+**Deployability:** Weekend build on Zapier, Make, or n8n plus a critic prompt. Replaces L1 support drafting; Erewhon claims ~1,500 hours/year across 10 stores.
+
+### 2. Platform-native "meeting note finished" trigger fans out writes to N systems
+**Source:** https://www.notion.com/releases/2026-07-01 and https://www.notion.com/help/custom-agents — Notion 3.6 Custom Agents, GA to Business/Enterprise in July.
+**Mechanism:** Notion AI Meeting Notes finishes transcription and summary → fires a `meeting_note.summarized` event → Custom Agent reads attendees, decisions, and action items → writes status updates into the linked project DB, drops a recap into a Slack channel or email, and files tickets in the connected bug or task DB. Which artifacts get touched depends on what's actually in the note.
+**Why agentic:** No cron and no manual kickoff. Agent decides which downstream systems to write to per meeting based on content, rather than a fixed post-meeting template.
+**Generalizable core:** A platform-native "artifact completed" event (transcript, doc, form submission) triggers an agent that fans writes out to N connected systems keyed off the content of the artifact.
+**Deployability:** Weekend if you already run on Notion. Custom Agents UI + trigger picker + connected DBs. Replaces chief-of-staff or PM doing meeting-follow-ups.
+
+### 3. Post-call CRM hygiene by diffing transcript against current field state
+**Source:** https://www.joinkatalyst.com/ and https://www.producthunt.com/products/katalyst — Katalyst, AI sales ops tool live on Product Hunt mid-2026.
+**Mechanism:** Sales call ends (Zoom or Gong webhook) → agent pulls the transcript, related email thread, and calendar context for the opportunity → reads current Salesforce field values → generates targeted field writes (stage, next step, close date, competitor mentions), a summary note, a draft follow-up, and next-action tasks. Runs continuously against every new call, email, and calendar event on the account, not just when a user prompts.
+**Why agentic:** Diff-driven writes. The agent compares transcript content to current CRM state and proposes updates to the specific fields that are stale, instead of dropping a summary blob in a notes field.
+**Generalizable core:** For any post-event system-of-record hygiene job, read the event artifact, diff against current system state, and propose targeted field updates rather than a summary attachment.
+**Deployability:** Week if buying, month if building against Salesforce + Gong or Fireflies webhooks. Replaces SDR/AE CRM admin time and RevOps periodic clean-up passes.
+
+### 4. Retroactive malware sweep triggered by new threat intel
+**Source:** https://www.helpnetsecurity.com/2026/07/29/stairwell-backstory-agentic-investigation/ and https://vmblog.com/news/stairwell-launches-backstory-the-first-agentic-investigation-platform-for-malware-blast-radius/ — Stairwell Backstory, GA July 29, targeted at SOC/IR teams.
+**Mechanism:** New threat intelligence signal arrives (new malware family, new dropper attribution, new variant hash, new detection rule) → agent re-runs a "Run-to-Ground" investigation across the customer's preserved historical file corpus from every endpoint → connects related files, endpoints, timelines, and infrastructure into a single campaign view → writes an investigation report listing affected systems and containment scope, feeds SIEM via the Google SecOps integration. Stairwell's own stat: each published hash averages 2.4 additional variants dormant implants would otherwise evade.
+**Why agentic:** External signal autonomously kicks off a multi-step investigation across historical evidence and produces a scoped report, instead of just flagging matches in an analyst queue.
+**Generalizable core:** On new external signal, the agent re-processes preserved historical data to retro-flag matches the previous state missed, then drafts a decision-ready investigation.
+**Deployability:** Requires the Stairwell corpus + investigation layer, so this is a "buy the platform" pattern rather than build. But the shape is portable to any domain where evidence is preserved and new external signals require re-checking history (fraud, compliance, medical recalls, product-safety). Replaces L1/L2 threat-hunt sweeps.
+
+### 5. Incident dedup and cross-cloud remediation coordinator
+**Source:** https://www.dynatrace.com/news/press-release/autonomous-operations-enterprise-ai/ and https://thenewstack.io/dynatrace-autonomous-sre-agents/ — Dynatrace Autonomous SRE Agent + Cloud SRE Agent, launched July 27.
+**Mechanism:** Dynatrace Davis flags a new APM anomaly → Autonomous SRE Agent reads the causal topology graph plus every open investigation → decides "is this actually the outage I already have open, or new?" → merges into the existing investigation with fresh signals, or opens a new one. If remediation is needed, Cloud SRE Agent coordinates the fix across AWS, Azure, and GCP APIs and writes the actions + reasoning into a single auditable record.
+**Why agentic:** Agent takes an autonomous merge-or-open decision on every incoming alert, then executes remediation across three cloud APIs. Not a status board.
+**Generalizable core:** For every inbound event, agent classifies "novel vs. duplicate of open work" and routes into existing state, then executes the associated actions with an audit trail.
+**Deployability:** Requires Dynatrace SaaS + DPS license, so buy-not-build. But the "dedup-then-act" shape is portable to support tickets, bug intake, security alerts, and any queue that suffers from duplicate work items. Replaces L1 on-call SRE triage and initial cloud runbook execution.
+
+## Sources checked
+- X/Twitter — searches for operator-first-person phrases returned mostly VC commentary and vendor threads; the strongest signal was still vendor GA press coverage.
+- Reddit (r/AI_Agents, r/n8n, r/automation, r/smallbusiness, r/Entrepreneur, r/ChatGPTCoding) — WebFetch to reddit.com blocked in this environment; searches returned aggregator SEO articles rather than real threads.
+- Hacker News — Show HN and front page returned 403 on direct fetch; relied on search snippets.
+- Product Hunt — 403 on direct fetch; Katalyst confirmed via third-party coverage and vendor site.
+- Newsletters — Ben's Bites and other issues largely inaccessible; picked up Notion release detail via docs.
+- Platform case studies — Zapier's Erewhon writeup, n8n's Delivery Hero (already surfaced in the 5/27 scan, so not re-logged as a pattern), Dynatrace and Stairwell press.
+- Anthropic and OpenAI customer stories — 403 on direct fetch; OpenAI Presence pilots at BBVA Mexico and SoftBank surfaced but are explicitly "exploring," not production.
+- YC — nothing new that met the bar beyond vendor GAs above.
+- Dropped: Gravity Climate's Gravity Agent (vertical SaaS with domain-curated skill library) — the vertical-SaaS-agent shape is well-worn; the expert-curated-vs-user-built distinction wasn't distinctive enough. PagerDuty SRE Agent — sits close to the coding/dev-agent saturation line since it reads GitHub for root cause.
