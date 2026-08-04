@@ -1,0 +1,54 @@
+Agent Pattern Scan — 2026-08-04 — 5 patterns | Meta-agent that patches its own production agent between shifts
+
+Full log: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-wobd4y/log/2026-08-04.md
+
+# 2026-08-04 — Agent Pattern Scan
+
+## TL;DR
+Five in-window patterns. Standout: OpenAI Presence's self-improving support agent, where a scheduled meta-agent reads the previous shift's human-handoff transcripts and ships prompt/tool fixes to the customer-facing agent automatically — pairing "agent does the work" with "agent patches the agent" cut escalations by 15 percentage points in 10 days. That reliability loop is the kind of thing every production agent build should have, and almost none do.
+
+## Patterns
+
+### 1. Meta-agent that patches its own production agent between shifts
+**Source:** OpenAI, "Introducing OpenAI Presence," July 22 2026 (https://openai.com/index/introducing-openai-presence/) — deployed against OpenAI's own English support line; BBVA Mexico is first named enterprise design partner.
+**Mechanism:** trigger = end-of-shift schedule (or handoff-rate threshold) → reads the last N support transcripts, focusing on the tail where the customer-facing agent escalated to a human → identifies missing tool coverage, ambiguous prompts, or wrong-branch decisions → drafts prompt and tool-definition changes → writes those changes to the running agent's config via Codex → replaces the "product manager + prompt engineer weekly retro" loop that would normally accumulate feedback for a sprint.
+**Why agentic:** it's a second-order autonomous loop, not a dashboard flagging problems for a human to fix. Cadence went from weekly-manual to nightly-automatic; result was self-resolution rising to 75% and human handoffs dropping 15 pp in 10 days.
+**Generalizable core:** primary agent runs a customer-facing workflow → meta-agent reads its failure tail on a schedule → meta-agent edits the primary agent's prompts/tools → measure escalation-rate delta.
+**Deployability:** the pattern is language- and stack-agnostic — Claude/GPT + any retrieval store + a config file the meta-agent can PR against. Weekend prototype on a narrow slice (one intent class); month-scale to production. Requires a labeled "handoff" event in the source system so the meta-agent knows what to read. Replaces the internal prompt-eng / QA loop for any customer-facing agent.
+
+### 2. Alerting-system event → sandboxed coding agent → PR in the repo
+**Source:** Launch HN: Hoplite (YC S26), Aug 3 2026 (https://news.ycombinator.com/item?id=49157997) — YC page: https://www.ycombinator.com/launches/SAM-hoplite-effortless-cloud-agents-for-programming. Small YC S26 team; positioning "trillions of tokens/day of coding agents."
+**Mechanism:** trigger = Sentry error notification (also manual mentions from Slack, Linear, iMessage) → reads the stack trace, repo state, developer's own MCP servers, and session context transferred at onboarding → spins up an isolated cloud sandbox, iterates on a candidate fix → writes a pull request in GitHub with the change → replaces the on-call engineer's first-pass triage plus the first draft of the fix commit.
+**Why agentic:** long-running, tool-using, multi-step; produces a durable artifact (a PR) that lands in a system-of-record, not a suggestion in a panel.
+**Generalizable core:** alerting-system event → sandboxed autonomous agent given the operator's own toolset → durable artifact in the system-of-record.
+**Deployability:** cloud VM/sandbox + MCP + Sentry + GitHub; roughly a week to wire against one repo. Quality of the resulting PR is bounded by the codebase's tests and docs — same ceiling as any coding agent. Replaces first-pass on-call triage; does NOT replace the reviewer.
+
+### 3. Computer-use agent as an API for legacy back-office data entry
+**Source:** Launch HN: Coasty (YC S26), ~July 29 2026 (https://news.ycombinator.com/item?id=48922706) — 2-person team, "a few thousand active users, 24x since Claude Cowork launched," 82% on OSWorld.
+**Mechanism:** trigger = API call (or app submission) with a natural-language task, target environment, credentials, and files → reads the target software's actual UI via screenshots → drives mouse and keyboard inside a fresh isolated VM → decides mid-run when to escalate to a human → writes a structured JSON result plus a full click/keystroke replay log → replaces a back-office admin doing manual entry in legacy desktop or on-prem apps that have no API.
+**Why agentic:** no pre-scripted RPA flow. The agent chooses what to click based on the current screen state, and it makes escalate-or-continue calls itself.
+**Generalizable core:** task queue item → agent drives a real UI in an isolated environment → structured result + audit trail written back.
+**Deployability:** their API is the runtime, so days to weeks to integrate. Cost scales with wall-clock VM time — economics favor high-value, long-tail tasks a human currently does one at a time. Replaces the ops person clicking through the vendor portal or the ancient Windows app that IT swore they'd retire five years ago.
+
+### 4. Outbound voice agent that navigates B2B IVRs, not customers
+**Source:** Launch YC: LunaBill, July 2026 (https://www.ycombinator.com/launches/Ooq-lunabill-ai-voice-callers-for-healthcare-billing-teams) — 60,000+ insurance calls automated, $30M+ recovered, live with UC Health, Mayo, Experian Health.
+**Mechanism:** trigger = a healthcare claim hits the follow-up queue (A/R aging bucket + payer-specific rules) → reads the claim number, patient record, EDI denial codes, and cached payer IVR tree → dials the payer, navigates the IVR, answers verification questions, asks for status or denial reason, and when the branch supports it, triggers reprocessing or files an appeal on the same call → writes updated claim status, denial reason, and next-action code back to the PMS/RCM system → replaces the biller's ~30-minute manual call (insurance follow-up is ~80% of a biller's day).
+**Why agentic:** multi-turn voice reasoning against an unpredictable IVR + human rep, dynamic branching, in-call escalation into appeals. Not a canned voicebot.
+**Generalizable core:** stale work-item in an AR/dunning/status queue → outbound voice agent that navigates another business's phone tree → structured update written back to the system-of-record. Different from inbound receptionist agents (5/24) and email-based invoice chase (5/25) — this is outbound voice against B2B phone systems.
+**Deployability:** month-scale — needs a payer/vendor directory, PMS or ERP integration, and a call model tuned on transcripts (LunaBill used 1.2M). Replaces a specialist FTE per 100–200 accounts. The reusable insight for smaller shops: any industry where humans currently spend hours on the phone with another business's IVR (insurance, freight, utilities, permitting, vendor status) is fair game — you don't need the healthcare-specific stack to run the play.
+
+### 5. "Artifact finalized" event as the fan-out trigger for downstream systems
+**Source:** Notion release notes, July 31 2026 (https://www.notion.com/releases/2026-07-31) — new "AI Meeting Note summarized" trigger now GA in Custom Agents for Business/Enterprise.
+**Mechanism:** trigger = an AI-generated meeting summary is finalized on a watched data source → reads the summary block for decisions, action items, and flagged feedback → acts by updating the project tracker row, posting a decisions + next-steps recap into Slack/email, and opening tickets in the engineering tracker from flagged items → writes across Notion databases, Slack, and the connected issue tracker → replaces the PM/chief-of-staff post-meeting fan-out ritual: circulate recap, update tracker, file tickets.
+**Why agentic:** event-driven, unattended, chooses which downstream tools to hit based on note contents. The human never opens the note first — they see the updated tracker and the Slack recap.
+**Generalizable core:** any "artifact-finalized" event (transcript ready, doc approved, ticket closed, invoice reconciled) becomes the fan-out trigger for an agent that writes into two or three downstream systems. The novel bit for our vocabulary: the interesting trigger isn't always an inbound message — it's often a document reaching a specific state.
+**Deployability:** no-code inside Notion Custom Agents; weekend project for one recurring meeting. Outside Notion, same pattern runs on Zapier/n8n with a Fathom/Fireflies/Granola webhook. Replaces the PM/EM/chief-of-staff post-meeting hour.
+
+## Sources checked
+- X/Twitter and Reddit — both blocked from fetch in this environment; verified snippets weren't retrievable at mechanism level. Skipped rather than substituted with weaker sources. Recommend a re-run once these are reachable, since builder cohorts on r/AI_Agents and r/n8n post the most granular mechanisms.
+- Hacker News, Product Hunt, YC — all pages 403 from proxy; patterns above reconstructed from WebSearch snippets that quote the Launch HN / Launch YC posts. Three in-window YC S26 launches surfaced (Hoplite, Coasty, LunaBill).
+- Podcasts (How I AI, Lenny's, Owned and Operated, Service Business Mastery, Small Business Big AI) — transcripts not directly retrievable; Aug 3 "How I AI" Codex episode read as a personal power-user workflow, not a business-in-production deployment.
+- Newsletters (Ben's Bites, The Neuron, Rundown AI, latent.space) — snippets surfaced but no new mechanism-level deployments beyond the platform announcements above.
+- Platform case studies (Zapier, n8n, Make, Lindy, Relevance AI, Gumloop) — nothing in-window with a distinct mechanism.
+- Anthropic and OpenAI customer stories — OpenAI Presence launch (in window) and Eve Legal case study on Anthropic (July 17, four days outside window — flagged for next scan: encoded case conditions → chained agents produce medical chronology → damages summary → attorney-voiced demand letter → written into the case file for attorney review).
+- Cyabra coordinated-activity investigation agent (July 28) — in-window but only one secondary source; held back rather than logged thin.
