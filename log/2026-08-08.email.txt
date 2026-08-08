@@ -1,0 +1,73 @@
+Agent Pattern Scan — 2026-08-08 — 4 patterns | Three-role AI workforce inside a firm
+
+Repo link: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-08-08.md
+
+# 2026-08-08 — Agent Pattern Scan
+
+## TL;DR
+Four qualifying patterns today. Standout: Eve's three-role AI workforce for plaintiff law firms (executor + auditor + analyst running concurrently) — a novel org-chart shape that generalizes cleanly to any firm with routine casework, compliance review, and untapped cross-file intelligence. Note: this session ran after a multi-week gap since 2026-05-28.
+
+## Patterns
+
+### 1. Three-role AI workforce inside a firm (Eve / EveOS)
+(tags: legal, accounting, home-health, dental-and-vet-clinics, insurance)
+
+Source: LawSites — Eve builds on AI workforce launch with EveOS (June 2026). https://www.lawnext.com/2026/06/eve-builds-on-ai-workforce-launch-with-eveos-an-ai-native-operational-platform-for-plaintiff-firms.html — Eve now serves 1,400+ plaintiff law firms with 200,000+ active matters, built on Claude.
+
+Mechanism: New document lands on a matter (intake form, medical record, deposition transcript). An executor agent reads the matter file and performs routine case work — drafts a demand letter, populates a case summary, updates statute-of-limitations calendar entries, writes to the firm's matter management system. In parallel, an auditor agent re-reads every document the firm produces and flags missed value, missing damages categories, or quality issues, writing review notes back to the matter. A separate analyst agent runs firm-wide queries — which case types are converting, which referral sources produce highest-value matters, where paralegals are bottlenecked — and writes weekly briefs to firm leadership.
+
+Why agentic: Three concurrent roles with different triggers (new doc / document produced / weekly cadence) and different write surfaces. Not one bot pretending to be a team; three separately-scoped roles that each replace a distinct human function.
+
+Generalizable core: In-house AI "org chart" — an executor role that does routine work, an auditor role that reviews the work, an analyst role that surfaces cross-work patterns to leadership. Each is separately triggered and separately scoped.
+
+Deployability: Claude API + MCP connector to the firm's system of record + a scheduled analyst job. Roughly month-scale custom build per role, or platform version from Eve at enterprise pricing. Copies cleanly into any professional-services firm — accounting practice (executor books entries and files, auditor cross-checks against tax code, analyst tracks client profitability), veterinary or dental group (executor books and charts, auditor QAs charting completeness, analyst finds under-recalled patients), independent insurance agency (executor renewal quotes, auditor policy-vs-declaration reconciliation, analyst book-of-business growth). Replaces the "junior + supervisor + BI analyst" trio at fractional cost.
+
+### 2. Screen-observation → automation-suggestion loop (MemoryLane)
+(tags: professional-services, accountants, paralegals, admin-work, back-office)
+
+Source: Show HN — MemoryLane records screen activity, spots repeated patterns, suggests automations. https://news.ycombinator.com/item?id=49097727 — an MCP plugin for Claude/Cursor that watches what you do and offers to automate the repetition.
+
+Mechanism: Trigger is a repeated screen action pattern the tool notices locally — you've copied the same field from a PDF into a spreadsheet three days in a row, or you re-open the same three tabs every morning to compile a report. It reads your local screen history and the applications involved. It surfaces a suggestion ("looks like you're rebuilding this report manually — want to automate it?") and, through MCP, hands off to Claude or Cursor to write the actual automation script. Output lands wherever the operator directs — a Zapier zap, a scheduled Claude Skill, a shell script, or a webhook.
+
+Why agentic: The trigger is self-observed pattern detection, not a schedule or a webhook someone set up in advance. Discovery of what to automate is the agentic part; the build-and-run is the follow-through.
+
+Generalizable core: Observe operator behavior → detect repetition → propose and build the automation of the repeated task. The agent's initiative is what makes it distinct from a macro recorder.
+
+Deployability: Screen capture + local embedding store + Claude via MCP. Weekend build for a bounded per-person prototype. This is the pattern to hand a bookkeeper or paralegal who says "I do the same thing every Monday morning" — instead of interviewing them for automation opportunities, put an observer on their machine for a week and let it find them. Replaces the internal ops person whose job is to walk around asking "what could we automate?"
+
+### 3. Predictive lease renewal agent
+(tags: property-management, real-estate, small-landlords, commercial-leasing)
+
+Source: Perspective AI (https://getperspective.ai/blog/ai-for-property-management-in-2026-a-guide-by-resident-journey-stage) and Haven (https://www.usehaven.ai/post/ai-for-lease-renewals-tools). Documented across the property management platform ecosystem: 23% of tenants are undecided about renewing 90 days out, and starting outreach at 120 days beats starting at 60.
+
+Mechanism: Trigger is a calendar cron running against the property management system (Buildium, AppFolio, Yardi) that fires 120 days before each lease end date. The agent reads the tenant's payment history, maintenance ticket volume and severity, communication tone from prior messages, and current local rent comps (RentCast, Zumper). It scores churn risk, then drafts a personalized renewal offer calibrated to that risk — a rent freeze for a high-risk long-tenure tenant, a minor unit upgrade for a mid-risk one, a straightforward renewal for a low-risk one. Writes: an outbound email or SMS to the tenant, a note on the tenant record in the PMS, and a follow-up task queued for the property manager if no reply in 7 days.
+
+Why agentic: Reads across multi-source history + external market data, makes a scoring decision, generates variable content, writes back to system of record and to the tenant. Different tenants get different outreach without a human writing rules.
+
+Generalizable core: Time-based trigger from a known renewal or expiry date → agent reads multi-source customer history + external context → generates personalized retention offer → writes to system of record and outbound channel.
+
+Deployability: PMS API (Buildium, AppFolio, or a Yardi custom integration) + Zapier or Make for orchestration + Claude for drafting + a market-rent source. Week build for a bounded MVP. Same skeleton copies to insurance renewals (agency management system + policy expiration date + claim history + market rate check → personalized renewal quote), gym memberships (POS + membership end date + attendance frequency + class preferences → win-back offer), or B2B SaaS contracts (CRM + renewal date + usage data + support ticket sentiment → account manager brief and draft outreach). Replaces the property manager's or account owner's manual renewal cycle plus their gut guess at the right incentive.
+
+### 4. 24/7 loan-file review agent (Addy AI / Dex)
+(tags: mortgage, small-lenders, credit-unions, commercial-lending)
+
+Source: AI Tools Bakery — 10 Best AI Tools for Loan Officers 2026. https://aitoolsbakery.com/blog/best-ai-tools-for-loan-officers/ — Addy AI's Dex agent reviews loan documents around the clock and flags critical issues instantly, trained on lending guidelines and rate sheets.
+
+Mechanism: Trigger is a new document landing in a loan file inside the loan origination system (Encompass, Byte, or a smaller-lender equivalent) — a borrower's W-2, a bank statement, an appraisal report, a title commitment. The agent reads the current state of the loan file plus the lender's underwriting guidelines and rate sheets. It runs pre-underwriting checks (income calc, debt-to-income, loan-to-value, missing conditions), flags anything that will block approval, and drafts a follow-up email to the borrower requesting specific missing documents by name. Writes: annotations on the loan file, condition list update in the LOS, an email queued for the loan officer to approve and send.
+
+Why agentic: Runs on document-arrival trigger without waiting for a human to open the file, aggregates cross-document understanding, drafts context-specific outreach the loan officer approves rather than composes.
+
+Generalizable core: New document lands in a case file → agent applies domain rules to the whole file → flags blocking issues + drafts targeted follow-up → writes to system of record and outbound channel with human approval.
+
+Deployability: LOS API + Claude with a lending-guidelines domain prompt + email queue. Month build for a serious in-house version, or off-the-shelf through Addy AI at platform pricing. Same skeleton fits medical prior authorization (EMR + payer rules + missing-clinical-doc flags), immigration paralegal work (case management + USCIS filing checklist + missing-evidence flags), and small-firm audit engagements (workpapers + PCAOB checklist + missing-support flags). Replaces the loan processor's or paralegal's daily "what's missing on this file?" review.
+
+## Sources checked
+- X/Twitter — accessible via search; found builder posts about hand-off tooling, error-propagation confidence scoring, and generic 2026-year-of-agents posts; mostly infrastructure not vertical deployments
+- Reddit (r/AI_Agents, r/automation, r/n8n, r/smallbusiness) — thread themes: bounded agents beat spectacle, cache burn debugging, session-cost dynamics; no new sector-specific mechanism beyond what's already logged
+- Hacker News — Show HN posts included MemoryLane (surfaced as pattern above), hwatu verification browser for agents, agent security posts; browsing YC HN directly blocked by egress proxy, worked around via search snippets
+- Podcasts — did not find qualifying new episodes in the search window; Owned and Operated and Service Business Mastery episode topics duplicate May coverage
+- Newsletters — Ben's Bites April coverage of Cloudflare agent-provisions-infrastructure noted but too devtools-inside for the log; no July/August issues surfaced concrete new SMB deployments
+- Product Hunt — recent launches skew toward embedded workflow teammates (River, Basedash, AirJelly, Happycapy) and no-code builders (Relay.app, Taskade, Lindy); Lindy for executive support duplicates prior logs; nothing mechanism-novel today
+- Platform case studies — n8n community deployments (Vodafone threat intel, Delivery Hero 200 hrs/mo) are enterprise-scale; property management platform coverage (Buildium, Yardi, RentCast) fed the renewal pattern
+- Anthropic and OpenAI customer stories — direct claude.com egress blocked; via search: Caylent's Agent SDK for migrations, Eve Legal (used as pattern above), Epilepsy Foundation's Sage assistant, Biomni — Sage and Eve most relevant; Caylent skew devtools
+- YC — S26 not publicly announced yet (Demo Day Sept 10); W26 recap material heavy on infrastructure and healthcare AI-for-clinicians; nothing shipped-deployment-mechanism specific
