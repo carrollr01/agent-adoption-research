@@ -1,0 +1,51 @@
+To: rcarrol6@nd.edu, klinhj24@wfu.edu
+Subject: Agent Pattern Scan — 2026-08-12 — 4 patterns | Board-column-as-agent-trigger
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-md0aqw/log/2026-08-12.md
+
+# 2026-08-12 — Agent Pattern Scan
+
+## TL;DR
+Four concrete agentic patterns worth capturing. The most useful one for A3 Dev's pattern vocabulary is board-column-as-agent-trigger — moving a ticket into a specific column kicks off a full autonomous work cycle (plan → do → PR/back) and turns the ticketing tool into the agent orchestration UI. Also notable: a PR risk-scoring agent that auto-approves the low-risk ones and only escalates the rest to humans, replacing the "review every PR" default with a triage layer.
+
+Note: the log has a 2.5-month gap (last entry 2026-05-28). Patterns picked from July–August 2026 activity.
+
+## Patterns
+
+### 1. Board-column-as-agent-trigger (ticketing tool as autonomous work orchestrator)
+**Source:** How I AI — Alessio Fanelli, Kernel Labs (https://www.lennysnewsletter.com/p/how-i-run-autonomous-coding-agents) — July 8 episode. Same pattern shipped at scale by Notion Delegate (https://claude.com/customers/notion).
+**Mechanism:** Moving a Linear (or Notion) ticket into a designated column ("To Do", "Ready to start") fires a webhook to OpenAI Symphony (or Claude Managed Agents). The agent reads the ticket description, linked context, and repo state; runs a full plan → implement → open PR cycle; posts progress back to the ticket comments; and moves the ticket into "In Review" when a PR is up. Rework loops if the human comments back on the ticket.
+**Why agentic:** The trigger is a state change in an existing operational tool the team already uses, and the agent runs an open-ended multi-step loop — not a fixed script.
+**Generalizable core:** state change in existing tool of record → agent assembles context from linked records → runs multi-step work loop → writes results back into the same tool → replaces the human who otherwise picks up the ticket.
+**Deployability:** Symphony + Linear webhook, or Claude Managed Agents + Notion API. Week-long build for a serious version, weekend for MVP on n8n or Zapier. Replaces the "someone has to grab this ticket" bottleneck. Works at any scale.
+
+### 2. PR risk-scoring auto-approver (Merge Mommy)
+**Source:** How I AI — Claire Vo, August 4 episode (https://www.lennysnewsletter.com/p/build-an-ai-code-review-bot-in-30) — built on Vercel Eve in a single Codex session, SOC 2 compatible.
+**Mechanism:** GitHub webhook fires after CI checks pass on a PR. Agent reads the diff, PR description, files changed, and CI output; scores the change across six risk dimensions (blast radius, test coverage, migration risk, etc.); auto-approves and merges anything below a threshold; pings Slack with the score breakdown and a reviewer suggestion for anything above it.
+**Why agentic:** The agent makes a judgment call per PR based on context it assembles fresh each time — not a linter or rule set — and takes a real action (merge or escalate). Downstream of AI-generated PR volume: the bottleneck only exists because upstream agents are producing more PRs than humans can review.
+**Generalizable core:** high-volume inbound work item → agent scores it against N criteria → routes low-risk to auto-action, high-risk to human queue with pre-computed context → replaces the "review everything" default that gets abandoned once volume goes up.
+**Deployability:** Vercel Eve + Codex; the reference build was one session. GitHub Actions + Claude API also works. Weekend build. Augments a senior engineer's PR triage. Useful the moment you deploy any code-generating agent upstream.
+
+### 3. Root-cause → auto-fix PR agent (Sentry Seer + Claude)
+**Source:** Sentry customer story (https://x.com/claudeai/status/2041927696351994006) — shipped in weeks on Claude Managed Agents; runs in production on Sentry itself.
+**Mechanism:** Production error hits Sentry → Seer performs root-cause analysis → hands the RCA to a Claude agent that reads the relevant repo files, related tests, and Sentry error history → generates a fix, adds/updates tests, and opens a PR with the Sentry issue linked → engineer reviews and merges (or comments and the agent iterates).
+**Why agentic:** The agent decides what code to touch based on the RCA and existing repo structure — not a template. Human stays in the loop for the merge but skips the diagnostic and drafting work.
+**Generalizable core:** monitoring system detects incident → diagnostic agent produces structured RCA → remediation agent reads current state → drafts a change with all context linked → human approves → replaces the "on-call engineer diagnoses at 2am" flow.
+**Deployability:** Claude Managed Agents or a custom Claude/OpenAI setup + GitHub API + a monitoring source. Month-long build for production-grade; the diagnostic quality is the hard part, not the PR authoring. Augments on-call engineers; reduces MTTR for well-scoped bugs.
+
+### 4. MCP-first SaaS: prompting instead of clicking dashboards (Hospitable)
+**Source:** Hospitable community announcement (https://community.hospitable.com/hospitable-changelog-3/hospitable-is-the-first-official-mcp-server-from-a-short-term-rental-platform-1426) — first official MCP server from a short-term rental platform.
+**Mechanism:** Hospitable exposes reservations, guest messages, calendars, tasks, payouts, and reviews across all connected booking channels as MCP tools. A property manager runs their own Claude/ChatGPT/n8n agent authenticated against their Hospitable MCP server. They prompt things like "check any reservations arriving tomorrow that don't have a payout confirmed and message the guests," and the agent traverses the tool surface to answer/act. The Hospitable web dashboard becomes optional.
+**Why agentic:** The pattern replaces a dashboard with a tool surface. Instead of a UI showing state and a human clicking through screens to reconcile, the state is exposed as callable tools an agent composes at runtime based on the prompt. Anti-dashboard shape explicitly.
+**Generalizable core:** any operational SaaS → wrap its API as MCP tools with sensible scopes → owner uses an agent (or wires n8n) to compose those tools against ad-hoc prompts → replaces the "log in, click through several tabs, cross-reference by hand" pattern.
+**Deployability:** For a SaaS vendor: weeks of build to wrap an existing API. For a customer or agency shop: no build — just point a Claude/n8n instance at the MCP server. Directly relevant because most client "we need a dashboard" requests are actually "we need to reconcile state across systems," and an MCP surface + agent replaces the dashboard cleanly. Enterprise customers do this in-house; SMBs won't, which is the wedge.
+
+## Sources checked
+- X/Twitter — Merge Mommy build tweet, Claude Managed Agents launch coverage (Sentry, Notion, Asana, Rakuten), Nous Research Hermes agent, NVIDIA Verified Agent Skills, Coinbase x402.
+- Reddit — search access limited; secondary coverage confirmed n8n deployments but nothing new at mechanism level.
+- Hacker News — Aug 2026 Show HN pattern shifted to observability/cost/memory infra rather than deployment mechanisms.
+- Podcasts — How I AI delivered the two strongest patterns (Merge Mommy Aug 4, Alessio Fanelli Linear + Symphony July 8).
+- Newsletters — Lenny's Newsletter carried the How I AI writeups with build detail.
+- Product Hunt — noise-heavy; nothing mechanism-level.
+- Platform case studies — Zapier stayed at outcome level.
+- Anthropic customer stories — direct claude.com fetch blocked by egress proxy; used X and third-party coverage.
