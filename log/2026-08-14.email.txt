@@ -1,0 +1,57 @@
+Agent Pattern Scan — 2026-08-14 — 5 patterns | AP invoice agent, non-engineer built, $7 to $0.20 per invoice
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-cn9x14/log/2026-08-14.md
+
+# 2026-08-14 — Agent Pattern Scan
+
+## TL;DR
+A ~$10M/yr accounting firm rebuilt its accounts-payable pipeline as an agent in Cursor + Claude Code — built by the owner and one non-technical staffer, no engineers — and reports cost-per-invoice falling from about $7 to about $0.20 at roughly 98% accuracy after six months of edge-case feeding. It is this week's clearest SMB-scale mechanism where non-engineers replaced a junior back-office role with an agent.
+
+## Patterns
+
+### 1. Vendor-invoice agent for AP, built by non-engineers in Cursor + Claude Code
+Source: https://x.com/businessbarista/status/2021003931950907428 — Alex Lieberman recap of a ~$10M/yr accounting-firm owner who rebuilt AP in-house.
+Mechanism: Vendor invoice arrives (email attachment or upload into an AP intake queue) → agent reads the vendor master, prior invoices for the same vendor, matching PO records, GL coding rules, and the firm's approval policy → extracts fields, matches to PO, codes to GL, routes for approval → posts the coded invoice into the accounting system and escalates edge cases to a human reviewer → replaces the junior AP bookkeeper's line-by-line work; per-invoice cost fell from ~$7 to ~$0.20 at ~98% accuracy after six months of edge-case feeding.
+Why agentic: The invoice arriving is the trigger, not a person asking. The agent assembles its own context from vendor history plus policy and takes a write action (posting to the ledger and routing for approval) instead of surfacing a report.
+Generalizable core: Structured document arrives in an intake channel → agent resolves it against a ledger and a policy → codes, routes, and posts → escalates only the edge cases.
+Deployability: Cursor + Claude Code + the accounting system's API + an email/upload intake. Weekend to scaffold, several months of edge-case tuning to reach production accuracy. Augments AP/bookkeeping headcount; the standout is that the owner built it with one non-technical accountant, not an engineer. Fits any SMB back office that processes structured documents against a policy (AP, insurance claim intake, permit applications, benefits enrollment forms).
+
+### 2. Analyst-deck agent that outputs a human-editable file in the firm's exact prior template
+Source: https://openai.com/index/model-ml/ — Model ML on GPT-5.6 Sol, deployed at banks, asset managers, and two of the Big Four (published Aug 10, 2026).
+Mechanism: Analyst request or scheduled cadence (daily / weekly / quarterly) → agent reads CRM records, the analyst's inbox, uploaded files, external data-vendor feeds, and meeting transcripts → assembles the evidence, reconciles the numbers, and generates a full PowerPoint / Excel / Word file in the firm's exact prior template → writes the editable file back into the analyst's workspace → replaces the junior-analyst hours spent formatting decks and cross-checking numbers, benchmarked against McKinsey/Bain consultants.
+Why agentic: The deliverable is an artifact, not a chat answer, and it lands in the same file format the human would have opened. The human-in-the-loop boundary is preserved as "edit the draft," not "review the summary."
+Generalizable core: Query or schedule → agent assembles evidence from siloed systems → renders an editable artifact in the human's native template → human finishes and ships.
+Deployability: LLM API + a template-rendering layer (python-pptx / openpyxl / python-docx) + connectors to CRM, email, and whichever data source the artifact draws on. Month-scale to reach quality; the template layer is the moat. Augments any analyst-shaped role that ends the week producing a document: accountants doing client reports, marketing agencies producing weekly performance decks, brokers producing property packages, insurance underwriters producing quote docs, contractors producing bid packets.
+
+### 3. Merchant fulfillment agent as a Model Context Protocol connector with write access
+Source: https://www.shipbob.com/blog/summer-release-26/ — ShipBob shipped "Bobby" plus an Anthropic-verified MCP connector on Aug 4, 2026, exposing 70+ read/write actions across its fulfillment stack.
+Mechanism: Merchant chats in the ShipBob dashboard or with Claude directly (via the installed MCP connector) → agent reads live inventory, SKU state, open orders, shipments, and exceptions → reorders SKUs, reroutes shipments, resolves exception orders, and adjusts inventory levels → writes those changes into the WMS and order-routing systems → replaces the merchant ops manager's time on ShipBob support tickets and manual reorder decisions.
+Why agentic: The MCP connector is a real operations surface with write access, not a Q&A layer. The merchant asks in natural language and the agent commits multi-step changes to the fulfillment stack.
+Generalizable core: Vertical SaaS exposes MCP with read + write → operator asks in chat → agent commits multi-step changes to a system of record → operator sees the outcome and audits.
+Deployability: Anthropic Claude client + a vendor-side MCP server. This is a shape any vertical SaaS can copy: HVAC field-service platforms exposing an MCP that reroutes a truck when a job overruns; property-management platforms exposing an MCP that files a maintenance ticket when a tenant reports a leak; medical PMS platforms exposing an MCP that reschedules a full day when a provider calls out. Scale caveat: the build is on the SaaS vendor side. Small integrators can still wire an existing vendor MCP into a client's Claude workspace in a day.
+
+### 4. Multimodal in-app shopping agent that visualises products in the customer's own room
+Source: https://internetretailing.net/dunelm-launches-ask-dunelm-ai-shopping-agent/ — Dunelm (UK homewares, 500k+ app downloads) shipped "Ask Dunelm" on Google Cloud Gemini Enterprise for Customer Experience, ~Aug 10, 2026.
+Mechanism: Shopper opens the iOS app and types, speaks, or uploads a photo of their room → agent reads the product catalogue, Click & Collect store inventory, and the uploaded image → answers product questions, renders a visualisation of candidate products in the customer's own space, and returns tailored recommendations → writes the shortlist and Click & Collect selection back into cart/session state → replaces the store associate's product-finding role and the shopper's own keyword-search grind.
+Why agentic: The photo is the trigger for a multimodal reasoning loop, and the output is an in-context visualisation the shopper can decide from directly, not a search-result page.
+Generalizable core: Customer-supplied image + spoken intent → agent resolves against inventory and fit constraints → returns an in-context visual answer + a commit path (buy, book, reserve).
+Deployability: Gemini Enterprise at large-retailer scale; a two-person shop can approximate with Claude vision + a catalogue API + a compositing step. Week-scale prototype, month-scale to a shippable in-app experience. Replaces the store-associate discovery role for anyone selling something the customer has to imagine in place: paint, furniture, tile, appliances, kitchens, landscaping, window treatments, siding.
+
+### 5. DLP guardrail as an Anthropic inference hook
+Source: https://www.cyera.com/blog/detect-and-block-sensitive-prompts-through-claudes-inference-hooks-with-cyera-agent-guardian — Cyera Agent Guardian, wired through Anthropic's inference-hook API. Featured in Anthropic's customer story published Aug 7, 2026.
+Mechanism: Any employee prompt to Claude Chat / Cowork / Code / Design → Anthropic's inference-hook API pauses the model call and forwards the prompt, prior tool calls in the session, and any attached file text to Cyera → Cyera checks against DLP policy and returns an allow / deny within the 5-second hook window → Claude either proceeds or is blocked, and Cyera writes an audit event to its DLP log → replaces the security-review gate that would otherwise block internal Claude rollouts and the after-the-fact SIEM triage of leaks.
+Why agentic: The trigger fires inside the model's own execution loop, not from an external log tail, and the model must wait for a synchronous verdict before acting. That makes the guardrail a policy actor in the loop rather than a monitor observing it.
+Generalizable core: Model call fires → hook interrupts and consults a policy service with full context → verdict returns within budget → agent proceeds or halts, and an audit record is written.
+Deployability: Anthropic inference hooks + any policy service that can respond in under 5 seconds (Cyera here; also achievable with a small self-hosted classifier for a single client's rules). The wiring is a small piece of code a two-person firm could ship — the hard part is the policy corpus, not the plumbing. Notable because it's the first production wiring of Anthropic's inference-hook primitive to appear in a customer story.
+
+## Sources checked
+- X/Twitter — egress-blocked for direct fetch; agent worked from search-engine snippets. Six candidates surfaced; two dropped as near-duplicates of prior logs (outbound-stack pattern 2026-05-24; voice receptionist 2026-05-20).
+- Reddit (all 20 target subreddits) — inaccessible. Anthropic's crawler is disallowed at the reddit.com domain level, and mirror frontends (libreddit, redlib, safereddit) are blocked by the egress proxy. Zero candidates. Persistent gap in this scan.
+- Hacker News — no Show HN in the last 7 days cleared the operator-deployment bar. Closest were personal dev tools (Ante Aug 10, NexusMem Aug 12).
+- Podcasts — no fresh episode with a concrete mechanism from the past week.
+- Newsletters — Ben's Bites and Rundown deep-link archives blocked. Anicca weekly and aiagentstore.ai daily surfaced Dunelm and Google "Let Google Call"; Dunelm made the list.
+- Product Hunt — platform launches dominated (Grok Bot, Framer canvas agents, L&T AgenticIQ). Framer parked as possible follow-up.
+- Platform case studies (Zapier, n8n, Make, Lindy, Relevance AI, Gumloop, Vapi, Retell) — no fresh mechanism-specific customer story in the 7-day window.
+- Anthropic customer stories — Cyera (Aug 7, above); Wondr Health rejected; Mercy Corps VERA noted but too adjacent to existing "cited-brief" pattern.
+- OpenAI customer stories — Model ML (Aug 10, above), Zapier internal marketing (Aug 10), Virgin Atlantic (Aug 10, weaker).
+- YC — Hoplite (S26, Aug 3) noted but adjacent to "development agent team" logged 2026-05-24.
