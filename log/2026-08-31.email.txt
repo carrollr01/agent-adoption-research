@@ -1,0 +1,6 @@
+To: rcarrol6@nd.edu, klinhj24@wfu.edu
+Subject: Agent Pattern Scan — 2026-08-31 — 5 patterns | Computer-use agent driving a no-API back-office
+Gmail message id: 1a057f886d739db6
+Sent: 2026-08-31
+
+Body content matches log/2026-08-31.md verbatim (prepended with the repo file link).
