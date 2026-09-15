@@ -1,0 +1,74 @@
+Agent Pattern Scan — 2026-09-15 — 4 patterns | Long-horizon outbound agent (Salesforce Hunter / Perk)
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-5c02xs/log/2026-09-15.md
+
+# 2026-09-15 — Agent Pattern Scan
+
+## TL;DR
+Four qualifying patterns today, most from the YC S26 batch that demoed September 10 and from Salesforce's September 11 Agentforce refresh. The most consequential is Salesforce's new long-horizon runtime under Hunter: an agent that keeps a plan running across weeks with durable state and memory, not one chat session — Perk (ex-TravelPerk) is already sourcing 60% of North American pipeline through it. Also notable: Nex remediating CRM data during the sales call itself, Screenpipe turning ambient screen recordings into agent context via MCP, and Orchestra silently swapping frontier LLM calls for a fine-tuned open-weight model once an eval gate clears.
+
+## Patterns
+
+### 1. Long-horizon outbound agent that carries a plan across weeks
+*(tags: `sales`, `renewals`, `pr-and-fundraising`, `recruiting`)*
+
+**Source:** [Salesforce Agentforce launch, Sept 11 2026](https://www.salesforce.com/news/stories/agentforce-job-ready-ai-agents/) — Hunter, the outbound sales agent, is the first Agentforce agent to run on Salesforce's new long-horizon runtime; [Perk (formerly TravelPerk) customer story](https://www.salesforce.com/customer-stories/perk/) reports 3x call volume and 60% of North American pipeline sourced by the agent.
+
+**Mechanism:** Trigger is an assigned territory or ICP definition, then the agent's own internal timers inside a multi-week plan. Reads CRM records, prospect firmographics, public web signals (funding rounds, hiring pages, news), prior engagement history, and the human closer's calendar. Sequences outreach across weeks, adapts the plan when a prospect responds, goes cold, or a trigger event fires, books meetings, and hands qualified conversations to a human closer. Writes activity records back to Salesforce and drafts into the connected dialer / email.
+
+**Why agentic:** The novel primitive is durable execution and memory that survives beyond a single chat session — the plan keeps advancing on its own timeline, not when a person opens the app. Three underlying pieces: memory (weeks of prospect and account context), durable execution (plans keep running), and dynamic steering (reps can nudge behavior mid-run).
+
+**Generalizable core:** persistent multi-week plan-execute-adapt loop against a queue of records, where state and memory survive chat boundaries so the agent can pick its own next moment to act.
+
+**Deployability:** Native inside Salesforce today — pilot now, GA in November 2026 for Hunter. Outside the Salesforce stack, the same mechanism can be built on Anthropic's Managed Agents (with the memory + scheduled-routines primitives) or Grok Bot cloud VMs plus a durable queue (e.g., Temporal, Trigger.dev). Month-scale build for a serious custom version. Replaces SDR/BDR front-of-funnel work and, by analogy, renewal CSMs chasing at-risk accounts, PR pitchers working a media list, or recruiters running a passive-candidate campaign.
+
+### 2. CRM data-hygiene agent that audits and fixes during the onboarding call
+*(tags: `revops`, `sales`, `crm-cleanup`, `data-quality`)*
+
+**Source:** [Nex (YC S26)](https://www.ycombinator.com/companies/nex) — co-founder Najmuzzaman Mohammad's [launch post on X](https://x.com/najmuzzaman/status/2089473930377777393) describes Nex auditing thousands of records in a customer's HubSpot on one onboarding call, flagging missing data, archived owners, and zombie deals, and starting to fix them before the call ended. Backed by Dharmesh Shah; team is ex-HubSpot platform engineers.
+
+**Mechanism:** Trigger is a natural-language description of "what good looks like" from a RevOps operator during the setup call. Reads the entire HubSpot instance — records, ownership, activity timestamps, deal stages, associations. For the predictable audit rules Nex writes deterministic code (not chat calls) and runs it fast against the whole database; it reserves LLM judgment for the genuinely ambiguous cases (which deal is really dead, which duplicate is canonical). Writes mutations back to HubSpot: archive, merge, reassign owner, fill missing fields.
+
+**Why agentic:** It doesn't produce a hygiene dashboard for someone to review later — it performs the write-backs itself, with the operator watching live. And it commits to determinism for the boring 90% instead of letting an LLM guess every row.
+
+**Generalizable core:** on-demand full-system audit-and-remediate against a system of record, kicked off from a natural-language description of the target state, with deterministic code for predictable rules and LLM judgment reserved for the ambiguous minority.
+
+**Deployability:** For A3 Dev–scale builds, same mechanism works against Salesforce, Airtable, Linear, Monday, Attio, or any inventory/ERP database with a decent API. Weekend-to-week build for a specific vertical (e.g., "Shopify catalog hygiene," "Attio prospect list dedupe"), using Claude Code / Claude Agent SDK to generate the deterministic audit code at runtime from the operator's description. Replaces the RevOps analyst's weekly data-hygiene sweep and the "clean the CRM before Q-end" scramble.
+
+### 3. Ambient screen-recording as the agent's context store
+*(tags: `internal-ops`, `sops`, `workflow-capture`, `onboarding`)*
+
+**Source:** [Screenpipe (YC S26) Launch YC page](https://www.ycombinator.com/launches/RTT-screenpipe-record-how-you-work-and-turn-that-into-agents) and [GitHub repo](https://github.com/screenpipe/screenpipe) — local-first client that records screen frames, audio, and keyboard/mouse activity 24/7 into a local SQLite index and exposes it to agents (Claude, Codex, OpenClaw, Hermes, Runner) via MCP.
+
+**Mechanism:** Trigger is any agent hitting a step where it needs to know "how does this org actually do X." Reads the operator's recorded history — the exact click path, form fields, tool switches — and either answers "here's how, from last Tuesday at 3:14pm" or emits a script an LLM can execute (in place of hand-written Playwright). Writes agent instructions or an executable automation into the calling agent's tool contract.
+
+**Why agentic:** The recording isn't for a human to re-watch — it's a passive corpus a downstream agent queries to disambiguate what to do, and the output is an executable script, not a video.
+
+**Generalizable core:** passive observation of how humans actually do the work becomes the source-of-truth an agent queries when its instructions don't cover the case, replacing tribal knowledge that normally lives only in muscle memory.
+
+**Deployability:** Screenpipe itself is Apache-2.0 and self-hostable, so this is a component to embed rather than a competitor — realistic pattern is "record the operator doing the task once, ship an agent that runs the same path via MCP." Complexity: week-scale to wire it into a specific vertical workflow. Replaces the SOP-writing exercise, the "come watch me do the export" onboarding call, and the sunk cost of maintaining hand-written browser automations against apps whose UI keeps changing. Privacy caveat: continuous local recording is real-user surveillance and needs consent flows; the appetite for it varies sharply by org.
+
+### 4. Eval-gated automatic downgrade from frontier LLM to fine-tuned open-weight
+*(tags: `llm-cost`, `platform-infra`, `inference-routing`, `ml-ops`)*
+
+**Source:** [Orchestra / Understudy Labs (YC S26)](https://www.ycombinator.com/companies/understudy-labs) — drop-in Anthropic/OpenAI-compatible gateway that captures production traffic, fine-tunes a smaller open-weight model on it, and only routes to the cheaper model once it matches or beats the frontier model on a held-out eval set. Marketed as an 80% cut to Anthropic bills without a quality drop.
+
+**Mechanism:** Trigger is production LLM traffic accumulating for a repeated task class through the gateway. Reads captured input/output pairs from that class. Fine-tunes an open-weight candidate, runs it against a held-out eval slice, and only when it clears a quality gate does it flip the routing table for that task class. Writes to the gateway's own routing config — the calling application sees no code change.
+
+**Why agentic:** The cutover decision is made by the system on evidence, not by a human deciding to launch a migration project. The gate is the agent.
+
+**Generalizable core:** eval-gated automatic swap of an expensive third-party API for a cheaper self-hosted equivalent, using real production traffic as both the training corpus and the validation set. Same shape works for OCR/vision APIs, TTS, translation, embeddings — any inference API with enough repeated volume to justify a smaller specialist.
+
+**Deployability:** Direct customer path is to sit Orchestra in front of an existing Anthropic/OpenAI integration; no A3 Dev build required. As a pattern to steal for other kinds of clients: the "shadow-run + eval-gate + silent cutover" idea works for any repeated model call (invoice extraction, resume parsing, support-ticket triage classification) where they're currently paying frontier prices. Complexity: month-scale to build a bespoke version without Orchestra's gateway; day-scale to plug it in. Scale caveat: needs enough repeated production volume that fine-tuning is worthwhile — a solo consultancy running 500 calls a month isn't the target.
+
+## Sources checked
+
+- X/Twitter — direct site access blocked on this run (relied on X posts surfaced through web search rather than native X search); found the Nex on-call remediation testimonial from Najmuzzaman Mohammad and inbound customer quotes about Nex vs. spreadsheets, plus Hunter/Perk chatter tied to Salesforce's Sept 11 launch. Note this as a partial X pass — retry direct X access next run.
+- Reddit (r/AI_Agents, r/automation, r/n8n, r/smallbusiness, r/Entrepreneur, r/ChatGPTCoding, r/LocalLLaMA) — accessible only via aggregated summaries; found generic ROI recaps and platform how-tos but no specific concrete deployment posts qualifying under the trigger/action/replaced-task filter that weren't already covered by other sources.
+- Hacker News — several Launch HN posts from YC S26 (Screenpipe, Hoplite, Coasty, Bullet, Nex, Reducto) surfaced through search; direct HN item fetches were blocked so mechanism detail came from company sites, YC launch pages, and third-party writeups.
+- Podcasts — How I AI (Claire Vo, Sept 2 2026) covered the Grok Bot vs OpenClaw migration and 30-agent personal stack; mechanism there is well-covered by prior logs on multi-agent orchestration, so not logged today.
+- Newsletters — Ben's Bites recent issues touched on Claude Code usage-limit changes and split-agent personality patterns; no new mechanism-level deployment worth logging.
+- Product Hunt — Screenpipe surfaced here as well (already captured); other 48h launches leaned toward voice agents and chat-first tools that duplicate prior log entries.
+- Platform case studies — Zapier and n8n case studies visible this week duplicated ticket-routing and invoice-processing patterns already documented in May.
+- Anthropic and OpenAI customer stories — Anthropic released Claude Commerce Agents Sept 2 (Apache-2.0 blueprint with a customer-facing shopping agent and a staff-facing merchant agent that drafts listings, prices, and campaigns for human approval); logged as reference architecture rather than a specific customer deployment. Rakuten's 79% time-to-market cut on Claude Code refactoring is a coding-agent story adjacent to prior logs. OpenAI: no new mechanism-level customer story this run.
+- YC — S26 Demo Day (Sept 10, 2026) yielded Nex, Screenpipe, Orchestra/Understudy Labs, plus Reducto (agentic document platform), Coasty (computer-use agent API), Hoplite (cloud coding agent deploy), Bullet (faster coding agent). Coding-agent infrastructure again dominates; the four surfaced today are the genuinely non-coding, mechanism-novel ones.
