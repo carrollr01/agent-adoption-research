@@ -1,0 +1,64 @@
+Agent Pattern Scan — 2026-09-19 — 6 patterns | Deadline-window PHI-redaction agent on call recordings
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-hgdw1z/log/2026-09-19.md
+
+# 2026-09-19 — Agent Pattern Scan
+
+## TL;DR
+Six mechanism-level patterns cleared the bar today. The most novel skeleton is Fullscript's deadline-window PHI-redaction agent on n8n: a firehose of new call recordings gets classified, mutated, and written back inside a 30-minute regulatory window, replacing a QA reviewer who used to listen manually. The same shape ports to any regulated recording pipeline (clinics, financial services, legal intake).
+
+## Patterns
+
+### 1. Slack-alert triage-to-PR agent
+Source: https://claude.com/customers/carvana — Carvana engineering, deployed across at least two engineering channels (retail science + wholesale platform), Anthropic customer story published Sept 4, 2026.
+Mechanism: Production monitoring alert lands in a Slack channel; Claude Tag reads the alert body and stack trace, walks the relevant repos to identify the code-owning team via CODEOWNERS or equivalent metadata; posts a root-cause writeup in the team's channel; opens a PR with a candidate fix and requests review; engineer approves and merges. Replaces the first-hour on-call triage of "who owns this, what changed, what's a plausible fix."
+Why agentic: The Slack event fires the agent without a human. It chooses which repo to read, forms a hypothesis, and takes a state-changing action (opening a PR) rather than summarizing anything on a page.
+Generalizable core: monitoring signal in a team channel -> agent identifies code owner from repo graph -> posts diagnosis and drafts fix -> human approves in the existing PR review flow.
+Deployability: Claude Tag or equivalent Slack-hooked agent + repo access with owner metadata + CI. Complexity: medium; ownership mapping and safely scoped repo tools are the real work. Role replaced/augmented: first-hour on-call SRE and eng triage. Caveat: only works where alerts already carry usable context; noisy legacy alerting needs a pre-cleaning pass first. Reported effect: 56% drop in retail-science alerts and 65% faster mean-time-to-answer on wholesale.
+
+### 2. In-app payroll-and-invoice batch agent
+Source: https://claude.com/customers/qonto — Qonto is a European SMB banking platform serving several thousand beta customers on the agent, sitting on top of Claude via Amazon Bedrock; Anthropic customer story published Sept 3, 2026.
+Mechanism: Owner opens the payroll or invoicing view in the Qonto app; the agent reads that month's payroll roster or an uploaded invoice PDF; decomposes it into individual bank transfers or invoice records; presents them for one-click approval; writes the transactions into Qonto's own ledger. Replaces the owner-side workflow of re-keying one transfer per pay slip or one invoice at a time.
+Why agentic: Multi-step read-decompose-propose-execute-writeback, not a chat window. The final step mutates the bank ledger.
+Generalizable core: system-of-record vendor spots a recurring N-item manual task inside its own app -> agent reads the source document -> generates the batch -> owner one-tap approves -> writes back into the same system of record.
+Deployability: Bedrock + Claude, structured outputs, prompt caching, evals-per-release. Complexity: high (bank-grade auditability, per-market approval flows). Role replaced: owner's own weekly admin time, plus any bookkeeper doing rote data entry into the banking layer. Caveat: this pattern only works where the platform already holds the system of record; a third-party layer bolted on would hit auth and liability walls.
+
+### 3. Deadline-window PHI-redaction agent on call recordings
+Source: https://n8n.io/case-studies/fullscript — Fullscript, a healthcare/wellness platform processing about 13,000 calls a month; n8n case study resurfacing widely in Sept 2026 community round-ups.
+Mechanism: Call recording completes (trigger); n8n workflow pulls the transcript; an LLM node scans for personal health information in context; the workflow tags PHI spans, redacts the matching audio segments, writes the clean recording back to storage, and logs the redaction to the compliance audit trail — all inside HIPAA's 30-minute window. Replaces a compliance reviewer listening to calls manually to catch and redact PHI.
+Why agentic: Runs continuously and self-directed against every new recording, decides what constitutes PHI in context, and permanently mutates a downstream artifact.
+Generalizable core: regulatory-window agent that watches a firehose of media events -> classifies sensitive spans in context -> rewrites the artifact before the compliance deadline.
+Deployability: n8n or equivalent workflow runner + call-recording pipeline + object storage. Complexity: medium; the hard parts are context-aware classification and hitting the deadline consistently. Role replaced: internal compliance/QA reviewer. Reported effect: per-call processing 5 min -> 30 sec, 99.7% redaction accuracy vs 94% human, 100% within the 30-min window (fines start at $400K per lapse). Ports cleanly to financial services (MiFID/FINRA call retention), law firms (privileged content in intake calls), and any regulated recording flow.
+
+### 4. Slack-triggered ERP supplier-onboarding agent
+Source: https://www.salesforce.com/news/press-releases/2026/09/15/siemens-agentforce-redefine-industrial-sales-service/ and Dreamforce writeup at https://logisticsviewpoints.com/2026/09/17/salesforce-dreamforce-keynote-the-deterministic-layer-behind-the-agentic-supply-chain/ — Siemens demoing "Marshall" at Dreamforce; learns the onboarding process in a 90-minute SAP sandbox run and compresses supplier setup from days to hours.
+Mechanism: Employee hands off a new supplier to a Slack bot (trigger); the bot orchestrates certification, financial, and risk checks by pulling from external verification sources plus Salesforce records; surfaces intermediate decisions back in Slack for approvals; on approval, the operations agent (Regrello underneath) writes the finalized supplier record — vendor master data, payment terms, tax fields — directly into SAP without human clicks.
+Why agentic: Runs across hours with checkpoint handoffs, calls multiple external systems in a defined order, and ends by writing to an ERP system-of-record. Not a chatbot.
+Generalizable core: chat-triggered onboarding agent runs a fixed gauntlet of external verifications -> surfaces decisions for approval -> writes the finalized record into the system-of-record ERP.
+Deployability: Slack + Agentforce/Regrello + SAP write access + external verification sources. Complexity: high. Enterprise-only in this exact form because SAP is required. Role replaced: procurement operations analyst / vendor master data admin. The SMB port is any Slack-triggered onboarding into QuickBooks, NetSuite, or a vertical ERP.
+
+### 5. Rep-coaching simulator trained on the company's own call corpus
+Source: https://claude.com/customers/impel — Impel builds AI for auto dealers and OEMs, 150+ customer-facing reps; Anthropic customer story published Sept 16, 2026.
+Mechanism: Claude ingests Impel's archive of 150,000+ recorded dealer calls; extracts the recurring hard conversations and objection patterns; generates dealer-persona roleplay scenarios grounded in those real objections; a rep opens a practice session; the agent plays the dealer, coaches in the moment, and issues a competency certification when the rep is ready; certification writes back to the rep's training record. Replaces sales engineers and managers running weeks of live shadowing.
+Why agentic: Two chained agentic moves — corpus mining that authors the scenarios, then an interactive coach that adapts to the rep and issues a decision at the end. Ends with a system write, not a summary.
+Generalizable core: any org sitting on a large corpus of frontline recordings (calls, tickets, chats) -> agent mines the actual hard cases -> generates roleplay and coaching against those -> replaces manager-led training and compresses onboarding.
+Deployability: Claude API + a call-recording archive + a training-record system to write back to. Complexity: low-to-medium once the corpus exists. Role replaced: sales-training manager and senior-rep shadow time. Reported effect: new-product ramp cut from 3–6 months to about 1 month across 150+ reps. Caveat: value scales with corpus size and quality; sectors without recorded frontline interactions need to instrument recording first.
+
+### 6. Employee-packaged skills marketplace inside a company AI
+Source: https://www.lennysnewsletter.com/p/build-your-own-company-brain-the plus the "How I AI" episode with Sharadh Krishnamurthy published Sept 11, 2026, and Stripe's own dev blog post on rebuilding Kai on Deep Agents in a week — Kai is Stripe's internal AI agent, used weekly by 10,000+ Stripe employees.
+Mechanism: An employee builds a data pull, report, or workflow interactively with Kai; clicks "save as Skill"; the underlying prompt, tool-call sequence, and data-source binding is persisted as a named, reusable workflow; any other employee invokes that Skill by name and Kai re-plans it against fresh data under the caller's permissions (enforced via Stripe's "Projects" context-scoped governance layer). Replaces the recurring "please DM an analyst" queue for standardized internal requests.
+Why agentic: A Skill is a persisted multi-step tool-use plan, not a saved prompt. Each invocation re-plans over live data and hits real systems; early iterations nearly took down production, which is what motivated the Projects governance layer — evidence the agent actually mutates state.
+Generalizable core: recurring analyst or ops request -> the requester (not IT) captures it once in an agent conversation -> agent stores the tool-call plan as a named, governed Skill -> org-wide fan-out of the same workflow without adding analyst headcount.
+Deployability: governance-aware agent runtime with tool registration, per-scope data bindings, and skill packaging. Complexity: high from scratch, but Stripe rebuilt it in a week on Deep Agents on top of existing dev-experience infra. Role replaced: internal BI/analytics ticket queue and power-user internal-tools engineers. Caveat: this is a platform pattern — the ROI compounds from the second and hundredth Skill, not the first, and it needs a data layer that agents can query safely.
+
+## Sources checked
+- X/Twitter — inaccessible from this environment; not queried.
+- Reddit (r/AI_Agents, r/n8n, r/automation, r/smallbusiness, r/ChatGPTCoding) — direct fetch blocked by proxy; visible only through search snippets. No individual thread met the mechanism bar for the last 10 days.
+- Hacker News — direct fetch blocked; visible via search snippets and third-party HN digests (Sept 15–19). Show HN posts were mostly agent frameworks and coding-agent harnesses, not deployed business cases.
+- Podcasts — "How I AI" episode with Stripe's Sharadh Krishnamurthy (Sept 11) yielded pattern #6. Owned and Operated, Service Business Mastery, The Modern CPA episodes in the window stayed at "AI voice agents matter" abstraction with no concrete trigger + action + replaced task.
+- Newsletters — Lenny's Newsletter recap of the Kai episode was the useful one; Ben's Bites had mostly launch coverage.
+- Product Hunt — Sept 4 batch surfaced vendor tools, not deployments.
+- Platform case studies — n8n (Fullscript, Delivery Hero, Koralplay) produced pattern #3 and a runner-up. Salesforce/Agentforce (Asana Piper, Engine Eva, Siemens Marshall from Dreamforce Sept 15–17) produced pattern #4 and two runners-up.
+- Anthropic customer stories — Carvana (Sept 4), Qonto (Sept 3), Impel (Sept 16) produced patterns #1, #2, and #5.
+- OpenAI customer stories — Gilbert + Tobin governance/compliance story (Sept 2) evaluated; strong mechanism, but adjacent to prior "business process documentation" logs and enterprise-only in this form, so held as a runner-up.
+- YC — S26 Demo Day (Sept 10) coverage described themes but no individually named company with a concrete trigger/action/replaced-task story that survived scrutiny.
