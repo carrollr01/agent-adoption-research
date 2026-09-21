@@ -1,0 +1,56 @@
+Agent Pattern Scan — 2026-09-21 — 5 patterns | Threshold-gated financial delegation at Qonto
+
+Repo: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-09-21.md
+
+# 2026-09-21 — Agent Pattern Scan
+
+## TL;DR
+Five real mechanisms this week, most from customer stories tied to Anthropic's September push and Cloudflare's Agents Week. The one worth stealing: Qonto letting solo founders delegate transfers up to €100K to an agent, with the human doing nothing but the final approval click — a variable-threshold approval gate is a much more useful trust primitive than "the agent does everything" or "the agent recommends and a human types."
+
+## Patterns
+
+### 1. Threshold-gated financial delegation (Qonto)
+**Source:** https://claude.com/customers/qonto — Qonto (European neobank for SMBs) using the Claude Platform API, published Sept 3, 2026.
+**Mechanism:** Founder-facing operator agent sits inside Qonto's banking app. Trigger is a new client added, a batch billing period, or a founder-issued instruction like "invoice all September consulting engagements." Agent reads the transaction ledger, client and supplier records, and pending invoice queue via Qonto's own MCP connector. Acts: creates clients, drafts and issues invoices, initiates SEPA transfers (up to a per-user-set cap — customers report caps as high as €100K), moves money between accounts, files expenses. Writes back to Qonto's core banking. The founder's only action is a tap-to-approve on the money-moving steps; everything else auto-executes.
+**Why agentic:** It's not "here's a summary of what to do." The agent takes multi-step chained actions (create client → generate invoice → dispatch → later chase payment → reconcile) across the ledger and only pauses at the value threshold the user sets. One operator handles 500+ invoices/month for a single user; another founder gets half a day back per month.
+**Generalizable core:** User-configurable value threshold on an agent's autonomous actions — agent acts freely below the line, requests a one-tap approval above it. The line is a slider, not a binary.
+**Deployability:** Claude API + MCP connector to a system-of-record + a tiny per-user "auto-approve up to $X" setting. Week build if the underlying app already has an API. Replaces bookkeeper / office manager tasks. Scale caveat: only useful once the underlying system has real write-actions worth delegating — read-only tools don't benefit.
+
+### 2. Slack as the agent's workspace, not just its inbox (Carvana)
+**Source:** https://claude.com/customers/carvana — Carvana's retail-science, verification, and wholesale platform teams, using Claude Agent SDK wrapped in a Slack app, published Sept 4, 2026.
+**Mechanism:** Production alerts land in a Slack channel. The Claude-Agent-SDK-backed bot picks them up in-channel, reads recent commits, logs, past incident threads, and internal runbooks (via MCP), and starts working the alert as thread replies — hypothesis, check, next check, conclusion, proposed fix — one message at a time. The team watches it work, and any engineer can jump into the same thread to redirect, correct, or take over. Result Carvana reported: production alerts down 56% from the agent finding and filing the underlying root causes.
+**Why agentic:** The alert is the trigger and the fix (or PR / config change) is the output — no human opens a dashboard, no human is the router. And the "watching" isn't passive: engineers course-correct mid-run because the agent is reasoning in public.
+**Generalizable core:** Inbound event in a shared team channel → agent works the problem live in-thread → any teammate can interrupt or take over mid-run → agent files the fix and closes the loop.
+**Deployability:** Claude Agent SDK + Slack bolt app + MCP connectors to the systems the agent needs to read (logs, source, incident history) and to the systems it needs to write to (PRs, config, ticket tracker). Week to a couple of weeks. Replaces the on-call engineer's triage-and-dispatch role, not the deep-fix role. Works at any scale — the observable-in-Slack framing is what makes it acceptable to teams that would refuse a black-box autofix bot.
+
+### 3. Back-office session as an agent tool (Koralplay)
+**Source:** https://n8n.io/case-studies/koralplay — Koralplay (online-gaming operator) running production n8n workflows across ops and support, published August–September 2026.
+**Mechanism:** Customer-support ticket about a blocked payment arrives. The n8n workflow (with an LLM node for classification and drafting) fires. It authenticates into the internal back-office system using MFA-scoped service credentials, looks up the specific transaction by ID, checks the regulatory-hold status against a compliance table, decides between "auto-refund," "escalate to compliance," or "release," executes the corresponding back-office action, and drafts the reply to the customer in the correct language and tone. Human only sees the ~30% that don't fit the pattern. Koralplay reports 70% of payment tickets fully automated, 616 hours saved/week, equivalent to 14 FTE.
+**Why agentic:** The workflow isn't reading a dashboard about payments — it's logging into the same internal tool the human agent uses, doing the multi-step lookup and decision, and taking the payment action. The MFA step is what makes this novel: most "automation" stops at the login wall.
+**Generalizable core:** Inbound ticket → agent logs into the same internal tool a human would use (MFA and all) → runs the lookup and decision → takes the corrective action in-system → replies to the customer.
+**Deployability:** n8n or similar + MFA-scoped service account + a decision node (LLM or rules) + a reply-drafting step. Week to a month depending on how many decision branches. Replaces L1 support headcount. Scale caveat: the MFA-scoped service account has to be something the security team will actually issue; this is easier at operators that already have a "back-office API" than at ones where the back office is a human-only web UI.
+
+### 4. Team research methods as slash commands (Specter Agent Skills)
+**Source:** https://insights.tryspecter.com/meet-specter-agent/ — Specter (private-markets data platform used by VC/PE firms), launched Skills feature summer 2026, more prominent through September.
+**Mechanism:** A partner or research lead defines a "Skill" — for example `/market-map <thesis>` or `/diligence-brief <company>` — as a saved multi-step recipe: query Specter's dataset (55M companies, 550M people, 1M transactions) with these filters, cross-check against these web sources, build a saved-search list of matches, deduplicate against portfolio, produce a comparison table, drop the results into a named folder in the workspace. Any analyst on the team then types the slash command in the Specter Agent chat and gets the same output shape every time — same filters, same ranking, same folder layout.
+**Why agentic:** The trigger is one command, but the underlying execution is multi-step across a proprietary dataset and the open web, with intermediate artifacts (saved searches, lists) that persist for follow-on work. And the codified-recipe angle means the pattern isn't "an analyst prompts a model" — it's "the firm's method is executable."
+**Generalizable core:** Team's repeatable research method is captured once as a named recipe → any teammate invokes it as a single command → outputs land in a consistent workspace shape → the method is now a shared asset, not tacit knowledge.
+**Deployability:** Claude API (or similar) + MCP over the proprietary dataset + a saved-prompt / skill registry + slash-command UX in whatever chat interface the team uses. Weekend build if you already have the dataset connector; the harder part is the initial skill-authoring conversation with the domain expert. Replaces the tacit-knowledge problem — the difference between the partner's diligence brief and the junior analyst's diligence brief. Works at any scale, but the value is higher for teams doing the same research shape repeatedly (VC, PE, corp-dev, executive search, legal discovery).
+
+### 5. Human-in-the-loop as unstick-the-browser-agent (Cloudflare Browser Run)
+**Source:** https://blog.cloudflare.com/agents-week-in-review/ — Cloudflare's Agents Week (rolled out August–September 2026), Browser Run primitive.
+**Mechanism:** An agent driving a browser session (checkout flow, portal submission, data pull from a vendor UI) hits an unexpected state — MFA challenge, CAPTCHA, unfamiliar consent dialog, a page that changed structure. Instead of retrying blindly or failing silently, the Browser Run runtime pauses the session and hands the live browser to a human operator via Live View. Operator clicks through the blocker in the same session, hands control back, and the agent resumes from where it stopped. Session is recorded end-to-end.
+**Why agentic:** The agent is doing autonomous multi-step browser work; the human isn't reviewing output afterward, they're stepping into the middle of the run to break a specific block, then leaving. That's not approval; that's cooperative execution.
+**Generalizable core:** Autonomous agent runs a workflow → detects "I can't proceed" state → escalates to a human who works in the same live context → agent picks the workflow back up.
+**Deployability:** Cloudflare Browser Run (managed) or Playwright + a Live View proxy (custom). Weekend for the managed version, a couple weeks for a self-hosted equivalent. Replaces the "the bot silently died overnight and we found out at 9am" failure mode of every unattended browser automation ever built. Scale caveat: only pays off when the alternative is a human doing the whole browser flow — for high-volume, always-succeeds flows there's nothing to unstick.
+
+## Sources checked
+- X / Twitter — access limited on this run; substituted with vendor customer-story surfaces and secondary aggregators.
+- Reddit — r/AI_Agents and r/n8n scanned via aggregators; nothing new past prior logs.
+- Hacker News — Show HN in the last 48h leans infrastructure (compliance layers, git-for-agents, agent messengers); nothing operator-level enough to qualify.
+- Podcasts — nothing new enough in the target podcasts this run.
+- Newsletters — Ben's Bites, aiagentstore.ai — mostly platform launches (Salesforce Agentforce named agents, Cloudflare Agents Week). Salesforce's Hunter "long-horizon" agent is interesting but pilot-only with light public mechanism; will revisit when GA lands in November.
+- Product Hunt — 2026-09-20 digest included Pushary, MosMos, Toone, AINA. Pushary and MosMos duplicate prior logs; Toone and AINA lacked concrete-enough public mechanism.
+- Platform case studies — n8n Koralplay (included); Zapier and Make case studies this week did not surface a novel mechanism.
+- Anthropic customer stories — Impel (Sept 16, 400+ Claude Enterprise seats, cross-MCP handoffs — headline compelling but concrete mechanism not publicly detailed enough yet), Qonto (included), Carvana (included), Pictet (skipped, mechanism-light).
+- YC / cloud vendors — Salesforce Agentforce portfolio (Casey, Paige, Carter, Hunter, Marshall, Piper, Fin) is the largest platform-level move; individual mechanisms are still marketing-shaped, so tracking rather than logging.
