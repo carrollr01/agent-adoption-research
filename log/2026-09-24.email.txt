@@ -1,0 +1,17 @@
+Agent Pattern Scan — 2026-09-24 — 5 patterns | Google CC as household ops agent with its own account
+
+https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-9qqllu/log/2026-09-24.md
+
+The standout pattern today comes from Google's Sept 18 relaunch of CC as a household-coordination agent in Labs. The novelty isn't the LLM — it's the ownership model. CC has its own Google account, its own permissions, and up to six family members individually opt in specific email streams (school confirmations, ortho appointments, sports RSVPs). The agent parses inbound, drafts calendar events and to-dos, and writes to the shared calendar and shared task list. Skeleton generalizes: multi-party inbound on opted-in channels → agent with its own audited identity → drafts or writes into a shared system of record. Reusable anywhere multiple stakeholders share ops but don't want to grant blanket inbox access (HOA boards, small property managers, small nonprofit boards, family co-ops).
+
+The other four patterns:
+
+Stripe's Kai as a skills-registry-as-agent-surface — 83% of Stripe uses it, 60k+ sessions/week, 1,000+ skills contributed by 100+ teams. Employees ask questions; the agent selects from typed team-published skills. Portable to any 50+ person org via Claude API + MCP tools per team.
+
+Anthropic Commerce Agents blueprint (Apache 2.0, Sept 2) — the merchant-side agent is the less-covered half. Scheduled tick or threshold event → reads sales/inventory state → drafts recap emails, promo copy, PO alerts. Runnable locally in an afternoon; applicable outside e-commerce to any weekly ops-review cadence.
+
+Understudy Labs (YC S26) — LLM gateway that captures your production traffic, auto-distills a cheaper open-weight replacement, and only routes to it after held-out evals gate the switch. Meta-pattern: an agent operating on other agents' cost stack.
+
+Proofpoint SOC Analyst Agent (on OpenAI Daybreak, Sept 3) — the interesting trigger is the proactive scheduled threat hunt, not the reactive investigation prompt. Cron tick → structured investigation over internal data → cited findings with next steps → routes to analyst. Skeleton reuses for scheduled fraud sweeps, churn digests, compliance sweeps.
+
+Sources this run had gaps: X/Twitter direct search unavailable (leads pulled indirectly via referenced posts), Reddit direct search hit indexing limits again. Cursor SDK CI/CD-triggered PR agent was strong signal but skipped as overlap with 5/15 autonomous-coder entry.
