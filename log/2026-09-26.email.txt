@@ -1,0 +1,9 @@
+To: rcarrol6@nd.edu, klinhj24@wfu.edu
+Subject: Agent Pattern Scan — 2026-09-26 — 4 patterns | Record-once-replay-forever browser agent for legacy portals
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-licnis/log/2026-09-26.md
+
+(Body: full markdown from log/2026-09-26.md — see repo file.)
+
+Gmail message id: 1a0dddb148105987
+Sent: 2026-09-26
