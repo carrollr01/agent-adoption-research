@@ -1,0 +1,85 @@
+Agent Pattern Scan — 2026-09-28 — 4 patterns | Inbound-document triage as the new front door
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-09-28.md
+
+Four concrete patterns today, all mechanism-level and all deployed in production somewhere. The most interesting angle for A3 is Spellbook's ACM: the trigger isn't a user request, it's the arrival of a document in any of three channels (email, Slack, Salesforce), and the output is a diagnosed and routed work item — not a summary. That's the shape we should be pitching in place of a dashboard for any client whose inbound work arrives as unstructured documents.
+
+The other three are worth internalizing as skeletons. Carvana's SRE agent turns a Slack production alert into a merged PR by fanning out across logs, warehouse, git and tickets before writing the change — a variation on our earlier Slack-mention-to-PR entry, but with an automated trigger rather than a human @mention, and with real cross-source investigation in between. Cloudflare and Stripe shipped an open protocol (discovery, identity attestation, payment tokenization) that lets a coding agent create an account, buy a domain, and deploy a Worker end-to-end with a tokenized card and a $100/mo spend cap — the pattern to watch is the agent becoming the buyer, not the user. And Amazon's new Seller Assistant workflows turn natural-language rules into persistent subscribers on the marketplace event stream that act on threshold crossings across price, listing and inventory in one shot — a direct swap-out for the "we have a dashboard for that" pitch.
+
+The pattern skeletons we should be able to draw on a whiteboard by end of week:
+1. Automated system event → agent fans out across logs + code + ownership → produces a diagnosed work item with the owner tagged.
+2. Inbound document in any channel → agent classifies against a stored standard → produces a diagnosed + partially-actioned artifact + routes to right human.
+3. User request for a capability → agent authenticates as user via tokenized identity → chains purchases and provisioning → returns a live artifact, not a checklist.
+4. Persistent NL rule + platform event stream → agent reads context on threshold crossing → executes multi-system action + posts a note.
+
+Sources not reached this run: community.n8n.io, blog.cloudflare.com, and bensbites.com were egress-blocked; captured what I could through downstream coverage. Will retry those next run.
+
+# 2026-09-28 — Agent Pattern Scan
+
+## TL;DR
+Four concrete patterns today, all mechanism-level: an alert-triggered SRE agent that traces incidents from Slack to a merged pull request (Carvana on Claude Agent SDK), an inbound-contract triage agent that redlines against a firm's standards before a lawyer opens the file (Spellbook ACM), an agent-native cloud provisioning protocol that lets a coding agent buy a domain and ship a Worker with tokenized payment (Cloudflare + Stripe), and Amazon's Seller Assistant "workflows" that react to marketplace threshold events instead of returning a dashboard row.
+
+## Patterns
+
+### 1. Alert-in-Slack becomes root-caused pull request
+(variation of 2026-04-22 entry — new angle: trigger is an automated production alert, not a human @mention; agent investigates across logs, warehouse and code before drafting the change)
+
+Source: Carvana Claude Tag case study (https://claude.com/customers/carvana) — Carvana's SRE and platform teams route production monitoring alerts into Slack channels where a Claude Agent SDK app is a listening member; reported outcomes are a 56% reduction in retail-science alert volume and 65% faster answers for the wholesale platform team.
+
+Mechanism: A production monitoring alert lands in a Slack channel → the agent reads the alert payload, pulls the last hour of pre-deploy baseline logs and compares them, queries the team-scoped cloud data warehouse for the affected slice, checks code ownership and recent commits/tickets, then posts a team-formatted root-cause analysis back to the thread with owner tags. When the fix is straightforward it opens a pull request directly from the investigation thread; human review still gates the deploy. Replaces the on-call engineer's first 20–40 minutes of triage.
+
+Why agentic: The alert never renders as a dashboard row; the agent fans out across four data sources and produces a mergeable artifact. A rule engine cannot pick the right warehouse slice for a novel alert or write a targeted PR.
+
+Generalizable core: automated system event in any channel → agent fans out across logs + code + ownership metadata → produces a diagnosed work item with the responsible owner tagged.
+
+Deployability: Claude Agent SDK + Slack app + read-only warehouse credentials scoped per team + GitHub App with PR-open scope. Week to two-week build for a first channel if the observability stack is already normalized. Replaces the on-call engineer's first-pass triage; augments the fix-and-review loop.
+
+### 2. Inbound contract triage across email, Slack and Salesforce
+(tags: in-house-legal, procurement, sales-ops, agencies-with-MSAs)
+
+Source: Spellbook ACM launch, June 30 2026 (https://spellbook.com/blog/introducing-acm), Artificial Lawyer coverage (https://www.artificiallawyer.com/2026/06/30/spellbook-launches-clm-killer-acm/). Serves 4,500+ legal teams including Dropbox in-house and Kennedys.
+
+Mechanism: A new contract arrives in email, Slack, or a Salesforce opportunity attachment → the agent pulls the file, classifies contract type, diffs each clause against the firm's playbook of preferred positions and hard redlines, generates a diagnostic (which clauses drift, where the risk sits, which fallback to propose), redlines the document, and routes it to the correct pipeline and owning attorney. Signed versions land in a renewal-aware repository that re-surfaces the contract before auto-renewal windows. Replaces the paralegal or contract manager's intake queue — 30–90 minutes per contract.
+
+Why agentic: A rule engine can route by sender domain but cannot read a novel clause and decide whether it drifts from a playbook. The trigger is polymorphic across three channels — a fixed workflow would need three branches with hardcoded handoffs.
+
+Generalizable core: inbound document in any channel → agent classifies, reads against a stored standard, produces a diagnosed + partially-actioned artifact + routes to right human, with a downstream repository that re-triggers on time-based conditions.
+
+Deployability: Buy Spellbook ACM directly (weekend integration), or rebuild the skeleton on Claude API + MCP file/email/Salesforce connectors + a playbook stored as versioned JSON/Markdown + a vector store. Custom build is a month for a real playbook; the playbook is the moat. Scale caveat: only pays back if the firm has a written playbook — most SMB legal work has playbooks in someone's head, which is a discovery moment, not a blocker.
+
+### 3. Agent-native cloud provisioning with tokenized payment
+(tags: dev-agencies, internal-tools-teams, agent-builders, SMB-solopreneurs)
+
+Source: Cloudflare + Stripe Projects launch, Agents Week 2026 (https://developers.cloudflare.com/agents/tools/payments/), Registrar API docs (https://developers.cloudflare.com/registrar/registrar-api/).
+
+Mechanism: User tells a coding agent "spin up a new project for X and register a domain" → the agent runs a three-step protocol: (1) discovery — asks Stripe which providers accept agent-initiated purchases, (2) identity attestation — presents a signed identity for the user, (3) payment tokenization — Stripe hands a short-lived token to Cloudflare so the card number never touches the agent. The agent then calls the Cloudflare Registrar API to buy a .dev, provisions an account, subscribes to Workers Paid, mints a scoped API token, and pushes the initial Worker. $100/month per-provider cap on the token is the guardrail. Replaces the "sign up → payment method → domain search → DNS → API token → first deploy" chain.
+
+Why agentic: The trigger is a natural-language request; the agent has to select a domain name (judgment), decide plan tier (judgment), route around failures. Opens a class of workflows where the agent itself is the buyer.
+
+Generalizable core: user request for a new capability → agent authenticates as the user through tokenized identity → performs a chain of purchases + provisioning → returns a live, connected artifact instead of a checklist.
+
+Deployability: Claude Agent SDK + Stripe Projects account + Cloudflare account. Weekend build. Interesting complexity is spend controls, audit logs, and the boundary of what the agent may buy — which is where an A3-style custom firm adds value. Scale caveat: only Cloudflare + Stripe today, but the shape will show up in AWS Marketplace and GCP within 12 months.
+
+### 4. Marketplace-metric-threshold workflow instead of a seller dashboard
+(tags: e-commerce-operators, amazon-3P-sellers, retail-brands, distributor-ops)
+
+Source: Amazon Seller Assistant workflows expansion, Sept 23 2026 (https://smallbiztrends.com/amazon-seller-assistant-adds-24-7-automation-and-claude-integration/), Distribution Strategy Group (http://distributionstrategy.com/2026/09/amazon-expands-agentic-ai-to-automate-seller-pricing-inventory-tasks/). Runs on Bedrock with Claude models; every primary seller account gets a 12-month Quick Plus subscription through Dec 2026.
+
+Mechanism: The seller writes a natural-language rule that becomes a persistent workflow: "if my Buy Box share on ASIN X drops below 80%, or a competitor drops price by more than 5%, adjust my price within my margin floor and update the listing copy to emphasize free shipping." The workflow runs 24/7 as a background subscriber to Amazon's own event stream → on threshold crossing the agent reads context (current margin, replenishment ETA, competing listings), takes the pre-authorized action (price change, listing edit, replenishment order draft), and posts a note. Replaces the seller's morning routine of pulling five reports and manually adjusting price/inventory — the classic "we have a dashboard for that" workflow.
+
+Why agentic: The rule is expressed in natural language, context assembly is dynamic, and the action chains price + listing + replenishment on a single trigger. A traditional repricer does one dimension.
+
+Generalizable core: persistent NL rule + platform event stream → agent reads context on threshold crossing → executes authorized action across multiple sub-systems → posts a note instead of a dashboard row.
+
+Deployability: Amazon's built-in Seller Assistant is free with the account for 3P sellers. For Shopify/Etsy/Faire/Walmart the pattern rebuilds on Claude API + marketplace webhooks + Zapier/Make for pre-authorized writes, or n8n for full custom. Week-long build for a single channel; a month for a multi-marketplace generalized version. Scale caveat: requires the marketplace to expose a webhook stream; also raises real questions about liability when the agent auto-lowers price into a loss, so most real deployments cap actions with hard floors.
+
+## Sources checked
+- X/Twitter — access intermittent; most surfaced posts were product marketing.
+- Reddit — r/AI_Agents and r/n8n community forum posts referenced but community.n8n.io was egress-blocked; noted for next run.
+- Hacker News — no Show HN post in last 48 hours cleared the mechanism bar.
+- Podcasts — no new operator-shop episodes surfaced.
+- Newsletters — Ben's Bites domain egress-blocked; Cloudflare + Stripe thread captured through downstream coverage.
+- Product Hunt — nothing above noise floor in last 48 hours.
+- Platform case studies — Spellbook ACM, Cloudflare Agents Week, Amazon Seller Assistant, Anthropic customer stories (Carvana used; Rocket Money, Notion, EvenUp duplicate prior logs).
+- Anthropic + OpenAI customer stories — Carvana included; KPMG tax-reg agent surfaced but public writeup lacks mechanism detail.
+- YC — no batch launch matched today's bar.
