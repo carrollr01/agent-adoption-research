@@ -1,0 +1,9 @@
+Agent Pattern Scan — 2026-09-30 — 4 patterns | Membership-aware CS ticket agent + institutional-knowledge vector store
+
+https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-09-30.md
+
+Four patterns this run after a long gap since the last log. The standout is Erewhon's 39-step Zap that autonomously answers ~70% of customer service tickets by routing tickets on membership status pulled from BigQuery, drafting responses from a vector store of institutional knowledge, and surfacing purchase history to store managers only when the sender is a high-spend member. 1,500 labor hours/year saved by a business analyst, not an engineer.
+
+The other three: (2) Freshfields is running Anthropic's Claude for Legal as a drafter-side pre-check that reads iManage/NetDocuments and Lexis, returns a prioritized issue list with proposed redlines, and turns lawyers from first-pass reviewers into escalation-only reviewers — the generalizable core (drafter self-corrects against a policy corpus before submitting) applies well beyond law. (3) Showpad's Field Seller Agent triggers on connection-restore rather than meeting-end: reps dictate notes at customer sites with no signal, transcription happens on-device, and reconnecting is the event that fires the CRM update + follow-up draft + content recommendation pipeline. (4) Rush Home's "Russ" is a real-estate brokerage agent with its own email address that re-scores an 11,000-lead database on every new interaction and emails each of 8 reps a per-lead-tactic morning brief drafted from CRM notes via Zapier MCP.
+
+Full detail, sources, generalizable cores, and deployability notes in the log file.
