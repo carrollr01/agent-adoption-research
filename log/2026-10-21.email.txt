@@ -1,0 +1,47 @@
+Agent Pattern Scan — 2026-10-21 — 4 patterns | Fleet telemetry triggers outbound driver calls and work orders
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-10-21.md
+
+TL;DR
+Motive's fleet Agents (launched Oct 19) ship the most interesting new skeleton: sensor telemetry crosses a threshold, an AI assistant calls the right human directly in-channel, and a work order gets created in the maintenance system in parallel. The same trigger-to-outbound-call-plus-system-write pattern is the piece most SMB shops are still doing by hand — a dispatcher watching a dashboard and then picking up the phone.
+
+1. Telemetry-triggered driver outreach plus work order creation
+Source: Motive launches Agents (SiliconANGLE, Oct 19 2026) — https://siliconangle.com/2026/10/19/motive-launches-agents/
+Mechanism: Customer configures a trigger condition (fatigue warning, engine fault, HOS risk, DVIR entries). When telemetry hits that condition, an Agent pulls vehicle+driver context, has the Atlas voice assistant call the driver in-cab to check in or guide action, opens a work order in the maintenance system with the fault code and recommended work, and escalates to the manager when the issue needs approval.
+Why agentic: Runs without a dispatcher in the loop; the agent picks which humans to involve based on severity and whether the driver responds. It is not a dashboard that pings a manager — it decides to place a voice call and writes a task on its own.
+Generalizable core: sensor/telemetry threshold → agent assembles vehicle/person context → outbound voice call to the operator in the field + task record in the system of record → human only when it escalates.
+Deployability: Enterprise today, but copies down to HVAC/plumbing shops with GPS-telemetry trucks (Samsara, Verizon Connect, Fleetio) — outbound Vapi/Retell call to the tech plus a ServiceTitan or Housecall Pro job when a van alert fires. Weekend build on n8n or Make. Replaces the on-call dispatcher relaying alerts by phone.
+
+2. Photo-in, graded-rating-out quality control agent
+Source: Albertsons AI-powered produce inspection (Google Cloud, May 13 2026) — https://www.googlecloudpresscorner.com/2026-05-13-Albertsons-Companies-Announces-AI-Powered-Supply-Chain-Tool-to-Further-Enhance-Produce-Quality-Control-and-Consistency
+Mechanism: Inspector uploads a photo of inbound produce. The agent scores it against Albertsons' internal visual quality standards, returns a rating with an accept/reject recommendation, logs the decision to the quality system, and flags trending supplier issues when ratings drift. Human inspector reviews and approves before the pallet moves.
+Why agentic: Doing the subjective judgment call that used to depend on which inspector was on shift, and routing anomalies back to supplier records. Output changes whether product ships, not a reporting layer.
+Generalizable core: image/doc uploaded at a handoff point → agent scores against a stored spec → rating + decision written into the system of record → human approves at the edges only.
+Deployability: Enterprise-scale today (Gemini Enterprise + Vision, in-house). SMB adaptations are cheaper to copy because the spec is small: a restaurant checking a daily produce delivery against Toast's inventory expectations, a used-car lot grading trade-in condition for pricing, a dental lab grading incoming impressions. Weekend build on Claude or Gemini API + a form on a shared iPad. Replaces the senior inspector doing it on gut feel.
+
+3. User-triggered pre-decision fraud check
+Source: Starling Bank Scam Intelligence — https://www.starlingbank.com/news/scam-intelligence-launch/
+Mechanism: Before sending money, the customer uploads a screenshot of the marketplace listing, seller profile, or message thread. The agent analyzes the content against known scam patterns (price-too-good signals, image reverse-search, bank-detail/seller-name mismatch, pressure/urgency language), writes a personalized explanation with the specific red flags found, and recommends whether to proceed. Starling cites ~4x lift in fraud cancellations since launch.
+Why agentic: A per-transaction judgment the user used to make alone, compressed into a check the agent runs on arbitrary artifacts the user hands it. Output is reasoned per-item guidance, not a score.
+Generalizable core: user uploads suspicious artifact at a decision point → agent evaluates against a known-pattern library → returns reasoned, specific guidance → user decides.
+Deployability: The pattern copies down to SMB with any multimodal model. Real-estate agents and property managers can let prospective landlords upload applicant pay stubs / IDs / rental history screenshots for a pre-background-check sniff test. Insurance brokers can let customers submit screenshots of a competing quote; the agent flags coverage gaps and non-standard clauses before the customer commits. Weekend build with a web form, a vision-capable model, and a shared prompt. Replaces the senior person who used to eyeball-check "does this look right."
+
+4. Event-triggered templated document generation from a master contract
+Source: Google Cloud Gemini at Work 2026 — https://cloud.google.com/blog/products/ai-machine-learning/welcome-to-gemini-at-work-2026 — Grupo Bafar runs a contract agent that generates operational annexes for new store openings in 17 minutes vs 140 minutes manually.
+Mechanism: A new store entering the pipeline triggers the agent. It reads the master contract plus the specific store's data (location, format, local terms, operating hours), generates the operational annex matching the master's clauses to the store's facts, and routes it into the signature workflow. Legal signs off instead of drafting per store.
+Why agentic: Doing document assembly against a parameterized spec, not filling a template — it has to pull the right clauses, resolve local overrides, and know when to escalate ambiguity. Humans move to approval only.
+Generalizable core: new child-record created in a repeatable program → agent reads the master template + the child's parameters → generates the derived document → routes for human sign-off.
+Deployability: Franchise operators generating per-unit opening packets (new franchisee in HubSpot → agent builds the franchise agreement addendum, ops manual annex, local lease rider), small law firms with high-volume templated engagements (new matter in Clio → agent drafts the engagement letter and conflict-check memo), HR consultancies issuing per-employee compensation agreements for a client (new hire in Gusto → agent generates offer letter, PIIA, and benefits elections). Week-long build with Claude API + a master-doc store + Google Docs API. Replaces the paralegal or ops person who drafts "the same letter, but customized" dozens of times.
+
+Sources checked
+- X/Twitter — not directly accessible this run; search results referenced several Oct 2026 agent discussions but no first-party builder threads at mechanism depth.
+- Reddit (r/AI_Agents, r/automation, r/smallbusiness via general web search) — mostly comparison posts (n8n vs Make vs Zapier); no new mechanism-level deployments beyond prior logs.
+- Hacker News — no October 2026 Show HN threads at mechanism depth; durable-agent tooling examples found (DBOS, agentic news digests) but not deployment stories.
+- Podcasts — not reached directly this run.
+- Newsletters — no fresh Ben's Bites content surfaced; October coverage mostly reiterates product launches rather than deployment stories.
+- Product Hunt — no new SMB-mechanism launches found beyond earlier logs.
+- Platform case studies — Lindy and Relevance AI pages mostly vendor-authored; Ankor yacht-industry case lacks trigger-level mechanism.
+- Anthropic and OpenAI customer stories — nothing newer than May's Claude for Small Business coverage; OpenAI's "Dots" (DevDay Sept 29 2026) is a product launch rather than a deployed mechanism and was filtered out.
+- Google Gemini at Work 2026 (Oct 2026) — richest single roundup this run: Albertsons produce QC, Starling Scam Intelligence, Grupo Bafar contract agent, Hitachi HMAX field agents, Snap Prism, Globo PlanejaAI, DBS 70-80 chained credit-memo agents, Verizon customer+network agents, Home Depot Magic Apron. Three of today's four patterns come from this list.
+- Motive Agents (Oct 19 2026) — launch surfaced via FleetOwner, Waste360, SiliconANGLE; mechanism confirmed across sources.
+- YC — Fall 2026 batch not surfaced in search; W26 and S26 recaps reiterate the "vertical, narrow-scope" thesis but no new concrete SMB mechanisms this run.
