@@ -1,0 +1,50 @@
+Agent Pattern Scan — 2026-10-25 — 4 patterns | Pending-reply watcher: self-scheduled follow-up loop
+
+https://github.com/a3-dev/agent-adoption-research/blob/claude/determined-meitner-li2juo/log/2026-10-25.md
+
+# 2026-10-25 — Agent Pattern Scan
+
+## TL;DR
+Four concrete patterns stood out, all from this month's write-ups. The strongest is the "pending-reply watcher": an agent posts an action item in a shared channel, sets a self-reminder for a specific day, then on that day re-checks the expected reply channel and drafts a nudge if the awaited reply never came. It is the clearest alternative to the usual "dashboard that shows open items," because the agent decides when to come back and what to do.
+
+## Patterns
+
+### 1. Pending-reply watcher (self-scheduled follow-up loop)
+**Source:** [How an Anthropic Japan BDR runs his day with a fleet of Claude agents](https://claude.com/resources/articles/how-an-anthropic-japan-business-development-representative-runs-his-day) — Oct 16, 2026 Anthropic post describing a working BDR's day on Claude Managed Agents and Claude Tag.
+**Mechanism:** An upstream agent posts an action item to Slack and tags `@Claude`. Claude Tag reads the thread, lays out options, and when the next step depends on a customer or an internal team replying, sets a reminder for a specific day. When that reminder fires, it checks whether the customer email thread has a reply yet and whether the deal desk responded, posts a status update in the same Slack thread, and if a nudge is needed, drafts the message and tags the BDR to send it.
+**Why agentic:** The agent chooses its own return trigger based on the thread's content, re-reads live state when it fires, and either closes out or drafts outbound text. A dashboard here would show "awaiting reply" and stop.
+**Generalizable core:** Human-flagged pending item → agent sets self-reminder for a chosen date → on fire, read current state of the expected reply channel → act (close, re-ping draft, or escalate) → write to the same thread.
+**Deployability:** Claude API with MCP for Slack + email/CRM, plus a job runner (Inngest, Trigger.dev, cron) to hold scheduled wakeups. Week build if the MCP servers for Slack and the mail/CRM already exist. Replaces the silent spreadsheet-of-pending-items that BDRs, account managers, project coordinators, legal paralegals chasing signatures, and recruiters chasing offers all keep in their heads.
+
+### 2. Chat-channel operator for an agent fleet
+**Source:** [How an Anthropic Japan BDR runs his day with a fleet of Claude agents](https://claude.com/resources/articles/how-an-anthropic-japan-business-development-representative-runs-his-day) — same post, "Coordinator" agent.
+**Mechanism:** A dedicated Slack channel accepts plain-English change requests, restricted to one user. A Coordinator agent polls the channel roughly every 15 minutes. On a new request, it reads the current system prompts of each other agent in the fleet, reads the shared knowledge base, and writes new numbered versions of whichever prompts or KB entries the request calls for. Downstream agents pick up the new versions on their next scheduled run.
+**Why agentic:** It is agents operating agents. A natural-language instruction propagates into multiple agents' configuration and shared memory, with version history, without anyone touching code or clicking through a prompt editor.
+**Generalizable core:** Plain-English instruction in a dedicated channel → read current configs across a set of agents → write new versioned configs and shared memory → downstream agents consume on next run.
+**Deployability:** Claude API with MCP to a prompt store (Git, DynamoDB, or a plain JSON blob store) and the Slack channel. Week to two-week build. Replaces the prompt-ops role of a developer or RevOps admin who otherwise edits individual agent definitions by hand. Works at any team running more than two agents in production.
+
+### 3. Transcript-added-to-shared-space ticket extractor
+**Source:** [Automatically create Linear issues from meeting transcripts (Tactiq)](https://help.tactiq.io/en/articles/12085070-automatically-create-linear-issues-from-meeting-transcripts) — vendor help doc, built-in automation.
+**Mechanism:** The trigger is a new transcript being added to a specific Space in Tactiq, not a schedule or a chat message. On fire, the automation runs an AI prompt against the transcript to pull out action items with owner and deadline, then uses the "Share to integration" step to create a Linear issue per item in a designated team, mapping named owners to Linear users.
+**Why agentic:** The trigger is an actual event (file lands in a folder), the agent decides what counts as an action item and who owns it, and the output is a write into a work-tracking system, not a summary a human then has to transcribe.
+**Generalizable core:** New document arrives in a watched location → agent extracts structured items (owner, deadline, description) → maps owners to accounts in the destination system → writes one record per item.
+**Deployability:** Tactiq's native built-in flow is a weekend setup. Rolling your own with Claude API, Google Drive or Dropbox webhook, and the Linear or Jira API is a weekend-to-week build. Replaces the manager's post-meeting job of writing up action items and filing tickets, or the "DRI on action items" rotation. Also works for sales calls into CRM tasks, legal intake calls into matter checklists, or inspection recordings into punch-list items.
+
+### 4. Incident-fire triage with past-incident memory
+**Source:** [New enhancements to PagerDuty's SRE Agent — triage faster without waking a human](https://www.pagerduty.com/blog/ai/new-enhancements-to-pagerdutys-sre-agent-triage-faster-without-waking-a-human/) — PagerDuty 2026 release notes; a related [PagerDuty Advance release note](https://www.pagerduty.com/blog/ai/sre-agent-enhancements-faster-triage-greater-access-controls-deeper-system-connectivity/) covers the remote MCP integration that Block built on.
+**Mechanism:** The SRE Agent is wired into Escalation Policies and incident workflows, so when an incident fires at a chosen priority or severity, the agent engages before anyone acks. It reads the current incident's metadata, pulls past incidents with similar signatures as memory, and reads the team's configured workflow library. It picks the workflow that best fits and either runs diagnostics automatically or executes predefined remediation steps if the team has authorized them, then attaches a triage summary to the incident timeline. Scope is cut per team through team-level permissions.
+**Why agentic:** The trigger is a real external event; the agent diagnoses, chooses from a library, and takes action, not just displays information. A dashboard here would be the current PagerDuty incident page.
+**Generalizable core:** External event fires in a monitoring, CRM, or queue system → agent pulls history of similar past events plus a library of runbooks → selects one and runs approved steps → writes a decision summary back onto the event timeline.
+**Deployability:** PagerDuty Advance is a vendor-shipped weekend setup inside a PagerDuty account. A custom version — Sentry webhook or CloudWatch alarm into Claude API, with runbooks in Markdown and a whitelist of CLI actions — is a month build. Augments or partly replaces an on-call L1 engineer's first ten to twenty minutes. Scale caveat: worth it for any team paged daily; not worth it for a team paged twice a quarter, and the remediation half only makes sense where runbooks are already codified.
+
+## Sources checked
+- X/Twitter — direct X search returned no hits for the "we built an agent that" phrases this cycle; secondary coverage of Vercel Ship 2026 and X-linked speaker posts was infrastructure-focused, not mechanism-level. Logged as a thin day for X.
+- Reddit (r/AI_Agents, r/automation, r/smallbusiness, r/n8n) — access limited; the only concrete thread was a solo-dev's WhatsApp-order agent for a local e-commerce shop, a near-duplicate of past voice-agent patterns.
+- Hacker News — Show HN surfaced production-agent framework pieces (Inngest, Trigger.dev, MLflow) rather than deployment mechanisms. No qualifying pattern.
+- Podcasts — no new Lenny / How I AI / Owned and Operated episodes with mechanism-level teardown surfaced this cycle.
+- Newsletters — Ben's Bites and comparable aggregators continued to lead with model launches rather than operator write-ups.
+- Product Hunt — recent AI launches skew to agent builders (Lindy, Gumloop, Relevance variants). Mechanisms are platform-level, not deployment-level.
+- Platform case studies — Lindy, Gumloop, and Relevance AI 2026 comparison pages confirmed the trigger-model split (Lindy stronger on triggers, Gumloop on multi-step pipes, Relevance requires manual Tool Trigger wiring) but offered no named-customer deployments.
+- Anthropic — Oct 16, 2026 Nakama fleet article is the richest primary source this cycle; sourced two patterns (#1, #2) from it.
+- OpenAI — "1 million businesses" post names Indeed's Invite to Apply (20% more applications, 13% more hires) and Lowe's Mylow Companion in 1,700+ stores. Both are model-inside-product deployments, not trigger-driven agent workflows. Shopify, Etsy, Walmart, PayPal, Salesforce building on the Agentic Commerce Protocol was announced but not described at mechanism level.
+- YC — W26 batch coverage emphasized industrials/physical-AI (23% of batch) and the autonomous-execution thesis, but concrete trigger→action deployments from batch companies were not surfaced in reachable material.
