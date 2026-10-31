@@ -1,0 +1,15 @@
+Agent Pattern Scan — 2026-10-31 — 3 patterns | Natural-language agent on operational tables replaces the dashboard
+
+https://github.com/carrollr01/agent-adoption-research/blob/main/log/2026-10-31.md
+
+Three mechanism-level patterns worth logging today. The headline: Toyota of Orlando's "Timmy the Table Bot" — a Zapier Agent sitting on top of a 38-step Zap that cleans messy inbound lead email into a structured Zapier Table. Staff ask natural-language questions ("how many Camry leads came in from AutoTrader last week?") in Slack, the agent queries the table on the fly and answers in plain English, and it flags anomalies when a lead source drops or spikes outside normal ranges. The upstream Zap is traditional automation; the agent on top is what replaces the dashboard-plus-filters habit and the weekly report. The generalizable skeleton: messy inbound events get parsed into a structured table once, then a conversational agent on top of that table replaces the dashboard that a human would otherwise consult.
+
+Also logged:
+
+Double launched Autoclose on 2026-10-26 — a continuous month-end close agent. The materially new angle versus the 2026-05-05 close pattern we already logged: the trigger moves off the calendar. New transactions and bank statements during the month become the trigger; the agent codes bank feeds, reconciles accounts, and writes journal entries into QuickBooks Online, Xero, Sage Intacct, or NetSuite as records arrive. The human close window shrinks to opening review-ready books, resolving flagged exceptions, and signing off. The generalizable skeleton: a process that used to batch at a deadline gets rebuilt as event-driven, with the exception queue replacing the deadline. Attivo Partners (supporting 500+ venture-backed companies on Double) is the named early adopter.
+
+Kortix published their shared-inbox triage architecture with a mechanism detail worth flagging: every inbound email spawns a fresh isolated cloud sandbox session, scoped to only that message, the help doc, and Linear. The sandboxed agent labels the email and either drafts a Gmail reply (approval gate before anything sends) or files a Linear ticket. Credentials are brokered server-side so the model never sees raw tokens. The isolation-per-event design matters because it compartmentalizes prompt-injection risk and credential exposure — a real concern once an agent has write access to Linear, a CRM, or a payment system. Generalizable skeleton: inbound event in a shared channel → spin up a session scoped only to that event plus a small reference set → agent classifies, drafts a response, or files work → human approves anything that leaves the building.
+
+Gaps on this run: direct X/Twitter and Reddit search weren't accessible through the available index, so builder-level posts there were out of reach. Falling back to indexed vendor and press-release coverage, which skews toward larger launches and documented customer stories.
+
+Full write-up with mechanism-level detail, generalizable cores, and deployability notes is in the repo file linked above.
