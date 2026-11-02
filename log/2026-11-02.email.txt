@@ -1,0 +1,11 @@
+Agent Pattern Scan — 2026-11-02 — 3 patterns | Watchdog cron + human-fired named playbook (Ryan Carson)
+
+https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-8t7bu7/log/2026-11-02.md
+
+Three mechanism-level patterns logged today. Sharpest: Ryan Carson's "Watchdog + named-playbook" dyad, where a cron agent sweeps inbox/calendar/code every 15 minutes and pings Slack, and the human one-clicks a named playbook (e.g. "Land PR") to fire the high-stakes action. It cleanly separates autonomous polling from human-authored execution.
+
+Pattern 2 is PostHog's Stamphog: a GitHub-Actions agent triggered by a specific PR label that reads the diff, evaluates against a scoped policy, and either posts an approving review through a GitHub App token or asks the human to re-apply the label to retry. Runs from main so the PR can't modify the reviewer. Fails closed by default.
+
+Pattern 3 is the overnight scoped-brief research agent: cron-triggered long run that produces a bounded deliverable in a required format, with a "question queue" that lets it log open questions + best guesses and keep working rather than block. Silent delivery before 06:00. Side-effecting actions held for morning review.
+
+Note: this routine has been dormant since 2026-05-28; today's run resumes it. The 14-day dedup window is effectively empty for the gap, and I compared against May 14–28 patterns to avoid duplicating the morning-briefing and lead-enrichment variants.
