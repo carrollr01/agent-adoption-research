@@ -1,0 +1,54 @@
+Agent Pattern Scan — 2026-11-12 — 5 patterns | Cluster-detection ticket incident commander (Zendesk)
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-fmki4w/log/2026-11-12.md
+
+# 2026-11-12 — Agent Pattern Scan
+
+## TL;DR
+Five concrete patterns today, led by Zendesk's Custom Agents: an incident commander that detects a cluster of similar tickets, reconciles state across Zendesk/Jira/Slack, and writes bespoke per-ticket replies before closing them when a fix ships. Also novel this scan: Carvana's monitoring-alert agent that opens PRs (including one that adds logging when logs were insufficient), and Papaya's trace-to-PR autoloop that turns production traces into code changes to the agent itself. X/Twitter and Reddit were inaccessible this run; findings are from platform customer stories and recent Product Hunt / YC launches.
+
+## Patterns
+
+### 1. Cluster-detection ticket incident commander
+**Source:** https://claude.com/customers/zendesk — Zendesk Custom Agents, 1M executions in the first 7 weeks of early access; GA planned at Zendesk's November AI Summit.
+**Mechanism:** Trigger is a detected surge of similar tickets in Zendesk. Agent reads a customer-written plain-English runbook plus connected Zendesk, Jira, Slack, and Drive. It files a Jira issue, alerts the owning engineers in Slack, posts a bespoke acknowledgement on each affected ticket, and after the fix deploys it closes every related ticket with an explanatory note. Replaces the L1/L2 supervisor who hand-fans incident comms across three systems.
+**Why agentic:** The agent decides a cluster exists, authors per-ticket copy rather than firing one template, and reconciles state across three different systems of record. Reported handle-time reductions up to 80%.
+**Generalizable core:** Signal cluster detected across inbound records → agent writes to upstream system (issue tracker), notifies owners, updates downstream records in-voice, closes the loop when the upstream state flips.
+**Deployability:** Anthropic Agent SDK, Claude Sonnet 4.6 via Bedrock. Weeks of setup; needs enough inbound volume for clustering to matter. Similar skeleton works for support-at-volume anywhere a plain-English runbook can describe "what counts as the same thing" and "who owns fixing it."
+
+### 2. Monitoring-alert triage with PR authorship
+**Source:** https://claude.com/customers/carvana — Carvana's retail-science team runs a Claude Tag bundle in Slack; alert volume down 56%, wholesale answers 65% faster.
+**Mechanism:** Trigger is a production monitoring alert (or an hourly pipeline/flag check) posting into a Slack channel. Agent reads the team's bundled prompt plus skill runbooks, read-only tickets, build history, code, and a scoped warehouse identity (it can trace a VIN). It tags the owning team, posts an RCA comparing current release logs to an hour-earlier baseline, opens PRs, files tickets, or stands down during known outages. One documented action: opened a PR that *added* logging when the existing logs were not sufficient to diagnose.
+**Why agentic:** Chooses between posting, filing a ticket, patching code, or doing nothing. Writes code, not just commentary. Carries scoped read identity to pull production data mid-investigation.
+**Generalizable core:** Alert into chat → agent assembles release + code + data context → chooses from a fixed action menu (notify / ticket / patch / stand-down) → writes to the appropriate system.
+**Deployability:** Claude Tag bundles, Opus 5 default. Realistic for any team on Slack + GitHub + a monitoring feed. One week per team bundle; the quality of the runbook/skill determines the ceiling.
+
+### 3. Conversational ad-ops operator with staged writes
+**Source:** https://claude.com/customers/supermetrics — Supermetrics MCP connector, 250% month-over-month active-user growth since Feb 2026 launch. One agency cut a client report from 10 hours to 20 minutes.
+**Mechanism:** Trigger is a marketer asking Claude a natural question ("why did campaign X underperform last week"). Agent calls the Supermetrics MCP to pull normalized data from hundreds of ad and analytics sources, each metric stamped with source, timestamp, and transform. It reasons, recommends, and then, inside per-account approval limits, pauses, adjusts, or creates campaigns on Google Ads, Meta, Microsoft, TikTok, LinkedIn, and Snapchat. New campaigns are created paused; approvers accept or reject on a review page before anything goes live.
+**Why agentic:** Multi-platform tool use with staged writes guarded by human approval, not a chat over a dashboard. The agent is picking which platforms to touch and what to change, not rendering numbers.
+**Generalizable core:** Ask-in-natural-language → agent pulls normalized cross-platform data → proposes writes in the originating systems → writes are staged behind an explicit approver action.
+**Deployability:** MCP server plus Claude Sonnet or Opus 5 on GCP Agent Platform. Weekend prototype; weeks to wire approval levels per ad account. Pattern transfers anywhere the SMB operates across N SaaS platforms that each already have an API.
+
+### 4. Router-plus-specialists for regulated bulk writes
+**Source:** https://claude.com/customers/qonto — Qonto AI Lab, Bedrock partner, 600k SMB customers across 8 EU markets. Transfers run 2x faster, payroll 5x; one customer created 500+ invoices in one batch.
+**Mechanism:** Trigger is a user dragging 15–20 payslips into a bulk transfer, or uploading a CSV of clients. An operator agent routes the task to specialized sub-agents: one prepares transfers end-to-end from the payslip OCR plus transaction history, one drafts invoices from the client list, one analyst agent answers questions about past transactions. Deterministic checks run alongside the agent for every regulated path. The user confirms each financial write individually. Replaces the bookkeeping admin step (up to 8 hours a month on Qonto's own numbers).
+**Why agentic:** It is a router plus specialists with policy guardrails, not form autofill. The deterministic checker running in parallel to the model is the piece most relevant to anyone writing to regulated systems.
+**Generalizable core:** File drop or structured upload → operator agent classifies and routes to specialist agents → each specialist drafts a write → deterministic policy check runs in parallel → human confirms per write.
+**Deployability:** Opus 4.5 / Sonnet / Haiku on Bedrock with routing on latency and cost. Month-plus build. Anywhere you have bulk data entry into a regulated system (payroll, AP, AR, compliance filings), this skeleton works.
+
+### 5. Trace-to-PR optimization autoloop for production agents
+**Source:** https://f4.fund/startups/papaya-fyi — Papaya (YC F26). Writeup: https://fondo.com/blog/start-niyaz-puzhikkunnath-faiz-vadakkumpadath (Oct 2, 2026).
+**Mechanism:** Trigger is a new batch of production traces from a customer's live agent, ingested via Papaya's SDK. Papaya runs 200-plus analyses across the agent's prompts, context packing, prompt-cache usage, sub-agent structure, and tool calls. Output is a pull request on the agent's own repository proposing specific fixes, with post-merge impact tracked on quality, latency, and cost. Replaces the in-house AI engineer who hand-tunes prompts from Langfuse-style dashboards.
+**Why agentic:** The output is a code diff, not a chart. The loop closes from observability signal to deployed code without a human writing the change.
+**Generalizable core:** New observability batch → agent inspects artifacts + repo → opens a PR proposing a change to the system that produced the traces → tracks post-merge delta.
+**Deployability:** Month-scale to replicate the trace-to-PR autoloop. The novel piece is not any single analysis but the closed loop; most teams currently stop at the dashboard. Pattern generalizes beyond LLM agents: any production system that emits structured traces (ETL jobs, CI pipelines, fraud rules) can have an agent own its own tuning PRs.
+
+## Sources checked
+- Platform customer stories (Anthropic, Zendesk, Carvana, Supermetrics, Qonto) — five qualifying patterns, all with documented scale metrics and specific triggers.
+- Product Hunt / YC F26 / Hacker News — Letterpress-1 (growth-engineering coding agent), Trigger.dev webhook gateway, Scalekit AgentKit, Tobira site agent, and Papaya surfaced. Papaya included; the others were infrastructure launches without named deployed customers at mechanism-level detail, so dropped.
+- X/Twitter — inaccessible this run. WebSearch did not return dated builder posts; `site:twitter.com` / `site:x.com` filters were silently ignored. Flagging rather than substituting weaker sources.
+- Reddit — WebFetch blocked on reddit.com and old.reddit.com, mirror DNS failed. The DEV Community roundups that normally surface Reddit discussion were not yet published for this window.
+- Podcasts — Lenny's Podcast and How I AI had no clearly dated November 2026 episode with a concrete deployment inside the 14-day window; Owned and Operated had no qualifying November episode surfaceable.
+- Newsletters — Ben's Bites index was unreachable.
+- Vendor announcements discarded: Smartsheet Agentic Workflows (Nov 4), Perplexity Teammates (Nov 4), Cowbell agent-liability insurance (Nov 10), ChatGPT Business Agents (Nov 11). All vendor-launch framing without a named customer deployment described at mechanism level.
