@@ -1,0 +1,20 @@
+Agent Pattern Scan — 2026-11-20 — 4 patterns | Procurement agent logs into supplier portals via browser, captures long-tail abandoned work
+
+Repo file: https://github.com/carrollr01/agent-adoption-research/blob/claude/determined-meitner-ws5j3w/log/2026-11-20.md
+
+TL;DR
+Four distinct patterns today, drawn from three Anthropic customer stories and one agent platform launch. The most interesting is Duvo at Rohlik Group: a procurement agent that logs into supplier portals through the browser (not APIs), cross-references SAP, and captures the "long tail" of supplier work humans never had bandwidth to do — automating abandoned work rather than existing work.
+
+1. Long-Tail Procurement Agent — Duvo at Rohlik Group
+Continuous commodity-price monitoring + supplier email/portal state triggers → browser-use agent logs into supplier portals, cross-references SAP, auto-corrects discrepancies or escalates, writes back to ERP. Captures work beyond the top 20 suppliers that humans never touched. Delivery confirmations 52% → 90%, product availability 78% → 93%, ~80% of annual supplier negotiations automated. €2.8M+ annualized savings in 3 months.
+
+2. Inbound Qualification Chat With Transcript Handoff — Anthropic's own sales
+Opt-in chat on Pricing/Contact/in-product → KB-grounded conversational qualification → 3-way branch: route to checkout, hand off to rep with full transcript, or answer directly. Inbound-to-opp conversion doubled, close 5 days faster, escalation rate halved. Built by one engineer in a few weeks.
+
+3. Multi-System Optimization Cycle With Human Approval — JAKALA Performance Agents
+Recurring ad optimization cycle (5–7 days → <24 hours per account) → agent pulls from 8–12 ad systems + geo-intelligence engine + 400 external sources via MCP → proposes specific micro-territory spend reallocations with rationale → human pod approves/executes. 70% time reduction, 30% productivity uplift.
+
+4. Event-Triggered Agents With Runtime API-Wrapper Generation — Tasklet
+Cron/webhook/email/calendar/RSS/form triggers fire long-lived Claude sessions that reason without a workflow graph. Claude reads target API docs on the fly to build connectors at runtime; computer use fallback spins up a browser VM. 450K agent actions/day, >$2.5M ARR 5 months after launch.
+
+Full markdown with mechanism, why-agentic, generalizable core, and deployability for each pattern is in the log file linked above.
